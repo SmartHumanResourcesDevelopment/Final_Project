@@ -52,90 +52,79 @@ def open_tabs(driver, tags):
         print(f"탭 열림: #{tag}")
     return handles
 
-def crawl_posts(driver, tag, handle, total=3):
+def crawl_posts(driver, tag, handle, total=1):
     driver.switch_to.window(handle)
     print(f"시작: #{tag}")
     time.sleep(3)
 
-    posts = driver.find_elements(By.XPATH, '//main//article//a')
+    try:
+        # 게시글 링크 목록 수집
+        posts = driver.find_elements(By.XPATH, '//main//a[contains(@href, "/p/")]')
+        if len(posts) == 0:
+            print(f"❌ 게시글 썸네일이 없습니다. #{tag}")
+            return
 
-    for i in range(total):
+        post_elem = posts[0]  # 첫 번째 게시글
+        driver.execute_script("arguments[0].click();", post_elem)
+        time.sleep(2)
+
+        # 본문 추출
         try:
-            if i >= len(posts):
-                print(f"#{tag} 게시글 {i+1} 없음")
+            caption_elem = driver.find_element(
+                By.XPATH,
+                '//article//ul/div[1]//li//div[2]//div[1]//h1'
+            )
+            raw_caption = caption_elem.text.strip()
+        except:
+            raw_caption = ""
+            print("본문 추출 실패")
+
+        # 날짜 추출
+        try:
+            time_elem = driver.find_element(By.XPATH, '//article//time')
+            iso_date = time_elem.get_attribute("datetime")
+            post_date = iso_date[:10]
+        except:
+            post_date = datetime.now().strftime("%Y-%m-%d")
+
+        hashtags = sorted(set([w for w in raw_caption.split() if w.startswith('#')]))
+        caption = ' '.join([w for w in raw_caption.split() if not w.startswith('#')])
+
+        print(f"\n#{tag} - 게시글 1")
+        print("작성일:", post_date)
+        print("본문:", caption)
+        print("해시태그:", hashtags)
+
+        # 닫기
+        closed = False
+        for close_xpath in [
+            '/html/body/div[5]/div[1]/div/div[2]/div',
+            '/html/body/div[6]/div[1]/div/div[2]/div'
+        ]:
+            try:
+                driver.find_element(By.XPATH, close_xpath).click()
+                closed = True
                 break
-
-            # JS로 강제 클릭 → 클릭 차단 오류 방지
-            driver.execute_script("arguments[0].click();", posts[i])
-            time.sleep(2)
-
-            # 본문 추출
-            try:
-                try:
-                    caption_elem = driver.find_element(
-                        By.XPATH,
-                        '/html/body/div[5]/div[1]/div/div[3]/div/div/div/div/div[2]/div/article/div/div[2]/div/div/div[2]/div[1]/ul/div[1]/li/div/div/div[2]/div[1]/h1'
-                    )
-                except:
-                    caption_elem = driver.find_element(
-                        By.XPATH,
-                        '/html/body/div[6]/div[1]/div/div[3]/div/div/div/div/div[2]/div/article/div/div[2]/div/div/div[2]/div[1]/ul/div[1]/li/div/div/div[2]/div[1]/h1'
-                    )
-                raw_caption = caption_elem.text.strip()
-            except Exception as e:
-                raw_caption = ""
-                print(f"본문 추출 실패: {e}")
-
-            # 날짜 추출
-            try:
-                time_elem = driver.find_element(By.XPATH, '//article//time')
-                iso_date = time_elem.get_attribute("datetime")
-                post_date = iso_date[:10]
             except:
-                try:
-                    title_date = driver.find_element(By.XPATH, '//article//time').get_attribute("title")
-                    post_date = extract_date_from_text(title_date) or datetime.now().strftime("%Y-%m-%d")
-                except:
-                    post_date = datetime.now().strftime("%Y-%m-%d")
+                continue
+        if not closed:
+            print("❌ 닫기 실패")
 
-            hashtags = sorted(set([w for w in raw_caption.split() if w.startswith('#')]))
-            caption = ' '.join([w for w in raw_caption.split() if not w.startswith('#')])
-
-            print(f"\n#{tag} - 게시글 {i+1}")
-            print("작성일:", post_date)
-            print("본문:", caption)
-            print("해시태그:", hashtags)
-
-            # 닫기
-            closed = False
-            for close_xpath in [
-                '/html/body/div[5]/div[1]/div/div[2]/div',
-                '/html/body/div[6]/div[1]/div/div[2]/div'
-            ]:
-                try:
-                    driver.find_element(By.XPATH, close_xpath).click()
-                    closed = True
-                    break
-                except:
-                    continue
-            if not closed:
-                print("❌ 닫기 버튼을 찾지 못했습니다")
-
-            time.sleep(1)
-
-            # 다음 게시글 대비 썸네일 다시 수집
-            posts = driver.find_elements(By.XPATH, '//main//article//a')
-
-        except Exception as e:
-            print(f"게시글 {i+1} 실패: {e}")
-            continue
+    except Exception as e:
+        print(f"게시글 열기 실패: {e}")
     print(f"완료: #{tag}")
 
-if __name__ == "__main__":
-    username = "alfowko3258@gmail.com"
-    password = "qudfhr123A!"
-    tags = ["말차", "마라탕", "핫플", "크로플"]
 
+
+
+
+if __name__ == "__main__":
+    # username = "alfowko3258@gmail.com"
+    # password = "qudfhr123A!"
+    username = "gua0412513@gmail.com"
+    password = "thdnf798A!"
+    tags = ["말차"]
+# "마라탕", "핫플", "크로플"]
     options = webdriver.ChromeOptions()
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
@@ -152,7 +141,9 @@ if __name__ == "__main__":
         for t in threads:
             t.join()
 
-        input("\n크롤링 완료. 창 닫지 않으려면 Enter")
+        input("\n크롤링 완료. 창 닫으려면 Enter")
 
     finally:
         driver.quit()
+
+

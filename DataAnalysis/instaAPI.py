@@ -14,35 +14,67 @@ def remove_hashtags(text):
     return re.sub(r"#\w+", "", text).strip()
 
 # 📌 크롤링 키워드 100개
-KEYWORDS = [
-    "마라탕", "말차", "떡볶이", "불닭", "김밥", "편의점", "초밥", "회오리감자", "닭강정", "국밥",
-    "버블티", "젤라또", "프라푸치노", "쿠앤크", "젤리", "카페투어", "브런치", "크로플", "팬케이크", "샌드위치",
-    "라멘", "우동", "쌀국수", "햄버거", "치킨", "피자", "떡라면", "샐러드", "분식", "바나나우유",
-    "메가커피", "이디야", "공차", "빽다방", "스타벅스", "할리스", "투썸", "던킨", "탐앤탐스", "배스킨라빈스",
-    "삼립", "오뚜기", "팔도", "농심", "빙그레", "롯데푸드", "해태", "노브랜드", "CJ제일제당", "쿠팡",
-    "브이로그", "먹방", "카공", "플로깅", "피크닉", "무인카페", "야외카페", "셀카", "룩북", "OOTD",
-    "마켓컬리", "배달의민족", "요기요", "당근마켓", "비건", "제로음료", "저탄고지", "홈카페", "홈쿡", "도시락",
-    "냉동식품", "편의점도시락", "밀키트", "하이볼", "스프라이트", "제로콜라", "몽쉘", "빼빼로", "초코파이", "칸쵸",
-    "빙수", "팥빙수", "망고빙수", "코스트코", "GS25", "CU", "세븐일레븐", "이마트24", "디저트카페", "노티드",
-    "도넛", "마카롱", "에그타르트", "인생맛집", "숨은맛집", "핫플", "카페거리", "감성카페", "무드등", "스누피카페"
-]
+# "마라탕", "말차", "떡볶이", "불닭",
 
-# 🔐 Instagram 로그인 정보
-INSTAGRAM_ID = 'your_username'
-INSTAGRAM_PW = 'your_password'
-POST_LIMIT = 100
+from instagrapi import Client
+from instagrapi.exceptions import LoginRequired
+import pandas as pd
+import re
+import os
+import time
+import random
+
+# 설정 ========================
+USERNAME = "your_instagram_username"
+PASSWORD = "your_instagram_password"
+PROXY = "http://<user>:<pass>@<host>:<port>"  # 예: http://id:pass@proxy.soax.com:9137
+SESSION_FILE = "session.json"
 CSV_FILE = "insta_잘파세대_키워드_게시글.csv"
+POST_LIMIT = 100
+# ============================
 
-# 🗂️ 파일 없을 경우 헤더 생성
+# 키워드 목록 (생략 가능)
+KEYWORDS = []
+
+# 한글 포함 여부 판별
+def is_korean(text):
+    return bool(re.search(r"[가-힣]", text))
+
+# 해시태그 제거 함수
+def remove_hashtags(text):
+    return re.sub(r"#\w+", "", text).strip()
+
+# 인스타그램 로그인 함수
+def login_user():
+    cl = Client()
+    cl.set_proxy(PROXY)  # 프록시 적용
+    cl.delay_range = [2.0, 5.0]  # 요청 간 랜덤 딜레이
+
+    try:
+        cl.load_settings(SESSION_FILE)
+        cl.login(USERNAME, PASSWORD)
+        try:
+            cl.get_timeline_feed()  # 세션 유효성 확인
+        except LoginRequired:
+            print("❗ 세션 만료. 재로그인 중...")
+            old = cl.get_settings()
+            cl.set_settings({})
+            cl.set_uuids(old.get("uuids"))
+            cl.login(USERNAME, PASSWORD)
+        cl.dump_settings(SESSION_FILE)  # 세션 갱신 저장
+        print("✅ 로그인 완료")
+        return cl
+    except Exception as e:
+        print(f"❌ 로그인 실패: {e}")
+        raise
+
+# CSV 파일 초기화
 if not os.path.exists(CSV_FILE):
     pd.DataFrame(columns=["작성일", "본문", "해시태그", "플랫폼"]).to_csv(CSV_FILE, index=False, encoding='utf-8-sig')
 
-# 🔌 인스타그램 클라이언트 설정
-cl = Client()
-cl.delay_range = [1.5, 4.0]  # 요청 간 딜레이 (초)
-cl.login(INSTAGRAM_ID, INSTAGRAM_PW)
+# 로그인 후 크롤링 시작
+cl = login_user()
 
-# 🔁 키워드별 크롤링
 for keyword in KEYWORDS:
     print(f"\n🔍 [{keyword}] 게시글 수집 중...")
     try:
@@ -51,12 +83,12 @@ for keyword in KEYWORDS:
 
         for media in medias:
             caption = media.caption_text or ""
-            if not is_korean(caption):
+            clean_text = remove_hashtags(caption)  # 해시태그 제거
+
+            if not is_korean(clean_text):  # 본문에 한글이 없으면 스킵
                 continue
 
             hashtags = re.findall(r"#\w+", caption)
-            clean_text = remove_hashtags(caption)
-
             post_data = {
                 "작성일": media.taken_at.strftime("%Y-%m-%d %H:%M:%S") if media.taken_at else "N/A",
                 "본문": clean_text,
@@ -70,15 +102,15 @@ for keyword in KEYWORDS:
             df.to_csv(CSV_FILE, mode='a', header=False, index=False, encoding='utf-8-sig')
             print(f"✅ [{keyword}] 저장 완료: {len(df)}개")
         else:
-            print(f"⚠️ [{keyword}] 저장할 한국어 게시글 없음")
+            print(f"⚠️ [{keyword}] 한국어 포함 게시글 없음")
 
-        # 🌙 속도 제한: 키워드 간 대기 시간
-        sleep_sec = random.uniform(10, 20)
-        print(f"⏳ 다음 키워드까지 {sleep_sec:.1f}초 대기...")
-        time.sleep(sleep_sec)
+        # 키워드 간 대기
+        sleep_time = random.uniform(15, 25)
+        print(f"⏳ 다음 키워드까지 {sleep_time:.1f}초 대기...")
+        time.sleep(sleep_time)
 
     except Exception as e:
         print(f"❌ [{keyword}] 오류 발생: {e}")
         continue
 
-print("\n✅ 전체 키워드 크롤링 종료.")
+print("\n✅ 전체 크롤링 완료")
