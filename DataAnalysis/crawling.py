@@ -9,11 +9,11 @@ import time
 import re
 
 def extract_date_from_kor_format(text):
-    match = re.search(r'(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일', text)
+    match = re.search(r'(\d{4})[\uAC00-\uD7A3]*\s*(\d{1,2})[\uAC00-\uD7A3]*\s*(\d{1,2})[\uAC00-\uD7A3]*', text)
     if match:
         y, m, d = match.groups()
         return f"{y}-{int(m):02d}-{int(d):02d}"
-    return None
+    return "날짜 없음"
 
 def login_instagram(driver, username, password):
     driver.get("https://www.instagram.com/accounts/login/")
@@ -22,13 +22,11 @@ def login_instagram(driver, username, password):
     driver.find_element(By.NAME, "password").send_keys(password)
     driver.find_element(By.XPATH, '//button[@type="submit"]').click()
     time.sleep(10)
-
     try:
         driver.find_element(By.XPATH, '//button[contains(text(), "나중에 하기")]').click()
         time.sleep(2)
     except:
         pass
-
     print("✅ 로그인 완료")
 
 def crawl_account_with_next(driver, username, limit=5):
@@ -36,24 +34,24 @@ def crawl_account_with_next(driver, username, limit=5):
     driver.get(url)
 
     try:
-        # _aagw 클래스의 썸네일이 보일 때까지 대기
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'div._aagw'))
         )
-
-        # 첫 번째 썸네일 요소 클릭
         thumbnail = driver.find_elements(By.CSS_SELECTOR, 'div._aagw')[0]
         post_link = thumbnail.find_element(By.XPATH, "./ancestor::a")
         driver.execute_script("arguments[0].click();", post_link)
         time.sleep(6)
-
     except Exception as e:
         print(f"❌ 첫 게시글 접근 실패: {e}")
         return
 
     for i in range(limit):
         try:
-            # 날짜
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, 'ul > div > li > div > div > div._a9zr'))
+            )
+
+            # 작성일
             try:
                 time_elem = driver.find_element(By.CSS_SELECTOR, 'time')
                 date_text = time_elem.get_attribute("title")
@@ -65,12 +63,12 @@ def crawl_account_with_next(driver, username, limit=5):
             try:
                 caption_elem = driver.find_element(By.CSS_SELECTOR, 'ul > div > li > div > div > div._a9zr')
                 full_text = caption_elem.text.strip()
-                hashtags = [w for w in full_text.split() if w.startswith('#')]
-                pure_caption = ' '.join([w for w in full_text.split() if not w.startswith('#')])
+                words = full_text.split()
+                hashtags = [w for w in words if w.startswith('#')]
+                pure_caption = ' '.join([w for w in words if not w.startswith('#') and not w.startswith(username)])
             except:
-                full_text = ""
-                hashtags = []
                 pure_caption = "본문 없음"
+                hashtags = []
 
             # 좋아요 수
             try:
@@ -79,12 +77,19 @@ def crawl_account_with_next(driver, username, limit=5):
             except:
                 like_count = "좋아요 없음"
 
-            # 댓글
+            # 댓글 (내용 + 작성자 ID + 작성일)
             comments = []
             try:
-                comment_elems = driver.find_elements(By.CSS_SELECTOR, 'ul ul div > li > div > div > div._a9zr')
-                for c in comment_elems[:9]:
-                    comments.append(c.text.strip())
+                comment_blocks = driver.find_elements(By.CSS_SELECTOR, 'ul ul > div')[:9]
+                for block in comment_blocks:
+                    try:
+                        user_id = block.find_element(By.CSS_SELECTOR, 'h3').text.strip()
+                        comment_text = block.find_element(By.CSS_SELECTOR, 'div._a9zr > div span').text.strip()
+                        comment_time_elem = block.find_element(By.CSS_SELECTOR, 'div time')
+                        comment_time = extract_date_from_kor_format(comment_time_elem.get_attribute("title"))
+                        comments.append({"id": user_id, "text": comment_text, "date": comment_time})
+                    except:
+                        continue
             except:
                 pass
 
@@ -94,13 +99,17 @@ def crawl_account_with_next(driver, username, limit=5):
             print("❤️ 좋아요 수:", like_count)
             print("📝 본문:", pure_caption)
             print("🏷 해시태그:", hashtags)
-            print("💬 댓글:", comments)
+            for c in comments:
+                print(f"💬 댓글: {c['id']} | {c['date']} | {c['text']}")
 
-            # 다음 버튼 클릭
+            # 다음 버튼 클릭 후 대기
             try:
                 next_btn = driver.find_element(By.CSS_SELECTOR, 'div._aaqg._aaqh > button')
                 driver.execute_script("arguments[0].click();", next_btn)
-                time.sleep(8)
+                time.sleep(1.5)
+                WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, 'ul > div > li > div > div > div._a9zr'))
+                )
             except:
                 print("🔚 다음 게시글 없음")
                 break
