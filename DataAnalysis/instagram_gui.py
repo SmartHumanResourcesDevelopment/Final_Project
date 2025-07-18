@@ -1,18 +1,20 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import threading
 import time
+import random
 from datetime import datetime
 
 class InstagramCrawlerApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Instagram Multi-Keyword Crawler")
-        self.root.geometry("600x600")
+        self.root.title("Instagram 내 피드/게시글 크롤러 (댓글 포함)")
+        self.root.geometry("650x650")
         self.results = []
         self.is_running = False
 
@@ -25,15 +27,15 @@ class InstagramCrawlerApp:
         self.entry_pw = tk.Entry(root, show="*", width=40)
         self.entry_pw.pack()
 
-        tk.Label(root, text="검색할 해시태그들 (최대 4개, 쉼표로 구분):").pack()
-        self.entry_tags = tk.Entry(root, width=50)
-        self.entry_tags.insert(0, "말차, 마라탕")
-        self.entry_tags.pack()
-
-        tk.Label(root, text="게시글 수 (해시태그당):").pack()
+        tk.Label(root, text="게시글 수 (최신순):").pack()
         self.entry_limit = tk.Entry(root, width=10)
         self.entry_limit.insert(0, "10")
         self.entry_limit.pack()
+
+        tk.Label(root, text="댓글 수 (게시글당, 최대 몇 개):").pack()
+        self.entry_comment_limit = tk.Entry(root, width=10)
+        self.entry_comment_limit.insert(0, "5")
+        self.entry_comment_limit.pack()
 
         # 버튼
         self.btn_start = tk.Button(root, text="크롤링 시작", command=self.start_crawling_thread)
@@ -43,10 +45,10 @@ class InstagramCrawlerApp:
         self.btn_save.pack(pady=5)
 
         # 진행률 및 결과
-        self.progress = ttk.Progressbar(root, length=400, mode="determinate")
+        self.progress = ttk.Progressbar(root, length=500, mode="determinate")
         self.progress.pack(pady=10)
 
-        self.text_output = tk.Text(root, height=15)
+        self.text_output = tk.Text(root, height=18)
         self.text_output.pack()
 
     def log(self, message):
@@ -63,44 +65,31 @@ class InstagramCrawlerApp:
 
         username = self.entry_id.get()
         password = self.entry_pw.get()
-        tags = [tag.strip() for tag in self.entry_tags.get().split(",") if tag.strip()]
-
-        if len(tags) > 4:
-            self.log("해시태그는 최대 4개까지 입력 가능합니다.")
-            return
-
         try:
             post_limit = int(self.entry_limit.get())
+            comment_limit = int(self.entry_comment_limit.get())
         except ValueError:
-            self.log("게시글 수는 숫자로 입력하세요.")
+            self.log("게시글 수/댓글 수는 숫자로 입력하세요.")
             return
 
-        self.total_tasks = len(tags)
+        self.total_tasks = post_limit
         self.finished_tasks = 0
 
         options = webdriver.ChromeOptions()
-        self.driver = webdriver.Chrome(service=Service("chromedriver.exe"), options=options)
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--start-maximized")
+        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
         try:
             self.login_instagram(self.driver, username, password)
+            time.sleep(2)
 
-            # 첫 탭에 첫 해시태그 페이지 열기
-            self.driver.get(f"https://www.instagram.com/explore/tags/{tags[0]}/")
-            tab_handles = [self.driver.current_window_handle]
+            # 내 프로필 페이지 열기
+            self.driver.get(f"https://www.instagram.com/{username}/")
             time.sleep(3)
 
-            # 나머지 해시태그 탭 생성
-            for tag in tags[1:]:
-                self.driver.execute_script("window.open('');")
-                self.driver.switch_to.window(self.driver.window_handles[-1])
-                self.driver.get(f"https://www.instagram.com/explore/tags/{tag}/")
-                tab_handles.append(self.driver.current_window_handle)
-                time.sleep(3)
-
-            # 각 탭에서 크롤링 수행
-            for tag, handle in zip(tags, tab_handles):
-                self.driver.switch_to.window(handle)
-                self.crawl_tag_in_tab(tag, post_limit)
+            # 최신 게시글 크롤링
+            self.crawl_my_posts(post_limit, comment_limit)
 
             self.driver.quit()
             self.log("전체 크롤링 완료")
@@ -112,21 +101,21 @@ class InstagramCrawlerApp:
             except:
                 pass
 
-    def crawl_tag_in_tab(self, tag, post_limit):
+    def crawl_my_posts(self, post_limit, comment_limit):
         for i in range(post_limit):
             try:
                 row = i // 3 + 1
                 col = i % 3 + 1
                 xpath = f'/html/body/div[1]/div/div/div[2]/div/div/div[1]/div[1]/div[1]/section/main/div/div[2]/div/div[{row}]/div[{col}]/div/a'
                 self.driver.find_element(By.XPATH, xpath).click()
-                time.sleep(2)
+                time.sleep(random.uniform(3.5, 6.0))
 
+                # 본문, 날짜, 해시태그
                 try:
                     caption_elem = self.driver.find_element(By.XPATH, '//article//div[@data-testid="post-comment-root"]')
                     raw_caption = caption_elem.text.strip()
                 except:
                     raw_caption = ""
-
                 try:
                     time_elem = self.driver.find_element(By.XPATH, '//article//time')
                     iso_date = time_elem.get_attribute("datetime")
@@ -137,16 +126,32 @@ class InstagramCrawlerApp:
                 hashtags = sorted(set([w for w in raw_caption.split() if w.startswith('#')]))
                 caption = ' '.join([w for w in raw_caption.split() if not w.startswith('#')])
 
+                # 댓글 크롤링
+                comments_data = []
+                try:
+                    comment_blocks = self.driver.find_elements(By.CSS_SELECTOR, "ul ul > div")[:comment_limit]
+                    for cb in comment_blocks:
+                        try:
+                            user_id = cb.find_element(By.CSS_SELECTOR, 'h3').text.strip()
+                            comment_text = cb.find_element(By.CSS_SELECTOR, 'div._a9zr > div span').text.strip()
+                            comment_time_elem = cb.find_element(By.CSS_SELECTOR, 'div time')
+                            comment_time = comment_time_elem.get_attribute("datetime")[:10]
+                            comments_data.append(f"{user_id} | {comment_time} | {comment_text}")
+                        except:
+                            continue
+                except:
+                    pass
+
                 self.results.append({
+                    "작성일": post_date,
                     "본문": caption,
                     "해시태그": ", ".join(hashtags),
-                    "작성일": post_date,
                     "플랫폼": "Instagram",
-                    "키워드": tag
+                    "댓글": "\n".join(comments_data) if comments_data else ""
                 })
-                self.log(f"#{tag} → {i+1}/{post_limit} 완료")
+                self.log(f"{i+1}/{post_limit}번째 게시글 완료")
 
-                # 닫기 버튼 시도
+                # 닫기 버튼
                 for close_xpath in [
                     '/html/body/div[5]/div[1]/div/div[2]/div',
                     '/html/body/div[6]/div[1]/div/div[2]/div'
@@ -156,14 +161,14 @@ class InstagramCrawlerApp:
                         break
                     except:
                         continue
-                time.sleep(1)
+                time.sleep(random.uniform(1.5, 2.5))
 
             except Exception as e:
-                self.log(f"#{tag} 게시글 {i+1} 실패: {e}")
+                self.log(f"{i+1}번째 게시글 실패: {e}")
                 continue
 
-        self.finished_tasks += 1
-        self.progress["value"] = (self.finished_tasks / self.total_tasks) * 100
+            self.finished_tasks += 1
+            self.progress["value"] = (self.finished_tasks / self.total_tasks) * 100
 
     def login_instagram(self, driver, username, password):
         driver.get("https://www.instagram.com/accounts/login/")
@@ -171,8 +176,7 @@ class InstagramCrawlerApp:
         driver.find_element(By.NAME, "username").send_keys(username)
         driver.find_element(By.NAME, "password").send_keys(password)
         driver.find_element(By.XPATH, '//button[@type="submit"]').click()
-        time.sleep(5)
-
+        time.sleep(6)
         try:
             not_now = driver.find_element(By.XPATH, '//button[contains(text(), "나중에 하기")]')
             not_now.click()
