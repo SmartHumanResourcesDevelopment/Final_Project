@@ -32,7 +32,7 @@ def login_instagram(driver, username, password):
 def crawl_account_with_next(driver, username, limit=5):
     url = f"https://www.instagram.com/{username}/"
     driver.get(url)
-
+    time.sleep(5)
     try:
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'div._aagw'))
@@ -106,7 +106,7 @@ def crawl_account_with_next(driver, username, limit=5):
             try:
                 next_btn = driver.find_element(By.CSS_SELECTOR, 'div._aaqg._aaqh > button')
                 driver.execute_script("arguments[0].click();", next_btn)
-                time.sleep(1.5)
+                time.sleep(8)
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, 'ul > div > li > div > div > div._a9zr'))
                 )
