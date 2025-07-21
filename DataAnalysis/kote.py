@@ -18,7 +18,7 @@ pipe = TextClassificationPipeline(
     function_to_apply='sigmoid'
 )
 
-# ✅ 분석할 텍스트 리스트 예시 (여기서 본문이나 댓글 리스트로 대체)
+# 분석할 텍스트 리스트 예시 (여기서 본문이나 댓글 리스트로 대체)
 texts = [
     "재미있어요! 재미는 확실히 있는데 뭐랄까... 너무 정신 없달까...ㅋㅋ",
     "정말 감동적이었어요. 눈물이 났어요.",
@@ -44,4 +44,4 @@ df = pd.DataFrame(results)
 
 # 결과 저장 (경로는 필요에 따라 수정 가능)
 df.to_csv("kote_emotion_result.csv", index=False, encoding='utf-8-sig')
-print("✅ 감성 분석 완료! 'kote_emotion_result.csv' 저장됨.")
+print("감성 분석 완료! 'kote_emotion_result.csv' 저장됨.")
