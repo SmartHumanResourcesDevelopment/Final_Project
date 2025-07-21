@@ -1,0 +1,33 @@
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+
+/* ✅ Base layer */
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    appearance: none;
+    background-color: transparent;
+    border: 0;
+    outline: none;
+  }
+}
+
+/* ✅ Utilities layer */
+@layer utilities {
+  .all-\[unset\] {
+    all: unset;
+  }
+
+
+}
+
+/* ✅ 전역 색상 변수 */
+:root {
+  --muted: rgb(217 217 217);
+  --main-button: #5969cf;
+  --main-button-hover: #4a5bb8;
+  --action-sec: rgba(12, 42, 146, 1);
+  --edf-2f-7: rgba(237, 242, 247, 1);
+}
