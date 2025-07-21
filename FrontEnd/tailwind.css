@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    @apply appearance-none bg-transparent border-0 outline-none;
+  }
+}
+
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .all-\[unset\] {
+    all: unset;
+  }
+}
+
+:root {
+  --action-sec: rgba(12, 42, 146, 1);
+  --edf-2f-7: rgba(237, 242, 247, 1);
+  --muted: rgba(217, 217, 217, 1);
+}
