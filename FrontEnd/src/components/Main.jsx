@@ -123,7 +123,7 @@ export const Main = () => {
         <div className="absolute w-[273px] h-[165px] top-[1670px] left-[-1053px] bg-[#6ff8a8] rounded-[136.63px/82.32px] rotate-[22.65deg]" />
 
         <div className="absolute w-[1560px] h-[200px] top-[5141px] left-0 bg-black">
-          <div className="relative w-[493px] h-[145px] top-[11px] left-[474px]">
+          <div className="relative w-[493px] h-[145px] top-[11px] left-[500px]">
             <img
               className="absolute w-[257px] h-[136px] top-0 left-[118px]"
               alt="footer"
@@ -267,9 +267,9 @@ export const Main = () => {
         
 
 
-        <div className="absolute w-[1260px] h-[713px] top-[4291px] left-[124px] bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
+        <div className="absolute w-[1260px] h-[713px] top-[4291px] left-[128px] bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
             <InsightsSection />
-          <p className="absolute w-[1148px] top-[518px] left-[54px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-black text-[22px] tracking-[0.50px] leading-10">
+          <p className="absolute w-[1148px] top-[518px] left-[60px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-black text-[22px] tracking-[0.50px] leading-10">
             AI 푸드는 개인 맞춤형 식단 추천과 3D 푸드 프린팅 기술 발전이
             인플루언서들을 통해 언급되며 새로운 식사 경험으로 주목받고 있습니다.
             로열 푸드 다이닝은 지역 특산물 활용 미식 경험과 지속 가능한 소비
