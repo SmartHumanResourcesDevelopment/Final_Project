@@ -1,0 +1,37 @@
+{
+  "nodes": [
+    {
+      "id": "src/components/Login.jsx",
+      "label": "Login",
+      "routes": [
+        "/"
+      ],
+      "isRoot": true
+    },
+    {
+      "id": "src/components/Join.jsx",
+      "label": "Join",
+      "routes": [
+        "/join"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "src\\components\\Login.jsx:18:31-to-src\\components\\Join.jsx",
+      "source": "src\\components\\Login.jsx",
+      "target": "src\\components\\Join.jsx",
+      "data": {
+        "viaRoute": "/join",
+        "trigger": {
+          "element": "navigate(\"/join\")",
+          "line": 18,
+          "endLine": 18,
+          "column": 31,
+          "endColumn": 48,
+          "sourceFile": "src\\components\\Login.jsx"
+        }
+      }
+    }
+  ]
+}
