@@ -1,290 +1,190 @@
 import React, { useState } from "react";
 import LoginSuccess from "./LoginSuccess.jsx";
-
+import { signUp } from "../api/authApi"; 
+import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
+import mint_bg_color from "../assets/img/common/mint_bg_color.png"
 
 export const Join = () => {
+  /* ---------- 상태 ---------- */
   const [formData, setFormData] = useState({
-    id: "",
-    password: "",
-    confirmPassword: "",
-    name: "",
-    nickname: "",
-    phone: "",
-    agreeToTerms: false,
+    id: "", password: "", confirmPassword: "",
+    name: "", nickname: "", phone: "", agreeToTerms: false,
   });
-
+  const [passwordError, setPasswordError] = useState("");
   const [showTermsModal, setShowTermsModal] = useState(false);
-  //정책 동의
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // 비밀번호 일치 여부
-  const [passwordError, setPasswordError] = useState('');
+  /* ---------- 입력 핸들러 ---------- */
+  const handleInputChange = (k, v) => {
+    setFormData((p) => ({ ...p, [k]: v }));
+    if (k === "password" || k === "confirmPassword") {
+      const pw = k === "password" ? v : formData.password;
+      const cf = k === "confirmPassword" ? v : formData.confirmPassword;
+      setPasswordError(pw && cf && pw !== cf ? "비밀번호가 일치하지 않습니다." : "");
+    }
+  };
 
+  const formatPhone = (n) => {
+    const nums = n.replace(/\D/g, "");
+    if (nums.length < 4) return nums;
+    if (nums.length < 8) return `${nums.slice(0, 3)}-${nums.slice(3)}`;
+    return `${nums.slice(0, 3)}-${nums.slice(3, 7)}-${nums.slice(7, 11)}`;
+  };
 
+  const handlePhoneChange = (e) => {
+    const rawInput = e.target.value;
 
-  // 체크박스 클릭시 직접 변경 불가, 모달 오픈만
+    // 숫자·하이픈만 허용
+    if (/[^0-9-]/.test(rawInput)) {
+      alert("숫자만 입력하세요.");
+      return;
+    }
+
+    // 하이픈 제거 후 숫자만
+    const onlyNums = rawInput.replace(/-/g, "");
+
+    // 11자리 초과 거부
+    if (onlyNums.length > 11) return;
+
+    // 하이픈 자동 삽입
+    const autoHyphen =
+      onlyNums.length < 4
+        ? onlyNums
+        : onlyNums.length < 8
+        ? `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`
+        : `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 7)}-${onlyNums.slice(7, 11)}`;
+
+    setFormData((p) => ({ ...p, phone: autoHyphen }));
+  };
+
   const handleAgreeClick = (e) => {
     e.preventDefault();
     setShowTermsModal(true);
   };
-
-  // 모달 내 동의 버튼 누르면 체크 처리
   const handleAgreeTerms = () => {
-    setFormData((prev) => ({ ...prev, agreeToTerms: true }));
+    setFormData((p) => ({ ...p, agreeToTerms: true }));
     setShowTermsModal(false);
   };
 
-  // 모달 내 거절 버튼 누르면 체크 해제
-  const handleDisagreeTerms = () => {
-    setFormData((prev) => ({ ...prev, agreeToTerms: false }));
-    setShowTermsModal(false);
-  };
+  /* ---------- 제출 ---------- */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleInputChange = (field, value) => {
-  setFormData((prev) => ({
-    ...prev,
-    [field]: value,
-  }));
-
-  // 비밀번호 일치 실시간 확인
-  if (field === "password" || field === "confirmPassword") {
-    const password = field === "password" ? value : formData.password;
-    const confirmPassword = field === "confirmPassword" ? value : formData.confirmPassword;
-    if (password && confirmPassword && password !== confirmPassword) {
-      setPasswordError("비밀번호가 일치하지 않습니다.");
-    } else {
-      setPasswordError('');
+    // 모든 필수값 체크
+    const required = ["id", "password", "confirmPassword", "name", "nickname", "phone"];
+    const emptyKey = required.find((k) => !formData[k].trim());
+    if (emptyKey) {
+      alert("모든 항목을 입력해주세요.");
+      return;
     }
-  }
-};
+    if (!formData.agreeToTerms) return alert("정책에 동의해주세요.");
+    if (formData.password !== formData.confirmPassword) {
+      setPasswordError("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+    try {
+-    setShowSuccessModal(true);  /* 실제 API 호출 자리 */
+      const { success, message } = await signUp(formData);
+      if (success) {
+        setShowSuccessModal(true);            // ★ 성공 모달
+      } else {
+        alert(message || "회원가입 실패입니다.");
+        }
+      } catch (err) {
+        alert("서버 오류가 발생했습니다.");
+      }
+  };
 
-
-  function formatPhone(value) {
-  // 숫자만 남기기
-  const onlyNums = value.replace(/\D/g, '');
-
-  // 010-1234-5678 형식 자동 변환
-  if (onlyNums.length < 4) return onlyNums;
-  if (onlyNums.length < 8) return `${onlyNums.slice(0,3)}-${onlyNums.slice(3)}`;
-  return `${onlyNums.slice(0,3)}-${onlyNums.slice(3,7)}-${onlyNums.slice(7,11)}`;
-}
-
-
-const handlePhoneChange = (e) => {
-  let value = e.target.value;
-  // 하이픈 제외한 숫자만 추출
-  const onlyNums = value.replace(/\D/g, '');
-
-  // 11자리 이상만 허용
-  if (onlyNums.length > 11) return;
-
-  // 하이픈 외 문자 입력시(알파벳, 한글 등) 경고
-  if (/[^\d-]/.test(value)) {
-    alert("숫자만 입력해주세요.");
-    return;
-  }
-
-  setFormData((prev) => ({
-    ...prev,
-    phone: formatPhone(onlyNums),
-  }));
-};
-
-
-
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!formData.agreeToTerms) {
-    alert("정책에 동의해주세요.");
-    return;
-  }
-
-  // 여기에 회원가입 입력값 유효성 검사 추가 가능
-  // 예시: if (!formData.id || !formData.password || ... ) return;
- // 비밀번호, 재확인 불일치시
-  if (formData.password !== formData.confirmPassword) {
-    setPasswordError("비밀번호가 일치하지 않습니다.");
-    return;
-  }
-  try {
-    // 실제 회원가입 API 연동 (아래는 예시, 실제 함수로 대체)
-    // const response = await signupApi(formData);
-    // if (response.success) {
-    //   setShowSuccessModal(true);  // 성공 모달
-    // } else {
-    //   alert("회원가입 실패입니다.");
-    // }
-    
-    // [DEMO용] 아래는 무조건 성공하는 구조
-    setShowSuccessModal(true);
-  } catch (error) {
-    // 실패 시 알람
-    alert("회원가입 실패입니다.");
-  }
-};
-
-
-  const formFields = [
-    {
-      id: "id",
-      label: "아이디",
-      placeholder: "당신의 이메일을 입력해주세요",
-      type: "text",
-      value: formData.id,
-      top: "220px",
-    },
-    {
-      id: "password",
-      label: "비밀번호",
-      placeholder: "당신의 비밀번호를 입력해주세요",
-      type: "password",
-      value: formData.password,
-      top: "303px",
-    },
-    {
-      id: "confirmPassword",
-      label: "비밀번호 재확인",
-      placeholder: "당신의 비밀번호를 입력해주세요",
-      type: "password",
-      value: formData.confirmPassword,
-      top: "386px",
-    },
-    {
-      id: "name",
-      label: "이름",
-      placeholder: "당신의 이름을 입력해주세요",
-      type: "text",
-      value: formData.name,
-      top: "484px",
-    },
-    {
-      id: "nickname",
-      label: "닉네임",
-      placeholder: "사용하실 닉네임을입력하세요",
-      type: "text",
-      value: formData.nickname,
-      top: "567px",
-    },
-    {
-      id: "phone",
-      label: "휴대폰번호",
-      placeholder: "당신의 휴디폰번호를 입력해주세요",
-      type: "tel",
-      value: formData.phone,
-      top: "655px",
-    },
-  ];
-
+  /* ---------- JSX ---------- */
   return (
-    <div className="bg-white flex flex-row justify-center w-full">
-      <div className="bg-white overflow-hidden w-[1440px] h-[960px] relative">
-        <form onSubmit={handleSubmit}>
-          <div className="absolute w-[404px] h-[108px] top-[170px] left-[165px]">
-            <div className="inline-flex h-[53px] items-start gap-2.5 absolute top-0 left-[103px]">
-              <h1 className="text-black text-[32px] relative w-fit mt-[-1.00px] [font-family:'Poppins-Medium',Helvetica] font-medium tracking-[0] leading-[normal]">
-                환영합니다😊
-              </h1>
+    <div className="bg-white flex justify-center w-full font-poppins">
+      {/* 메인 캔버스: 높이 720 데스크탑 / 650 모바일 */}
+      <div className="relative w-full h-[650px] lg:h-[720px] overflow-hidden">
+
+        {/* ───────── 좌측 폼 ───────── */}
+        <div className="absolute inset-y-0 left-0 w-1/2 flex justify-center">
+          <form
+            onSubmit={handleSubmit}
+            className="w-[540px] flex flex-col items-start gap-3 justify-center"
+          >
+            {/* 타이틀 */}
+            <div className="space-y-4">
+              <h1 className="text-[32px] font-semibold">환영합니다😊</h1>
             </div>
 
-            <div className="flex flex-col w-[404px] h-[70px] items-start absolute top-[50px] left-0">
-              <div className="inline-flex items-start gap-2.5 relative flex-[0_0_auto]">
-                <label
-                  htmlFor="id"
-                  className="text-black text-sm relative w-fit mt-[-1.00px] [font-family:'Poppins-Medium',Helvetica] font-medium tracking-[0] leading-[normal]"
-                >
-                  아이디
-                </label>
-              </div>
-
-              <div className="flex w-[404px] h-12 items-center gap-2.5 pl-2.5 pr-0 py-2.5 relative rounded-[10px] overflow-hidden border border-solid border-[#d9d9d9]">
+            {/* 입력 필드 모음 */}
+            {[
+              { id: "id", label: "아이디", ph: "당신의 아이디를 입력해주세요", type: "text" },
+              { id: "password", label: "비밀번호", ph: "당신의 비밀번호를 입력해주세요", type: "password" },
+              { id: "confirmPassword", label: "비밀번호 재확인", ph: "당신의 비밀번호를 입력해주세요", type: "password" },
+              { id: "name", label: "이름", ph: "당신의 이름을 입력해주세요", type: "text" },
+              { id: "nickname", label: "닉네임", ph: "사용하실 닉네임을입력하세요", type: "text" },
+              { id: "phone", label: "휴대폰번호", ph: "당신의 휴대폰번호를 입력해주세요", type: "tel" },
+            ].map((f) => (
+              <div key={f.id} className="w-full">
+                <label htmlFor={f.id} className="text-sm font-semibold">{f.label}</label>
                 <input
-                  id="id"
-                  type="text"
-                  value={formData.id}
-                  onChange={(e) => handleInputChange("id", e.target.value)}
-                  placeholder="당신의 아이디를 입력해주세요"
-                  className="text-black text-[14px] relative w-full mt-[-1.00px] [font-family:'Poppins-Medium',Helvetica] font-medium tracking-[0] leading-[normal] placeholder:text-muted"
-                  aria-label="아이디 입력"
+                  id={f.id}
+                  type={f.type}
+                  inputMode={f.id === "phone" ? "numeric" : undefined}
+                  value={formData[f.id]}
+                  onChange={f.id === "phone"
+                    ? handlePhoneChange
+                    : (e) => handleInputChange(f.id, e.target.value)}
+                  placeholder={f.ph}
+                  className="mt-1 w-full h-12 rounded-[10px] pl-2.5 border border-[#d9d9d9] text-[14px]"
                 />
-              </div>
-            </div>
-          </div>
-
-          {formFields.slice(1).map((field) => (
-            <div
-              key={field.id}
-              className="flex flex-col w-[404px] items-start absolute left-[165px]"
-              style={{ top: field.top, height: field.id === "confirmPassword" ? "84px" : "70px" }}
-            >
-              <div className="inline-flex items-start gap-2.5 mb-1">
-                <label
-                  htmlFor={field.id}
-                  className="text-black text-sm [font-family:'Poppins-Medium',Helvetica] font-medium"
-                >
-                  {field.label}
-                </label>
-              </div>
-              <div className="w-full">
-                <input
-                  id={field.id}
-                  type={field.type}
-                  value={field.value}
-                  onChange={field.id === "phone" ? handlePhoneChange : (e) => handleInputChange(field.id, e.target.value)}
-                  placeholder={field.placeholder}
-                  className="text-black text-[14px] w-full h-12 [font-family:'Poppins-Medium',Helvetica] font-medium tracking-[0] leading-[normal] placeholder:text-muted border border-solid border-[#d9d9d9] rounded-[10px] pl-2.5"
-                  aria-label={field.label}
-                  inputMode={field.id === "phone" ? "numeric" : undefined}
-                  maxLength={field.id === "phone" ? 13 : undefined}
-                />
-                {/* input과 별도로 아래에만 에러 메시지 */}
-                {field.id === "confirmPassword" && (
-                  <div className="text-red-500 text-xs mt-1 min-h-[14px] mb-6">
-                    {passwordError ? passwordError : "\u00A0"}
-                  </div>
+                {f.id === "confirmPassword" && (
+                  <span className="text-xs text-red-500 mt-1 block min-h-[14px]">{passwordError || "\u00A0"}</span>
                 )}
               </div>
-            </div>
-          ))}
+            ))}
 
-  
-
-
-         
-
-
-
-
-
-          <div className="absolute w-[180px] h-[24px] top-[743px] left-[165px] flex items-center">
-            <input
-              id="agreeToTerms"
-              type="checkbox"
-              checked={formData.agreeToTerms}
-              // onChange를 직접 사용하지 않고 클릭 시 모달만 띄움
-              onClick={handleAgreeClick}
-              readOnly
-              className="w-5 h-5 border border-gray-300 rounded-sm accent-blue-500 cursor-pointer appearance-auto"
-              aria-label="모든 정책 동의"
-            />
-            <label
-              htmlFor="agreeToTerms"
-              className="ml-3 [font-family:'Poppins-Medium',Helvetica] font-medium text-black text-[12px] tracking-[0] leading-[normal] cursor-pointer select-none"
-              onClick={handleAgreeClick}
-            >
+            {/* 정책 동의 */}
+            <label className="flex items-center gap-2 text-[13px] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.agreeToTerms}
+                readOnly
+                onClick={handleAgreeClick}
+                className="w-5 h-5 accent-blue-500 border border-gray-300 rounded-sm appearance-auto"
+              />
               모든 정책 동의
             </label>
-          </div>
 
-          {/* 정책 모달 예시 */}
-          {showTermsModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div className="bg-white rounded-lg p-8 max-w-lg w-full">
-                <h2 className="text-lg font-bold mb-4">이용약관 동의</h2>
-                <div className="max-h-60 overflow-y-auto text-sm mb-4">
-                  <p>
-                    <strong>잘파세대 식문화 트렌드 대시보드 서비스 이용 약관 동의(요약)</strong><br />
+            {/* 회원가입 버튼 */}
+            <button
+              type="submit"
+              className="h-9 w-full rounded-md bg-[#5969cf] text-white font-bold hover:bg-[#4a5bb8] transition-colors"
+            >
+              회원가입
+            </button>
+          </form>
+        </div>
+
+        {/* ───────── 우측 이미지 & 배경 ───────── */}
+        <div className="absolute inset-y-0 right-0 w-1/2 overflow-hidden">
+          <div className="absolute inset-0 bg-[#E9FFFF] bg-repeat-x bg-top bg-[length:320px_100%]" 
+          style={{ backgroundImage: `url(${mint_bg_color})`,  // React 변수를 사용해야 빌드 시 경로가 정확히 매핑됩니다
+                  backgroundSize : "320px 100%",          // 가로 320 px, 세로 100 %
+                  }}/>
+          <div className="relative z-10 flex h-full items-center justify-center">
+            <img
+              src={login_join_bg_img}
+              alt="Analysts"
+              className="w-[90%] max-w-[640px] h-auto object-contain"
+            />
+          </div>
+        </div>
+
+        {/* ───────── 모달들 ───────── */}
+        {showTermsModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-white rounded-lg p-8 max-w-lg w-full">
+              <h2 className="text-lg font-bold mb-4">이용약관 동의</h2>
+              <div className="max-h-60 overflow-y-auto text-sm mb-4">
+                <p>
+                    <strong>잘파세대 식문화 트렌드 대시보드 서비스 이용 약관 동의</strong><br />
                     <br />
                     1. 본 서비스는 인스타그램, 유튜브 등에서 공개된 데이터를 분석하여 식문화 트렌드 및 통계를 제공합니다.<br />
                     2. 회원가입 시 이메일(아이디), 비밀번호, 이름, 닉네임, 휴대폰번호 등의 개인정보를 수집합니다.<br />
@@ -296,58 +196,18 @@ const handleSubmit = async (e) => {
                     <br />
                     ※ 본인은 위 내용을 충분히 읽고 이해하였으며, 이에 동의합니다.
                   </p>
-
-                </div>
-                <div className="flex justify-end gap-4">
-                  <button
-                    onClick={handleDisagreeTerms}
-                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-sm"
-                  >
-                    동의하지 않음
-                  </button>
-                  <button
-                    onClick={handleAgreeTerms}
-                    className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
-                  >
-                    동의합니다
-                  </button>
-                </div>
               </div>
-            </div>
-          )}
-          {/* 로그인 성공 페이지 모달 생성 */}
-          {showSuccessModal && <LoginSuccess onClose={() => setShowSuccessModal(false)} />}
-
-
-
-          <div className="absolute w-[404px] h-[35px] top-[787px] left-[165px] bg-edf-2f-7">
-            <div className="relative h-8">
-              <div className="top-0 left-0 flex flex-col w-[404px] items-start absolute">
-                <button
-                  type="submit"
-                  className="items-center bg-[#5969cf] flex w-[404px] h-8 gap-2.5 pl-2.5 pr-0 py-2.5 relative rounded-[10px] overflow-hidden border border-solid cursor-pointer hover:bg-[#4a5bb8] transition-colors duration-200"
-                  aria-label="회원가입 버튼"
-                >
-                  <div className="inline-flex items-start justify-center gap-2.5 relative flex-[0_0_auto] mt-[-1.50px] mb-[-1.50px]" />
-                </button>
+              <div className="flex justify-end gap-4">
+                <button onClick={()=>{setShowTermsModal(false);}} className="px-4 py-2 bg-gray-200 rounded">동의하지 않음</button>
+                <button onClick={()=>{handleAgreeTerms();}} className="px-4 py-2 bg-blue-600 text-white rounded">동의합니다</button>
               </div>
-
-              <span className="absolute top-[7px] left-[185px] [font-family:'Poppins-Bold',Helvetica] font-bold text-white text-[13px] tracking-[0] leading-[normal] pointer-events-none">
-                회원가입
-              </span>
             </div>
           </div>
-        </form>
-
-        <div className="absolute w-[720px] h-[960px] top-0 left-[720px] bg-[url(/img/rectangle-9.png)] bg-[100%_100%]">
-          <img
-            className="absolute w-[704px] h-[736px] top-[187px] left-4"
-            alt="Analysts"
-            src="/img/analysts-strategizing-with-graphs-and-metrics.png"
-          />
-        </div>
+        )}
+        {showSuccessModal && <LoginSuccess onClose={() => setShowSuccessModal(false)} />}
       </div>
     </div>
   );
 };
+
 export default Join;

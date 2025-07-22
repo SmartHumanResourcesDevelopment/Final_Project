@@ -8,6 +8,9 @@ module.exports = {
         "edf-2f-7": "var(--edf-2f-7)",
         muted: "var(--muted)",
       },
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],   // ★ 추가
+      },
     },
   },
   plugins: [],

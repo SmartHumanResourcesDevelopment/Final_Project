@@ -1,209 +1,154 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
+import mint_bg_color from "../assets/img/common/mint_bg_color.png"
+import google_login from "../assets/img/login_join/google_login.png" // Assuming you have an image for the background
+import apple_login from "../assets/img/login_join/apple_login.png" // Assuming you have an image for the background
 
 export const Login = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Handle login logic here
     console.log("Login attempt:", { id, password, rememberMe });
   };
-
-   const navigate = useNavigate();
-    const handleGoToJoin = (e) => {
-      e.preventDefault();
-      navigate("/join");
-    };
+  const handleGoToJoin = () => navigate("/join");
 
   return (
-    <div
-      className="bg-white flex flex-row justify-center w-full"
-      data-model-id="318:669"
-    >
-      <div className="bg-white w-[1440px] h-[960px] relative">
-        <div className="absolute w-[418px] h-3.5 top-[572px] left-[165px]">
-          <div className="relative w-[401px] h-3.5 left-2">
-            <img
-              className="absolute w-[401px] h-0.5 top-2 left-0"
-              alt="Line"
-              src="/img/line-2.png"
-            />
+    /* ① 전체 화면 세로 중앙 */
+    <div className="bg-white flex flex-col items-center justify-center min-h-screen w-full font-poppins">
+      {/* ② 1440×720(2:1) 캔버스 */}
+      <div className="relative bg-white
+            w-full  h-[650px] lg:h-[692px] mx-auto overflow-hidden">
+       {/* ───── 우측 영역 ───── */}
+        <div className="absolute inset-y-0 right-0 w-1/2 flex items-center justify-center overflow-hidden">
 
-            <div className="flex w-5 items-center justify-center gap-2.5 px-[3px] py-0 absolute top-0 left-[191px] bg-white">
-              <div className="relative w-fit mt-[-1.00px] [font-family:'Poppins',Helvetica] font-medium text-black text-[12px] tracking-[0] leading-[normal]">
-                Or
-              </div>
-            </div>
-          </div>
-        </div>
+          {/* 1) 배경색 + 타일 반복 */}
+          <div
+            className="absolute inset-0 bg-[#E9FFFF] bg-repeat-x bg-top"   /* 파스텔 배경·가로 반복·상단 정렬 */
+            style={{
+              backgroundImage: `url(${mint_bg_color})`,  // React 변수를 사용해야 빌드 시 경로가 정확히 매핑됩니다
+              backgroundSize : "320px 100%",          // 가로 320 px, 세로 100 %
+            }}
+          />
 
-        <div className="absolute w-[720px] h-[960px] top-0 left-[720px] bg-[url(/img/rectangle-9.png)] bg-[100%_100%]">
+          {/* 2) 중앙 일러스트 */}
           <img
-            className="absolute w-[704px] h-[736px] top-[185px] left-4"
+            src={login_join_bg_img}
             alt="Analysts"
-            src="/img/analysts-strategizing-with-graphs-and-metrics.png"
+            className="relative z-10 w-[85%] max-w-[640px] h-auto object-contain"
           />
         </div>
 
-        <header className="inline-flex h-[53px] items-start gap-2.5 absolute top-[202px] left-[234px]">
-          <h1 className="relative w-fit mt-[-1.00px] text-black text-[32px] [font-family:'Poppins',Helvetica] font-medium tracking-[0] leading-[normal]">
-            만나서 반가워요!🫨
-          </h1>
-        </header>
+        {/* ─── 좌측 정보 영역 ─── */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 flex justify-center">
+          <div className="w-[540px] flex flex-col items-start gap-1">
 
-        <p className="absolute w-[372px] top-[263px] left-[174px] text-black text-base [font-family:'Poppins',Helvetica] font-medium tracking-[0] leading-[normal]">
-          당신의 아이디를 입력해주세요
-        </p>
-
-        <form onSubmit={handleLogin}>
-          <div className="top-[341px] left-[174px] flex flex-col w-[404px] h-[59px] items-start absolute">
-            <label className="inline-flex items-start gap-2.5 relative flex-[0_0_auto]">
-              <span className="text-black text-sm relative w-fit mt-[-1.00px] [font-family:'Poppins',Helvetica] font-medium tracking-[0] leading-[normal]">
-                아이디
-              </span>
-            </label>
-
-            <div className="flex items-center gap-2.5 pl-2.5 pr-0 py-2.5 rounded-[10px] overflow-hidden border border-solid border-[#d9d9d9] w-[404px] h-12 relative">
-              <input
-                type="text"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                placeholder="아이디를 입력해주세요."
-                className="text-black text-[14px] relative w-full mt-[-1.00px] [font-family:'Poppins',Helvetica] font-medium tracking-[0] leading-[normal] placeholder:text-muted"
-                required
-              />
+            {/* 타이틀 */}
+            <div className="space-y-4">
+              <h1 className="text-[32px] font-semibold">만나서 반가워요!🫨</h1>
+              <p className="text-[15px] font-medium ">당신의 아이디를 입력해주세요</p>
             </div>
-          </div>
 
-          <div className="absolute w-[404px] h-[60px] top-[419px] left-[174px]">
-            <div className="top-px left-0 flex flex-col w-[404px] h-[59px] items-start absolute">
-              <label className="inline-flex items-start gap-2.5 relative flex-[0_0_auto]">
-                <span className="text-black text-sm relative w-fit mt-[-1.00px] [font-family:'Poppins',Helvetica] font-medium tracking-[0] leading-[normal]">
-                  비밀번호
-                </span>
-              </label>
-
-              <div className="flex items-center gap-2.5 pl-2.5 pr-0 py-2.5 rounded-[10px] overflow-hidden border border-solid border-[#d9d9d9] w-[404px] h-12 relative">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="비밀번호를 입력해주세요."
-                  className="text-black text-[14px] relative w-full mt-[-1.00px] [font-family:'Poppins',Helvetica] font-medium tracking-[0] leading-[normal] placeholder:text-muted"
-                  required
-                />
+            {/* 폼 */}
+            <form onSubmit={handleLogin} className="w-full space-y-4 mt-5">
+              {/* 아이디 */}
+              <div>
+                <label className="block mb-1 text-sm font-medium">아이디</label>
+                <div className="flex items-center h-12 pl-3 rounded-lg border border-solid border-gray-300 bg-white focus-within:border-[#5969cf]">
+                  <input
+                    value={id}
+                    onChange={(e) => setId(e.target.value)}
+                    placeholder="아이디를 입력해주세요."
+                    className="w-full text-[14px] placeholder:text-gray-400 focus:outline-none"
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            <button
-              type="button"
-              className="absolute top-0 left-[275px] text-action-sec text-[11px] [font-family:'Poppins',Helvetica] font-medium tracking-[0] leading-[normal] hover:underline"
-            >
-              비밀번호를 잊어버리셨나요?
-            </button>
-          </div>
+              {/* 비밀번호 */}
+              <div className="relative">
+                <label className="block mb-1 text-sm font-medium">비밀번호</label>
+                <div className="flex items-center h-12 pl-3 rounded-lg border border-solid border-gray-300 bg-white focus-within:border-[#5969cf]">
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="비밀번호를 입력해주세요."
+                    className="w-full text-[14px] placeholder:text-gray-400 focus:outline-none"
+                    required
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="absolute top-0 right-0 text-[11px] text-action-sec hover:underline"
+                >
+                  비밀번호를 잊어버리셨나요?
+                </button>
+              </div>
 
-          <div className="absolute w-[200px] h-[20px] top-[498px] left-[174px]">
-            <label className="flex items-center cursor-pointer">
-              <input
+              {/* 30일 저장 */}
+              <label className="flex items-center gap-2 text-[13px] cursor-pointer">
+                <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="w-5 h-5 border border-gray-300 rounded-sm accent-blue-500 cursor-pointer appearance-auto"
                 id="rememberMe"
               />
-
-              <span className="absolute w-[140px] top-0.8 left-[25px] text-black text-[12px] [font-family:'Poppins',Helvetica] font-medium tracking-[0] leading-[normal]">
                 30일동안 아이디 저장하기
-              </span>
-            </label>
-          </div>
+              </label>
 
-
-          <button
-            type="submit"
-            className="absolute w-[404px] h-[35px] top-[534px] left-[174px]"
-          >
-            <div className="relative h-8">
-              <div className="flex flex-col w-[404px] items-start absolute top-0 left-0">
-                <div className="flex w-[404px] h-8 items-center gap-2.5 pl-2.5 pr-0 py-2.5 relative bg-[#5969cf] rounded-[10px] overflow-hidden  hover:bg-[#4a5bb8] transition-colors">
-                  <div className="inline-flex items-start justify-center gap-2.5 relative flex-[0_0_auto] mt-[-1.50px] mb-[-1.50px]" />
-                </div>
-              </div>
-
-              <span className="left-[184px] absolute top-[7px] [font-family:'Poppins',Helvetica] font-bold text-white text-[13px] tracking-[0] leading-[normal]">
+              {/* 로그인 버튼 */}
+              <button
+                type="submit"
+                className="h-9 w-full rounded-md bg-[#5969cf] font-semibold text-white hover:bg-[#4a5bb8] transition-colors mb-0"
+              >
                 로그인
-              </span>
-            </div>
-          </button>
-        </form>
+              </button>
+            </form>
 
-        <div className="absolute w-[231px] h-[23px] top-[762px] left-[267px]">
-          <p className="absolute w-[229px] top-0 left-0 text-transparent text-sm [font-family:'Poppins',Helvetica] font-medium tracking-[0] leading-[normal]">
-            <span className="text-black">
-              아이디가 없으신가요?&nbsp;&nbsp;{" "}
-            </span>
-
-            <button
-              type="button"
-              className="text-[#0f3cde] hover:underline"
-              onClick={() => handleGoToJoin()}
-            >
-              회원가입
-            </button>
-          </p>
-        </div>
-
-       <div className="inline-flex items-center gap-[23px] absolute top-[707px] left-[174px]">
-        <button
-          type="button"
-          className="relative w-[190px] hover:opacity-80 transition-opacity"
-          onClick={() => console.log("Google login")}
-        >
-          <img
-            alt="Sign in with Google"
-            src="/img/frame-60.png"
-            className="w-full"
-          />
-        </button>
-
-        <button
-          type="button"
-          className="relative w-[190px] hover:opacity-80 transition-opacity"
-          onClick={() => console.log("Apple login")}
-        >
-          <img
-            alt="Sign in with Apple"
-            src="/img/frame-62.png"
-            className="w-full"
-          />
-        </button>
-      </div>
-
-
-        <button
-          type="button"
-          onClick={handleGoToJoin}
-          className="absolute w-[404px] h-[35px] top-[596px] left-[174px] bg-edf-2f-7"
-        >
-          <div className="relative h-8">
-            <div className="flex flex-col w-[404px] items-start absolute top-0 left-0">
-              <div className="flex w-[404px] h-8 items-center gap-2.5 pl-2.5 pr-0 py-2.5 relative bg-[#5969cf] rounded-[10px] overflow-hidden  hover:bg-[#4a5bb8] transition-colors">
-                <div className="inline-flex items-start justify-center gap-2.5 relative flex-[0_0_auto] mt-[-1.50px] mb-[-1.50px]" />
+            {/* 로그인 ↔ Or ↔ 회원가입 (간격 4 px) */}
+            <div className="w-full flex flex-col gap-1">
+              {/* Or */}
+              <div className="flex items-center">
+                <span className="flex-1 h-px bg-gray-300" />
+                <span className="px-2 text-[13px] font-medium bg-white">Or</span>
+                <span className="flex-1 h-px bg-gray-300" />
               </div>
+
+              {/* 회원가입 버튼 */}
+              <button
+                type="button"
+                onClick={handleGoToJoin}
+                className="h-9 w-full rounded-md bg-[#5969cf] font-semibold text-white hover:bg-[#4a5bb8] transition-colors"
+              >
+                회원가입
+              </button>
             </div>
 
-            <span
-              className="left-[178px] absolute top-[7px] [font-family:'Poppins',Helvetica] font-bold text-white text-[13px] tracking-[0] leading-[normal] cursor-pointer"
-            >
-              회원가입
-            </span>
+            {/* SNS 로그인 */}
+              <div className="flex justify-center gap-6 w-full mt-10">
+                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Google login")}>
+                  <img src={google_login} alt="Sign in with Google" />
+                </button>
+                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Apple login")}>
+                  <img src={apple_login} alt="Sign in with Apple" />
+                </button>
+              </div>
 
+            {/* 하단 문구 */}
+            <p className="w-full text-[13px] font-medium mt-4 text-center">
+              아이디가 없으신가요?{" "}
+              <button className="text-[#0f3cde] hover:underline" onClick={handleGoToJoin}>
+                회원가입
+              </button>
+            </p>
           </div>
-        </button>
+        </div>
       </div>
     </div>
   );
