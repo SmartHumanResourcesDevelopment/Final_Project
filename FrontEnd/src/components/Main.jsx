@@ -222,7 +222,7 @@ export const Main = () => {
 
        
 
-        <div className="absolute w-[1260px] h-[718px] top-[2519px] left-[124px]">
+        <div className="absolute w-[1260px] h-[718px] top-[2519px] left-[128px]">
           <div className="absolute w-[1260px] h-[713px] top-[5px] left-0 bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
             <p className="absolute w-[1148px] top-[558px] left-[54px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-black text-[22px] tracking-[0.50px] leading-10">
               탕후루는 비주얼 중심 SNS 유행과 함께 급상승, 마라탕은 여전히
