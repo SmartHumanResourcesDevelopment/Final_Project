@@ -1,7 +1,7 @@
 import React from "react";
-import rectangle1253 from "./rectangle-125-3.svg";
-import rectangle1254 from "./rectangle-125-4.svg";
-import rectangle1255 from "./rectangle-125-5.svg";
+import rectangle1253 from "../assets/img/common/rectangle-125-3.png";
+import rectangle1254 from "../assets/img/common/rectangle-125-4.png";
+import rectangle1255 from "../assets/img/common/rectangle-125-5.png";
 
 export const ChartSection = () => {
   const trendData = [
@@ -33,7 +33,7 @@ export const ChartSection = () => {
 
   return (
     <section className="absolute w-[1250px] h-[500px] top-[94px] left-[171px]">
-      <div className="absolute w-[872px] h-[500px] top-0 left-[378px]">
+      <div className="absolute w-[872px] h-[500px] top-0 left-[488px]">
         {trendData.map((trend, index) => (
           <article
             key={trend.id}
