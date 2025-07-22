@@ -1,5 +1,5 @@
 import React from "react";
-import group494 from "./group-494.png";
+import group494 from "../assets/img/common/hot_chart.png";
 
 export const InsightsSection = () => {
   const dateLabels = [
@@ -20,7 +20,7 @@ export const InsightsSection = () => {
     >
       <div className="absolute w-[1014px] h-[523px] top-0 left-0">
         <div
-          className="absolute w-[964px] h-[19px] top-[479px] left-[46px]"
+          className="absolute w-[964px] h-[19px] top-[479px] left-[48px]"
           role="group"
           aria-label="Chart date labels"
         >
@@ -59,6 +59,8 @@ export const InsightsSection = () => {
         <div className="absolute w-[42px] top-px left-[30px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-[#121212] text-xs tracking-[0.50px] leading-3 whitespace-nowrap">
           탕후루
         </div>
+            
+       
       </div>
     </section>
   );

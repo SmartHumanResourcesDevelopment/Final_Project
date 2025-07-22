@@ -1,14 +1,14 @@
 import React from "react";
-import { ChartSection } from "../UI/Main_insigth";
-import { InsightsSection } from "../UI/Main_insights";
-import { KeywordSection } from "../UI/Main_title2";
+import { ChartSection } from "../UI/Main_top3";
+import { InsightsSection } from "../UI/Main_insigth";
+import { KeywordSection } from "../UI/Main_up";
 import { NavigationSection } from "../common/menu_bar";
 import { RecommendationsSection } from "../common/Main_search";
 import { StatisticsSection } from "../UI/Main_title1";
-import { TopKeywordsSection } from "../UI/Main_top3";
+import { TopKeywordsSection } from "../UI/Main_title2";
 
-import chatgptImage20257160255421 from "./chatgpt-image-2025-7-16-02-55-42-1.png";
-import maskGroup from "./mask-group.png";
+import footer from "../assets/img/common/footer_img.png";
+// import maskGroup from "./mask-group.png";
 
 export const Main = () => {
   // Data for ranking items
@@ -119,15 +119,15 @@ export const Main = () => {
 
   return (
     <div className="bg-white flex flex-row justify-center w-full">
-      <div className="bg-white overflow-hidden w-[1440px] h-[5341px] relative">
+      <div className="bg-white overflow-hidden w-[1560px] h-[5341px] relative">
         <div className="absolute w-[273px] h-[165px] top-[1670px] left-[-1053px] bg-[#6ff8a8] rounded-[136.63px/82.32px] rotate-[22.65deg]" />
 
-        <div className="absolute w-[1440px] h-[200px] top-[5141px] left-0 bg-black">
+        <div className="absolute w-[1560px] h-[200px] top-[5141px] left-0 bg-black">
           <div className="relative w-[493px] h-[145px] top-[11px] left-[474px]">
             <img
               className="absolute w-[257px] h-[136px] top-0 left-[118px]"
-              alt="Chatgpt image"
-              src={chatgptImage20257160255421}
+              alt="footer"
+              src={footer}
             />
 
             <p className="top-[101px] [font-family:'Noto_Sans_KR-Medium',Helvetica] font-medium text-white tracking-[0] leading-[normal] absolute left-0 text-lg text-center">
@@ -143,7 +143,7 @@ export const Main = () => {
           <img
             className="absolute w-[736px] h-[500px] top-12 left-[662px]"
             alt="Mask group"
-            src={maskGroup}
+            src={footer}
           />
 
           <TopKeywordsSection />
@@ -160,6 +160,7 @@ export const Main = () => {
           <div className="absolute w-[400px] h-[241px] top-12 left-6 bg-[#e0faff] rounded-[200px/120.5px] rotate-[-15.00deg]" />
 
           <ChartSection />
+        
         </div>
 
         <div className="absolute w-[1426px] h-[594px] top-[3438px] left-[-76px]">
@@ -172,7 +173,7 @@ export const Main = () => {
         {rankingData.map((item, index) => (
           <div
             key={index}
-            className="absolute w-[823px] h-10 left-[521px]"
+            className="absolute w-[823px] h-10 left-[640px]"
             style={{ top: `${1055 + index * 50}px` }}
           >
             {item.trend === "↔" ? (
@@ -219,21 +220,9 @@ export const Main = () => {
           </div>
         </div>
 
-        <div className="absolute w-[655px] h-[109px] top-[4132px] left-[110px]">
-          <div className="absolute w-[655px] h-[29px] top-[26px] left-0 bg-[#fffbe1]" />
+       
 
-          <div className="top-0 left-0 flex flex-col w-[369px] items-start gap-[17px] absolute">
-            <p className="relative w-fit mt-[-1.00px] mr-[-231.00px] [font-family:'Noto_Sans_KR-Bold',Helvetica] font-bold text-5xl leading-[58px] whitespace-nowrap text-black tracking-[0.50px]">
-              급상승 중! 놓치면 늦는 키워드
-            </p>
-
-            <p className="relative w-fit mr-[-237.00px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-2xl leading-[34px] whitespace-nowrap text-black tracking-[0.50px]">
-              갑작스러운 검색량 증가는 새로운 트렌드의 신호일 수 있어요
-            </p>
-          </div>
-        </div>
-
-        <div className="absolute w-[1260px] h-[718px] top-[2519px] left-[90px]">
+        <div className="absolute w-[1260px] h-[718px] top-[2519px] left-[124px]">
           <div className="absolute w-[1260px] h-[713px] top-[5px] left-0 bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
             <p className="absolute w-[1148px] top-[558px] left-[54px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-black text-[22px] tracking-[0.50px] leading-10">
               탕후루는 비주얼 중심 SNS 유행과 함께 급상승, 마라탕은 여전히
@@ -260,7 +249,26 @@ export const Main = () => {
           </div>
         </div>
 
-        <div className="absolute w-[1260px] h-[713px] top-[4291px] left-[90px] bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
+
+         <div className="absolute w-[655px] h-[109px] top-[4132px] left-[120px]">
+          <div className="absolute w-[655px] h-[29px] top-[26px] left-0 bg-[#fffbe1]" />
+
+          <div className="top-0 left-0 flex flex-col w-[369px] items-start gap-[17px] absolute">
+            <p className="relative w-fit mt-[-1.00px] mr-[-231.00px] [font-family:'Noto_Sans_KR-Bold',Helvetica] font-bold text-5xl leading-[58px] whitespace-nowrap text-black tracking-[0.50px]">
+              급상승 중! 놓치면 늦는 키워드
+            </p>
+
+            <p className="relative w-fit mr-[-237.00px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-2xl leading-[34px] whitespace-nowrap text-black tracking-[0.50px]">
+              갑작스러운 검색량 증가는 새로운 트렌드의 신호일 수 있어요
+            </p>
+          </div>
+          
+        </div>
+        
+
+
+        <div className="absolute w-[1260px] h-[713px] top-[4291px] left-[124px] bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
+            <InsightsSection />
           <p className="absolute w-[1148px] top-[518px] left-[54px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-black text-[22px] tracking-[0.50px] leading-10">
             AI 푸드는 개인 맞춤형 식단 추천과 3D 푸드 프린팅 기술 발전이
             인플루언서들을 통해 언급되며 새로운 식사 경험으로 주목받고 있습니다.

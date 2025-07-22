@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import search from "./search.png";
+import search from "../assets/img/common/search.png";
 
 export const RecommendationsSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,7 +18,7 @@ export const RecommendationsSection = () => {
 
   return (
     <section
-      className="absolute w-[864px] h-[205px] top-[637px] left-[290px]"
+      className="absolute w-[864px] h-[205px] top-[637px] left-[350px]"
       role="search"
       aria-labelledby="search-heading"
     >

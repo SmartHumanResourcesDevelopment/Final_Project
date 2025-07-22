@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import image from "./image.svg";
-import rectangle1252 from "./rectangle-125-2.svg";
-import rectangle125 from "./rectangle-125.svg";
+// import image from "./image.svg";
+import rectangle1251 from "../assets/img/common/rectangle-125-1.png";
+import rectangle1252 from "../assets/img/common/rectangle-125-2.png";
+import rectangle1253 from "../assets/img/common/rectangle-125-3-3.png";
 
 export const KeywordSection = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -12,7 +13,7 @@ export const KeywordSection = () => {
       title: "AI 푸드",
       summary:
         "개 인 맞춤형 식단 추천부터 3D 푸드 프린팅까지, 기술이 이끄는 새로운 식사 경험",
-      image: rectangle125,
+      image: rectangle1251,
       titlePosition: "left-[104px]",
     },
     {
@@ -20,7 +21,7 @@ export const KeywordSection = () => {
       title: "로컬 푸드 다이닝",
       summary:
         "지역 특산물을 활용한 미식 경험과 지속 가능한 소비 지향, '힙'한 로컬 맛집 탐방",
-      image: image,
+      image: rectangle1252,
       titlePosition: "left-[60px]",
     },
     {
@@ -28,7 +29,7 @@ export const KeywordSection = () => {
       title: "식물성 육류 퓨전",
       summary:
         "기존 요리에 식물성 대체육을 접목하여 건강과 환경을 모두 잡는 새로운 미식 시도",
-      image: rectangle1252,
+      image: rectangle1253,
       titlePosition: "left-[60px]",
     },
   ];
@@ -43,7 +44,7 @@ export const KeywordSection = () => {
       role="main"
       aria-labelledby="keyword-section-title"
     >
-      <div className="absolute w-[853px] h-[500px] top-0 left-[397px]">
+      <div className="absolute w-[853px] h-[500px] top-0 left-[488px]">
         {keywordData.map((keyword, index) => (
           <article
             key={keyword.id}

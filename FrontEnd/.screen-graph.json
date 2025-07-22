@@ -14,6 +14,13 @@
       "routes": [
         "/join"
       ]
+    },
+    {
+      "id": "src/components/Main.jsx",
+      "label": "Main",
+      "routes": [
+        "/main"
+      ]
     }
   ],
   "edges": [

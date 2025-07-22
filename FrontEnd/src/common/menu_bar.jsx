@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { ChevronDown } from "./ChevronDown";
-import notifIcon from "./notif-icon.svg";
+import ChevronDown from "../assets/img/common/chevron_down.png";
+import notifIcon from "../assets/img/common/notif-icon.png";
+// import notifsigin from "../assets/img/common/notif-sigin.png";
 
 export const NavigationSection = () => {
   const [activeMenu, setActiveMenu] = useState("메인페이지");
@@ -52,7 +53,7 @@ export const NavigationSection = () => {
           className="absolute top-2 left-[152px] cursor-pointer hover:opacity-80 transition-opacity"
           aria-label="User menu dropdown"
         >
-          <ChevronDown className="!absolute !w-5 !h-5 !top-0 !left-0" />
+          <img src={ChevronDown}      /* ← 방금 import 한 변수 */ alt="▼"                /* 스크린리더용 대체 텍스트 */ className="absolute w-5 h-5 top-0 left-0"/>
         </button>
 
         <button
@@ -71,7 +72,7 @@ export const NavigationSection = () => {
         </button>
       </div>
 
-      <h1 className="absolute top-[18px] left-[54px] [font-family:'Racing_Sans_One-Regular',Helvetica] font-normal text-black text-[28px] text-center tracking-[0.50px] leading-10 whitespace-nowrap">
+      <h1 className="absolute top-[18px] left-[54px] font-['Racing_Sans_One',Helvetica] font-normal text-black text-[28px] text-center tracking-[0.50px] leading-10 whitespace-nowrap">
         EAT PICk
       </h1>
     </nav>
