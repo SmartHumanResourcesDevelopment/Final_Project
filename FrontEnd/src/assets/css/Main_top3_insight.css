@@ -1,7 +1,7 @@
 /* ── 레이아웃 컨테이너 ─────────────────────────── */
 .insight {
   max-width: 1260px;
-  margin: 5rem auto 0;
+  margin: 5rem auto 10rem;
   padding: 0 1rem;
   font-family: "Noto Sans KR", sans-serif;
   display: flex;
