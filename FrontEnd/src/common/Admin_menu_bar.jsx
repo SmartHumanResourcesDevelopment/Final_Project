@@ -1,6 +1,6 @@
 import React from "react";
-import { ChevronDown } from "./ChevronDown";
-import notifIcon from "./notif-icon.svg";
+import ChevronDown from "../assets/img/common/chevron_down.png";
+import notifIcon from "../assets/img/common/notif-icon.png";
 
 export const NavigationBarSection = () => {
   const navigationItems = [
@@ -49,7 +49,7 @@ export const NavigationBarSection = () => {
 
       <div className="absolute w-[222px] h-8 top-5 left-[1182px]">
         <div className="absolute w-8 h-8 top-0 left-0 bg-[#ffe6cc] rounded-2xl">
-          <div className="absolute top-[9px] left-2 [font-family:'Poppins-Regular',Helvetica] font-normal text-white text-base tracking-[0.50px] leading-[13px] whitespace-nowrap">
+          <div className="absolute top-[9px] left-1.5 [font-family:'Poppins-Regular',Helvetica] font-normal text-white text-base tracking-[0.50px] leading-[13px] whitespace-nowrap">
             🍔
           </div>
         </div>
@@ -58,7 +58,11 @@ export const NavigationBarSection = () => {
           Admin
         </div>
 
-        <ChevronDown className="!absolute !w-5 !h-5 !top-2 !left-[152px]" />
+        <button aria-label="User menu dropdown" className="absolute top-2 left-[152px] w-5 h-5 flex items-center justify-center
+             cursor-pointer hover:opacity-80 focus:outline-none focus:ring-2
+             focus:ring-blue-500 focus:ring-offset-2">
+            <img src={ChevronDown} alt="▼" className="w-5 h-5" />
+        </button>
 
         <button
           className="absolute w-[15px] h-[18px] top-1.5 left-[204px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -78,7 +82,7 @@ export const NavigationBarSection = () => {
         </button>
       </div>
 
-      <h1 className="top-[18px] left-[54px] [font-family:'Racing_Sans_One-Regular',Helvetica] font-normal text-[28px] text-center tracking-[0.50px] leading-10 absolute text-black whitespace-nowrap">
+      <h1 className="top-[18px] left-[54px] font-['Racing_Sans_One',Helvetica] font-normal text-[28px] text-center tracking-[0.50px] leading-10 absolute text-black whitespace-nowrap">
         EAT PICk
       </h1>
     </nav>

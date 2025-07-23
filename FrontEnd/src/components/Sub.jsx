@@ -2,11 +2,11 @@ import React from "react";
 import { FeaturedKeywordsSection } from "../UI/Detail_keyword";
 import { InsightsSection } from "../UI/Detail_title";
 import { KeywordHighlightSection } from "../UI/Detail_kote";
-import { NavigationBarSection } from "../common/menu_bar";
+import { NavigationSection }  from "../common/menu_bar";
 import { TrendAnalysisSection } from "../UI/Detail_same";
 import chatgptImage20257160255421 from "../assets/img/common/footer_img.png";
 import group410 from "../assets/img/common/Group 410.png";
-import messageBot from "../assets/img/common/message-bot.png";
+import messageBot from "../assets/img/common/Message Bot.png";
 // import oval from "./oval.svg";
 // import path14 from "./path-14.svg";
 // import rectangle112 from "./rectangle-112.png";
@@ -52,7 +52,7 @@ export const Sub = () => {
 
         <header className="absolute w-[1647px] h-[723px] top-0 left-[-207px]">
           <div className="absolute w-[1647px] h-[658px] top-0 left-0">
-            <NavigationBarSection />
+            <NavigationSection />
             <div className="absolute w-[923px] h-[595px] top-[63px] left-0">
               <div className="absolute w-[687px] h-[414px] top-[82px] left-[42px] bg-[#fffbe0] rounded-[343.48px/206.94px] rotate-[-15.00deg]" />
 

@@ -1,7 +1,7 @@
 import React from "react";
-import { ApiStatusTableSection } from "./ApiStatusTableSection";
-import { DataVisualizationSection } from "./DataVisualizationSection";
-import { NavigationBarSection } from "./NavigationBarSection";
+import { ApiStatusTableSection } from "../UI/Admin_api_chart";
+import { DataVisualizationSection } from "../UI/Admin_bar_chart";
+import { NavigationBarSection } from "../common/Admin_menu_bar";
 // import image from "../assets/imgs/image.svg";
 import line2 from "../assets/img/admin/line.png";
 import line3 from "../assets/img/admin/line.png";
