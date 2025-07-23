@@ -33,7 +33,7 @@ export const ChartSection = () => {
 
   return (
     <section className="absolute w-[1250px] h-[500px] top-[94px] left-[171px]">
-      <div className="absolute w-[872px] h-[500px] top-0 left-[488px]">
+      <div className="absolute w-[872px] h-[500px] top-0 left-[468px]">
         {trendData.map((trend, index) => (
           <article
             key={trend.id}
