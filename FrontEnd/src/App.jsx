@@ -13,8 +13,8 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/join" element={<Join />} />
         <Route path="/main" element={<Main />} />
-        <Route path="/sub" element={<Sub />} />
         <Route path="/mypage" element={<MyPage />} />
+        <Route path="/sub" element={<Sub />} />
       </Routes>
     </BrowserRouter>
   );
