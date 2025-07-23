@@ -28,6 +28,13 @@
       "routes": [
         "/mypage"
       ]
+    },
+    {
+      "id": "src/components/Sub.jsx",
+      "label": "Sub",
+      "routes": [
+        "/sub"
+      ]
     }
   ],
   "edges": [

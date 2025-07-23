@@ -1,19 +1,19 @@
 import React from "react";
-import image from "./image.svg";
-import line2 from "./line-2.svg";
-import line3 from "./line-3.svg";
-import line4 from "./line-4.svg";
-import line5 from "./line-5.svg";
-import line6 from "./line-6.svg";
-import line7 from "./line-7.svg";
-import line8 from "./line-8.svg";
-import line from "./line.svg";
-import rectangle62 from "./rectangle-6-2.svg";
-import rectangle6 from "./rectangle-6.svg";
-import rectangle7 from "./rectangle-7.svg";
-import rectangle105 from "./rectangle-105.svg";
-import rectangle106 from "./rectangle-106.svg";
-import rectangle107 from "./rectangle-107.svg";
+// import image from "./image.svg";
+import line2 from "../assets/img/admin/line.png";
+import line3 from "../assets/img/admin/line.png";
+import line4 from "../assets/img/admin/line.png";
+import line5 from "../assets/img/admin/line.png";
+import line6 from "../assets/img/admin/line.png";
+import line7 from "../assets/img/admin/line.png";
+import line8 from "../assets/img/admin/line.png";
+import line from "../assets/img/admin/line.png";
+import rectangle62 from "../assets/img/common/Rectangle_bar.png";
+import rectangle6 from "../assets/img/common/Rectangle_bar.png";
+import rectangle7 from "../assets/img/common/Rectangle_bar.png";
+import rectangle105 from "../assets/img/common/Rectangle_red.png";
+import rectangle106 from "../assets/img/common/Rectangle_red.png";
+import rectangle107 from "../assets/img/common/Rectangle_red.png";
 
 export const KeywordHighlightSection = () => {
   const positiveData = [
@@ -44,7 +44,7 @@ export const KeywordHighlightSection = () => {
     { src: line2, top: 0, left: 2 },
     { src: line7, top: 40, left: 2 },
     { src: line4, top: 70, left: 1 },
-    { src: image, top: 110, left: 1 },
+    { src: line4, top: 110, left: 1 },
     { src: line6, top: 150, left: 1 },
     { src: line3, top: 184, left: 0 },
     { src: line, top: 224, left: 0 },

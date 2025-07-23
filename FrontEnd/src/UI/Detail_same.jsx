@@ -1,9 +1,9 @@
 import React from "react";
-import ellipse172 from "./ellipse-17-2.svg";
-import ellipse173 from "./ellipse-17-3.svg";
-import ellipse174 from "./ellipse-17-4.svg";
-import ellipse175 from "./ellipse-17-5.svg";
-import ellipse17 from "./ellipse-17.svg";
+import ellipse172 from "../assets/img/same_/green.png";
+import ellipse173 from "../assets/img/same_/orange.png";
+import ellipse174 from "../assets/img/same_/sky.png";
+import ellipse175 from "../assets/img/same_/pupple.png";
+import ellipse17 from "../assets/img/same_/pink.png";
 
 export const TrendAnalysisSection = () => {
   const trendData = [
