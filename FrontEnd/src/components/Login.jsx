@@ -21,8 +21,8 @@ export const Login = () => {
     /* ① 전체 화면 세로 중앙 */
     <div className="bg-white flex flex-col items-center justify-center min-h-screen w-full font-poppins">
       {/* ② 1440×720(2:1) 캔버스 */}
-      <div className="relative bg-white
-            w-full  h-[650px] lg:h-[692px] mx-auto overflow-hidden">
+     <div className="flex flex-col justify-center items-center
+                w-full min-h-[650px] md:min-h-[75vh] px-4 bg-white">
        {/* ───── 우측 영역 ───── */}
         <div className="absolute inset-y-0 right-0 w-1/2 flex items-center justify-center overflow-hidden">
 
