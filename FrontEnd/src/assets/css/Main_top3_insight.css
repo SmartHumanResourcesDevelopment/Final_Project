@@ -1,0 +1,125 @@
+/* ── 레이아웃 컨테이너 ─────────────────────────── */
+.insight {
+  max-width: 1200px;
+  margin: 5rem auto 0;
+  padding: 0 1rem;
+  font-family: "Noto Sans KR", sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── 제목 + 탭 영역 ───────────────────────────── */
+.insight__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 2rem;
+}
+.insight__header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+.highlight {
+  position: relative;
+}
+.highlight::after {
+  content: "";
+  position: absolute;
+  inset: 60% 0 0;
+  background: #e0faff;
+  z-index: -1;
+}
+.insight__sub {
+  flex-basis: 100%;
+  font-size: 1.125rem;
+  margin: 0;
+}
+.insight__tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+.insight__tabs button {
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #f0f0f0;
+  font-weight: 600;
+  cursor: pointer;
+}
+.insight__tabs .is-active {
+  background: #b3ecff;
+  color: #000;
+}
+
+/* ── 그래프 캔버스 ─────────────────────────────── */
+.insight__canvas {
+  position: relative;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 2rem 3rem; 
+  
+}
+.insight__canvas img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* X축 날짜 레이블 */
+.xlabels {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  position: absolute;
+  left: 3rem;
+  right: 3rem;
+   bottom: 1rem; 
+  font-size: 0.75rem;
+  color: #555;
+  margin: 1.25rem 3rem 0; 
+}
+.xlabels li {
+  text-align: center;
+}
+
+/* 범례 */
+.legend {
+  position: absolute;
+  top: 2rem;
+  right: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.legend span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* ── 설명문 ───────────────────────────────────── */
+.insight__caption {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 1.8rem 0 0;   
+  margin: 0;
+}
+
+/* ── 반응형 ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .insight__header h2 {
+    font-size: 2rem;
+  }
+  .insight__canvas {
+    padding: 1.5rem;
+  }
+}

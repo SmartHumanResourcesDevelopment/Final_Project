@@ -1,0 +1,88 @@
+/* 0) 공통 리셋 – Tailwind와 충돌 없도록 필요한 최소한만 */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* 1) 전체 래퍼 */
+.main-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+/* 2) 가로 100% 섹션 공통 */
+.section {
+  width: 100%;
+  max-width: 1440px;
+  padding: 4rem 1.5rem;
+  margin-inline: auto;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+}
+
+/* 4) 카드 · 차트 영역 배경색 */
+.alt-bg-cyan   { background: #e0faff; }
+.alt-bg-yellow { background: #fffbe1; }
+
+/* 5) 2단 그리드 레이아웃 (PC) */
+.stats-grid,
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 2rem;
+}
+
+/* 6) 랭킹 리스트 */
+.ranking-list          { list-style: none; }
+.ranking-item          { display: flex; align-items: center; gap: 1rem; }
+.ranking-item__label   { flex: 0 0 260px; font-weight: 700; font-size: 1.25rem; }
+.ranking-item__bar     { flex: 1; height: 20px; background: #5969cf; border-radius: 4px; }
+.ranking-item__count   { font-weight: 700; }
+
+/* 7) 기간 선택 버튼 */
+.time-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0 2rem;
+  flex-wrap: wrap;
+}
+.time-selector button {
+  padding: 0.25rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: #f3f3f3;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.time-selector button.active,
+.time-selector button:hover {
+  font-weight: 700;
+  background: #ffe2e4;
+}
+
+/* 8) 푸터 */
+.footer {
+  width: 100%;
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+.footer img {
+  width: 257px;
+  max-width: 55%;
+  height: auto;
+  margin-bottom: 0.75rem;
+}
+
+/* 9) 큰 화면 대응 (예: >1650px) */
+@media (min-width: 1650px) {
+  .section { padding-inline: 0; }
+}

@@ -1,0 +1,76 @@
+/************ 전역 초기화 (필요 시 한 번만) ************/
+html, body { margin: 0; padding: 0; }
+
+/************ 변수 ************/
+:root {
+  --nav-h: 25px;          /* 네비 높이 */
+  --hero-bg: #e7faff;     /* 배경색 */
+}
+
+/************ Hero ************/
+.hero {
+  margin-top: calc(var(--nav-h) - 40px);  /* 네비 아래에 붙이기 */
+  background: var(--hero-bg);
+  width: 99vw;               /* 뷰포트 전폭 */
+}
+
+/* 내부 레이아웃 */
+.hero__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;                 /* 모바일 : 세로 스택 */
+  gap: clamp(1rem, 1vw, 2rem);
+
+  /*      ↑ top                  ↑ 좌·우                     ↑ bottom */
+  padding: clamp(1.5rem, 4vh, 3rem) clamp(1.25rem, 5vw, 5rem) 0;
+}
+
+/* ───── 텍스트 블록 ───── */
+.hero__text {
+  flex: 1 1 45%;              /* 45% 비율, 남으면 늘어남 */
+  min-width: 280px;
+  max-width: 640px;
+}
+
+.hero__title {
+  font-family: "Racing Sans One", Helvetica, sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(2.6rem, 6vw, 4.3rem);
+  line-height: 1.1;
+  margin: 0 0 1.2rem;
+}
+
+.hero__subtitle {
+  font-size: clamp(1.1rem, 6vw, 1.6rem);
+  margin: 0 0 2.2rem;
+}
+
+.hero__link {
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  color: #000;
+  transition: color .2s;
+}
+.hero__link:hover { color:#1f1f1f; }
+
+/* ───── 이미지 ───── */
+.hero__img {
+  flex: 1 1 45%;
+  width: 100%;
+  height: auto;
+  min-width: 260px;
+  max-width: 600px;
+}
+
+/* ───── 반응형 ───── */
+@media (max-width: 768px) {
+  .hero__inner { justify-content: center; }
+  .hero__img   { flex-basis: 80%; margin-top: 2rem; }
+}
+
+@media (min-width: 992px) {
+  .hero__inner { gap: 1.5rem; }   /* 데스크톱 전용 */
+}
