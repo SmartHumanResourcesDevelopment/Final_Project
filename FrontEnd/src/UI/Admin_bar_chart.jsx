@@ -1,13 +1,13 @@
 import React from "react";
-import line8 from "../assets/im/admin/line-8.svg";
-import rectangle6 from "../assets/im/admin/rectangle-6.svg";
-import rectangle7 from "../assets/im/admin/rectangle-7.svg";
-import rectangle8 from "../assets/im/admin/rectangle-8.svg";
-import rectangle9 from "../assets/im/admin/rectangle-9.svg";
-import rectangle10 from "../assets/im/admin/rectangle-10.svg";
-import rectangle105 from "../assets/im/admin/rectangle-105.svg";
-import rectangle106 from "../assets/im/admin/rectangle-106.svg";
-import rectangle107 from "../assets/im/admin/rectangle-107.svg";
+import line8 from "../assets/img/admin/line-8.svg";
+import rectangle6 from "../assets/img/admin/rectangle-6.svg";
+import rectangle7 from "../assets/img/admin/rectangle-7.svg";
+import rectangle8 from "../assets/img/admin/rectangle-8.svg";
+import rectangle9 from "../assets/img/admin/rectangle-9.svg";
+import rectangle10 from "../assets/img/admin/rectangle-10.svg";
+import rectangle105 from "../assets/img/admin/rectangle-105.svg";
+import rectangle106 from "../assets/img/admin/rectangle-106.svg";
+import rectangle107 from "../assets/img/admin/rectangle-107.svg";
 
 export const DataVisualizationSection = () => {
   const chartData = [

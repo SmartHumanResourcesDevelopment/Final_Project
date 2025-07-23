@@ -40,7 +40,7 @@ export const NavigationSection = () => {
 
       <div className="absolute w-[222px] h-8 top-5 left-[1182px]">
         <div className="absolute w-8 h-8 top-0 left-0 bg-[#ffe6cc] rounded-2xl">
-          <div className="absolute top-[9px] left-2 [font-family:'Poppins-Regular',Helvetica] font-normal text-white text-base tracking-[0.50px] leading-[13px] whitespace-nowrap">
+          <div className="absolute top-[9px] left-1.5 [font-family:'Poppins-Regular',Helvetica] font-normal text-white text-base tracking-[0.50px] leading-[13px] whitespace-nowrap">
             🍔
           </div>
         </div>

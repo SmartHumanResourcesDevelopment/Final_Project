@@ -99,7 +99,8 @@ export const Join = () => {
   return (
     <div className="bg-white flex justify-center w-full font-poppins">
       {/* 메인 캔버스: 높이 720 데스크탑 / 650 모바일 */}
-      <div className="relative w-full h-[650px] lg:h-[720px] overflow-hidden">
+      <div className="flex flex-col justify-center items-center
+                w-full min-h-[650px] md:min-h-[75vh] px-4 bg-white">
 
         {/* ───────── 좌측 폼 ───────── */}
         <div className="absolute inset-y-0 left-0 w-1/2 flex justify-center">
