@@ -1,0 +1,304 @@
+/* Login.css */
+
+/* Google Fonts - Poppins 임포트 (전역 CSS에 있다면 여기서 제거 가능) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ① 전체 화면 세로 중앙 */
+.login-full-screen-container {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  font-family: 'Poppins', sans-serif; /* Poppins 폰트 적용 */
+}
+
+/* ② 1440x720 캔버스 (부모 요소) */
+.login-canvas {
+  position: relative;
+  background-color: white;
+  width: 100%;
+  max-width: 1440px; /* 데스크탑 최대 너비 */
+  height: 650px; /* 기본 높이 */
+  overflow: hidden;
+  margin: 0 auto; /* 중앙 정렬 */
+  display: flex; /* 좌우 패널을 위한 flex */
+  flex-direction: row; 
+}
+
+/* 대형 화면을 위한 높이 조정 */
+@media (min-width: 1024px) { /* lg:h-[692px] */
+  .login-canvas {
+    height: 692px;
+  }
+}
+
+/* ───── 우측 영역 ───── */
+.login-right-panel {
+  position: relative;
+  width: 50%; /* 1/2 너비 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* 이미지 넘침 방지 */
+    order: 2; /* 좌측에 먼저 배치 */
+  
+}
+
+/* 1) 배경색 + 타일 반복 */
+.login-bg-pattern {
+  position: absolute;
+  inset: 0; /* top, right, bottom, left 모두 0 */
+  background-color: #E9FFFF; /* 파스텔 배경 */
+  background-repeat: repeat-x; /* 가로 반복 */
+  background-position: top; /* 상단 정렬 */
+  background-size: 320px 100%; /* 가로 320px, 세로 100% */
+}
+
+/* 2) 중앙 일러스트 */
+.login-main-illustration {
+  position: relative; /* z-index를 위해 relative */
+  z-index: 10; /* 배경보다 위에 */
+  width: 85%;
+  max-width: 640px; /* 최대 너비 */
+  height: auto; /* 비율 유지 */
+  object-fit: contain; /* 이미지가 잘리지 않고 포함되도록 */
+}
+
+/* ─── 좌측 정보 영역 ─── */
+.login-left-panel {
+  position: relative; /* absolute 제거, flex 컨테이너 내에서 배치 */
+  width: 50%; /* 1/2 너비 */
+  display: flex;
+  justify-content: center; /* 내부 콘텐츠 중앙 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+    order: 1; /* 좌측에 먼저 배치 */
+}
+
+.login-form-container {
+  width: 540px; /* 고정 너비 */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* 좌측 정렬 */
+  gap: 4px; /* gap-1 (tailwind 기본 4px) */
+}
+
+/* 타이틀 */
+.login-title-group {
+  margin-bottom: 16px; /* space-y-4 */
+}
+
+.login-main-title {
+  font-size: 32px;
+  font-weight: 600; /* semibold */
+  margin-bottom: 16px; /* space-y-4 */
+}
+
+.login-sub-title {
+  font-size: 15px;
+  font-weight: 500; /* medium */
+}
+
+/* 폼 */
+.login-form {
+  width: 100%;
+  margin-top: 20px; /* mt-5 */
+  margin-bottom: 0; /* mb-0 */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* space-y-4 */
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 4px; /* mb-1 */
+  font-size: 14px; /* text-sm */
+  font-weight: 500; /* font-medium */
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  height: 48px; /* h-12 */
+  padding-left: 12px; /* pl-3 */
+  border-radius: 8px; /* rounded-lg */
+  border: 1px solid #d1d5db; /* border border-solid border-gray-300 */
+  background-color: white;
+  transition: border-color 0.2s ease-in-out; /* focus-within transition */
+}
+
+.input-wrapper:focus-within {
+  border-color: #5969cf; /* focus-within:border-[#5969cf] */
+}
+
+.form-input {
+  width: 100%;
+  font-size: 14px; /* text-[14px] */
+  color: #333; /* 기본 텍스트 색상 */
+  background-color: transparent; /* 배경 투명 */
+  border: none;
+  outline: none; /* 포커스 아웃라인 제거 */
+}
+
+.form-input::placeholder {
+  color: #9ca3af; /* placeholder:text-gray-400 */
+}
+
+.password-group .forgot-password-link {
+  position: absolute;
+  top: 0; /* label과 동일한 라인 */
+  right: 0;
+  font-size: 11px; /* text-[11px] */
+  color: #6366f1; /* text-action-sec (tailwind.config에서 정의된 색상으로 가정) */
+  text-decoration: none;
+  transition: text-decoration 0.2s ease-in-out;
+}
+
+.password-group .forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+/* 30일 저장 체크박스 */
+.remember-me-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* gap-2 */
+  font-size: 13px; /* text-[13px] */
+  cursor: pointer;
+  -webkit-touch-callout: none; /* 텍스트 선택 방지 */
+  -webkit-user-select: none; /* 텍스트 선택 방지 */
+  -moz-user-select: none; /* 텍스트 선택 방지 */
+  -ms-user-select: none; /* 텍스트 선택 방지 */
+  user-select: none; /* 텍스트 선택 방지 */
+}
+
+.custom-checkbox {
+  width: 20px; /* w-5 */
+  height: 20px; /* h-5 */
+  border: 1px solid #d1d5db; /* border border-gray-300 */
+  border-radius: 2px; /* rounded-sm */
+  accent-color: #3b82f6; /* accent-blue-500 (체크박스 색상) */
+  cursor: pointer;
+  /* appearance-auto는 브라우저 기본 스타일을 유지 */
+}
+
+/* 로그인 버튼 */
+.login-button {
+  height: 36px; /* h-9 */
+  width: 100%;
+  border-radius: 6px; /* rounded-md */
+  background-color: #5969cf; /* bg-[#5969cf] */
+  font-weight: 600; /* font-semibold */
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  margin-bottom: 0; /* mb-0 */
+}
+
+.login-button:hover {
+  background-color: #4a5bb8; /* hover:bg-[#4a5bb8] */
+}
+
+/* 로그인 ↔ Or ↔ 회원가입 (간격 4 px) */
+.login-or-signup-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* gap-1 (tailwind 기본 4px) */
+}
+
+/* Or 구분선 */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0; /* 위아래 여백 */
+}
+
+.divider-line {
+  flex: 1; /* flex-1 */
+  height: 1px; /* h-px */
+  background-color: #d1d5db; /* bg-gray-300 */
+}
+
+.divider-text {
+  padding: 0 8px; /* px-2 */
+  font-size: 13px; /* text-[13px] */
+  font-weight: 500; /* font-medium */
+  background-color: white;
+  color: #6b7280; /* 회색 텍스트 */
+}
+
+/* 회원가입 버튼 */
+.signup-button {
+  height: 36px; /* h-9 */
+  width: 100%;
+  border-radius: 6px; /* rounded-md */
+  background-color: #5969cf; /* bg-[#5969cf] */
+  font-weight: 600; /* font-semibold */
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.signup-button:hover {
+  background-color: #4a5bb8; /* hover:bg-[#4a5bb8] */
+}
+
+/* SNS 로그인 */
+.sns-login-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 24px; /* gap-6 */
+  width: 100%;
+  margin-top: 40px; /* mt-10 */
+}
+
+.sns-button {
+  width: 190px;
+  background-color: transparent; /* 이미지 자체가 버튼이므로 배경 제거 */
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.sns-button:hover {
+  opacity: 0.8;
+}
+
+.sns-button img {
+  width: 100%;
+  height: auto;
+  display: block; /* 이미지 하단 여백 제거 */
+}
+
+/* 하단 문구 */
+.bottom-text {
+  width: 100%;
+  font-size: 13px; /* text-[13px] */
+  font-weight: 500; /* font-medium */
+  margin-top: 16px; /* mt-4 */
+  text-align: center;
+  color: #333;
+}
+
+.signup-link {
+  color: #0f3cde; /* text-[#0f3cde] */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: text-decoration 0.2s ease-in-out;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
