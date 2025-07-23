@@ -7,8 +7,9 @@ import { Main_search } from "../common/Main_search";
 import { Main_servise_banner } from "../UI/Main_servise_banner";
 import { Main_rank } from "../UI/Main_rank";
 import { Main_top3 } from "../UI/Main_top3";
-import { KeywordSection } from "../UI/Main_up";
+import { Main_Trending } from "../UI/Main_Trending";
 import { Main_top3_insight } from "../UI/Main_top3_insight";
+import { Main_Trending_insight } from "../UI/Main_Trending_insight.jsx";
 import FooterSection from "../common/footer";
 
 
@@ -39,10 +40,13 @@ const Main = () => {
     {/* 키워드TOP3 그래프 */}
     <Main_top3_insight />
 
-      {/* 잠재키워드
-      <KeywordSection /> */}
+      {/* 잠재키워드 */}
+      <Main_Trending />
 
-      {/* 서비스 소개 */}
+      {/* 급상승 인사이트 */}
+      <Main_Trending_insight />
+
+      
 
      
       {/* footer */}

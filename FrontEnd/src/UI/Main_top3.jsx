@@ -1,5 +1,5 @@
-import React from "react";
-import "../assets/css/Main_top3.css";               // ★ 새로 만든 전용 CSS
+import React, { useState } from "react";
+import "../assets/css/Main_keyword_card.css";
 import img1 from "../assets/img/common/rectangle-125-3.png";
 import img2 from "../assets/img/common/rectangle-125-4.png";
 import img3 from "../assets/img/common/rectangle-125-5.png";
@@ -26,40 +26,61 @@ const trendData = [
 ];
 
 export default function Main_top3() {
+  const [hovered, setHovered] = useState(null);
+
   return (
-    <section className="top3">
-      {/* ── 왼쪽 소개 영역 ───────────────────────────── */}
-      <header className="top3__intro">
-        <h2>
-          <strong>가장핫한 키워드<br /></strong>
-          <strong>TOP&nbsp;3</strong>
-        </h2>
-        <p>
-          EAT&nbsp;PICK 선정&nbsp;TOP3<br />
-          심층 분석 해 보러가요.
-        </p>
-        <p className="top3__note">※ 심층분석 보러가기 버튼을 눌러보세요</p>
-      </header>
+    <section className="trending-section top3">
+      {/* ── 왼쪽 소개 ─────────────────────── */}
+      <header id="keyword-section-title" className="intro-box">
+          {/* h2 → h1 로 변경 */}
+          <h1>
+            <strong>가장핫한 키워드<br /></strong>
+            <strong>TOP&nbsp;3</strong>
+          </h1>
 
-      {/* ── 오른쪽 카드 영역 ────────────────────────── */}
-      <div className="top3__cards">
-        {trendData.map(({ id, image, title, desc }, idx) => (
-          <article key={id} className={`top3__card ${idx === 0 ? "is-active" : ""}`} >
+          <p>
+            EAT&nbsp;PICK 선정&nbsp;TOP3<br />
+            심층 분석 해 보러가요.
+          </p>
+
+          {/* note 클래스 그대로 */}
+          <p className="note top3__note">
+            ※ 심층분석 보러가기 버튼을 눌러보세요
+          </p>
+        </header>
+
+      {/* ── 카드 영역 ─────────────────────── */}
+      <div className="card-list top3__cards">
+        {trendData.map(({ id, image, title, desc }) => (
+          <article
+            key={id}
+            className={`keyword-card top3__card${hovered === id ? " is-hover" : ""}`}
+            onMouseEnter={() => setHovered(id)}
+            onMouseLeave={() => setHovered(null)}
+          >
             <img src={image} alt={`${title} 이미지`} />
-            <h3>{title}</h3>
 
-            {desc.split("\n").map((line, i) => (
-              <p key={i}>{line}</p>
-            ))}
+            {/* ↓↓↓ 카드 내부 콘텐츠 래퍼 추가 ↓↓↓ */}
+            <div className="card-body">
+              <h3>{title}</h3>
 
-            <button aria-label={`${title} 심층분석 보러가기`}>
-              심층분석 보러가기
-            </button>
-          </article>
+              {/* 요약 문단에 카드 공통 클래스 부여 */}
+              {desc.split("\n").map((line, i) => (
+                <p key={i} className="card-summary">
+                  {line}
+                </p>
+              ))}
+
+              <button aria-label={`${title} 심층분석 보러가기`}>
+                심층분석 보러가기
+              </button>
+            </div>
+</article>
+
         ))}
       </div>
     </section>
   );
 }
 
-export{Main_top3}
+export { Main_top3 };
