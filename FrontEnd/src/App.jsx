@@ -4,6 +4,7 @@ import Login from "./components/Login";
 import Join from "./components/Join";
 import Main from "./components/Main";
 import MyPage from "./components/MyPage";
+import Sub from "./components/Sub";
 
 function App() {
   return (
@@ -13,6 +14,8 @@ function App() {
         <Route path="/join" element={<Join />} />
         <Route path="/main" element={<Main />} />
         <Route path="/mypage" element={<MyPage />} />
+        <Route path="/sub" element={<Sub />} />
+
       </Routes>
     </BrowserRouter>
   );
