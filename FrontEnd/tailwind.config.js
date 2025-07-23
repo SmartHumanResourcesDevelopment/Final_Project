@@ -1,12 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{html,js,ts,jsx,tsx}"],
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      colors: {
-        "action-sec": "var(--action-sec)",
-        "edf-2f-7": "var(--edf-2f-7)",
-        muted: "var(--muted)",
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
+        racing: ["'Racing Sans One'", "sans-serif","Helvetica"],
+        // 기본 sans를 교체하면 class="font-sans"만 써도 Noto Sans KR
+        sans: ["'Noto Sans KR'", "sans-serif","Helvetica"],
       },
     },
   },

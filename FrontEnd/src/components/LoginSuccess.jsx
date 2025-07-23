@@ -1,44 +1,40 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
+import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
+import mint_bg_color from "../assets/img/common/mint_bg_color.png";
 
 export const LoginSuccess = () => {
   const navigate = useNavigate();
-      const handleLoginClick = (e) => {
-        e.preventDefault();
-        navigate("/");
-      };
+  const handleLoginClick = () => navigate("/");
+
   return (
-    <div className="relative w-[662px] h-[706px]">
-      <div className="fixed w-[662px] h-[706px] top-0 left-0 bg-[#fbffff] rounded-[20px] shadow-[4px_4px_20px_10px_#00000040]">
+    /* ① 오버레이 : 뷰포트 100% 덮고 정확히 중앙 정렬 */
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+      {/* ② 모달 박스 : 500×450px, 둥근 모서리 + 그림자 */}
+      <div className="w-[500px] h-[450px] bg-[#fbffff] rounded-[20px] shadow-[4px_4px_20px_8px_#00000030] flex flex-col items-center py-10 px-8 gap-6">
+        
+        {/* ③ 타이틀 */}
+        <h1 className="text-[32px] font-semibold text-center">
+          회원가입 완료 <span role="img" aria-label="축하">👏👏</span>
+        </h1>
+
+        {/* ④ 일러스트(가로 80%) */}
         <img
-          className="absolute w-[474px] h-[285px] top-[210px] left-[94px]"
-          alt="Woman with graph chart illustration"
-          src="/img/woman-with-graph-chart.png"
+          src={login_join_bg_img}
+          alt="Woman with graph chart"
+          className="w-4/5 max-w-[350px] h-auto object-contain"
         />
 
-        <header className="inline-flex h-[53px] items-start gap-2.5 absolute top-[105px] left-[137px]">
-          <h1 className="relative w-fit mt-[-1.00px] mb-[-21.47px] [font-family:'Poppins-Medium',Helvetica] font-medium text-black text-[50px] tracking-[0] leading-[normal]">
-            회원가입 완료👏👏
-          </h1>
-        </header>
-
-        <div className="absolute w-[404px] h-[35px] top-[581px] left-[129px]">
-          <div className="relative h-8">
-            <button
-              onClick={handleLoginClick}
-              className="flex w-[404px] h-8 items-center justify-center gap-2.5 pl-2.5 pr-0 py-2.5 relative bg-[#5969cf] rounded-[10px] overflow-hidden border border-solid cursor-pointer hover:bg-[#4a5bb8] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#5969cf] focus:ring-offset-2"
-              aria-label="로그인 페이지로 이동"
-            >
-              <span className="[font-family:'Poppins-Bold',Helvetica] font-bold text-white text-[13px] text-center tracking-[0] leading-[normal]">
-                로그인 하러 가기
-              </span>
-            </button>
-          </div>
-        </div>
+        {/* ⑤ 로그인 버튼 */}
+        <button
+          onClick={handleLoginClick}
+          className="w-3/4 h-9 bg-[#5969cf] rounded-[10px] text-white font-bold hover:bg-[#4a5bb8] transition-colors"
+        >
+          로그인 하러 가기
+        </button>
       </div>
     </div>
   );
 };
 
-export default LoginSuccess; 
+export default LoginSuccess;

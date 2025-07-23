@@ -1,0 +1,471 @@
+/* Element.css */
+
+/* 전체 컨테이너 및 기본 설정 (Tailwind-like class 제거) */
+.element-container {
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}
+
+.element-inner-wrapper {
+  background-color: white;
+  overflow: hidden; /* 이 부분은 전체 페이지가 넘칠 때를 대비한 것 */
+  width: 1440px; /* 이 값은 여전히 고정되어 있어 반응형에 취약합니다 */
+  height: 4247px; /* 이 값은 여전히 고정되어 있어 반응형에 취약합니다 */
+  position: relative; /* 내부 absolute 요소들을 위한 기준점 */
+}
+
+
+/* KOTE 감성분석 섹션 */
+.kote-analysis-section {
+  position: absolute;
+  width: 373px;
+  height: 109px;
+  top: 1970px;
+  left: 100px;
+}
+
+.kote-analysis-bg {
+  position: absolute;
+  width: 373px;
+  height: 29px;
+  top: 26px;
+  left: 0;
+  background-color: #e0faff;
+}
+
+.kote-analysis-content {
+  display: flex;
+  flex-direction: column;
+  width: 369px;
+  align-items: flex-start;
+  gap: 17px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.kote-analysis-title {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  font-family: 'Noto Sans KR', Helvetica; /* 폰트 지정 */
+  font-weight: bold;
+  font-size: 58px; /* 5xl = 58px */
+  line-height: 58px;
+  color: black;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.kote-analysis-description {
+  position: relative;
+  width: fit-content;
+  margin-right: -237px; /* 폰트 길이 따라 조절 */
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: normal;
+  font-size: 24px; /* 2xl = 34px */
+  line-height: 34px;
+  color: black;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+
+/* 비슷한 키워드 TOP5 섹션 */
+.similar-keywords-section {
+  position: absolute;
+  width: 473px;
+  height: 109px;
+  top: 3012px;
+  left: 100px;
+}
+
+.similar-keywords-bg {
+  position: absolute;
+  width: 469px;
+  height: 29px;
+  top: 26px;
+  left: 1px;
+  background-color: #fff6bf;
+}
+
+.similar-keywords-content {
+  display: flex;
+  flex-direction: column;
+  width: 369px;
+  align-items: flex-start;
+  gap: 17px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.similar-keywords-title {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  margin-right: -49px;
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: bold;
+  font-size: 58px;
+  line-height: 58px;
+  color: black;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.similar-keywords-description {
+  position: relative;
+  width: fit-content;
+  margin-right: -205px;
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: normal;
+  font-size: 24px;
+  line-height: 34px;
+  color: black;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+
+/* 상단 네비게이션 및 핵심 섹션 그룹 */
+.top-sections-group {
+  position: absolute;
+  width: 1647px;
+  height: 723px;
+  top: 0;
+  left: -207px; /* 이 값 때문에 네비게이션 바가 왼쪽으로 밀려 나옵니다 */
+}
+
+.top-sections-inner {
+  position: absolute;
+  width: 1647px;
+  height: 658px;
+  top: 0;
+  left: 0;
+}
+
+.main-content-area {
+  position: absolute;
+  width: 923px;
+  height: 595px;
+  top: 63px;
+  left: 0;
+}
+
+.main-content-bg {
+  position: absolute;
+  width: 687px;
+  height: 414px;
+  top: 82px;
+  left: 42px;
+  background-color: #fffbe0;
+  border-radius: 343.48px / 206.94px; /* 타원형 반지름 */
+  transform: rotate(-15deg);
+}
+
+.top-right-image {
+  position: absolute;
+  width: 558px;
+  height: 558px;
+  top: 165px;
+  left: 1020px;
+}
+
+.search-button {
+  position: absolute;
+  width: 90px;
+  height: 50px;
+  top: 88px;
+  left: 1514px;
+  background-color: black;
+  border-radius: 200px;
+}
+
+.search-text {
+  position: absolute;
+  top: 17px;
+  left: 22px;
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: bold;
+  font-size: 12px;
+  color: white;
+  letter-spacing: 0.5px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+.search-icon-wrapper {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  top: 19px;
+  left: 62px;
+}
+
+.search-icon-oval {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  top: 0;
+  left: 0;
+}
+
+.search-icon-path {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  top: 9px;
+  left: 9px;
+}
+
+
+/* 트렌드 확산 배경 정보 박스 */
+.trend-info-box {
+  position: absolute;
+  width: 1260px;
+  height: 713px;
+  top: 1087px;
+  left: 90px;
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0px 4px 10px 2px rgba(0, 0, 0, 0.25); /* #00000040 */
+}
+
+.trend-info-text {
+  position: absolute;
+  width: 1148px;
+  top: 564px;
+  left: 56px;
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: normal;
+  font-size: 22px;
+  color: black;
+  letter-spacing: 0.5px;
+  line-height: 40px;
+}
+
+.trend-info-image {
+  position: absolute;
+  width: 1087px;
+  height: 442px;
+  top: 61px;
+  left: 77px;
+}
+
+
+/* 말차 트렌드 확산 배경 섹션 (헤더) */
+.matcha-trend-header {
+  position: absolute;
+  width: 491px;
+  height: 109px;
+  top: 928px;
+  left: 100px;
+}
+
+.matcha-trend-header-bg {
+  position: absolute;
+  width: 491px;
+  height: 29px;
+  top: 29px;
+  left: 0;
+  background-color: #ffe0e2;
+}
+
+.matcha-trend-header-content {
+  display: flex;
+  flex-direction: column;
+  width: 369px;
+  align-items: flex-start;
+  gap: 17px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.matcha-trend-header-title {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  margin-right: -67px;
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: bold;
+  font-size: 58px;
+  line-height: 58px;
+  color: black;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.matcha-trend-header-description {
+  position: relative;
+  width: fit-content;
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: normal;
+  font-size: 24px;
+  line-height: 34px;
+  color: black;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+
+/* 아이디어가 필요하신가요? 챗봇 버튼 */
+.chatbot-area {
+  position: absolute;
+  width: 239px;
+  height: 188px;
+  top: 763px;
+  left: 1162px;
+}
+
+.chatbot-button-wrapper {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  top: 68px;
+  left: 68px;
+  background-color: white;
+  border-radius: 200px;
+  box-shadow: 1px 1px 10px 1px rgba(0, 0, 0, 0.25); /* #00000040 */
+}
+
+.chatbot-icon {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  top: 15px;
+  left: 15px;
+}
+
+.chatbot-text-bubble {
+  position: absolute;
+  width: 239px;
+  height: 58px;
+  top: 0;
+  left: 0;
+  background-image: url(/img/rectangle-23.svg);
+  background-size: 100% 100%;
+}
+
+.chatbot-text {
+  position: absolute;
+  top: 23px;
+  left: 20px;
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: 500;
+  font-size: 18px; /* lg = 18px */
+  color: white;
+  letter-spacing: 0.3px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+
+/* 하단 푸터 */
+.footer {
+  position: absolute;
+  width: 1440px;
+  height: 200px;
+  top: 4047px;
+  left: 0.5px;
+  background-color: black;
+}
+
+.footer-content {
+  position: relative;
+  width: 493px;
+  height: 145px;
+  top: 11px;
+  left: 474px;
+}
+
+.footer-chatgpt-image {
+  position: absolute;
+  width: 257px;
+  height: 136px;
+  top: 0;
+  left: 118px;
+}
+
+.footer-info {
+  position: absolute;
+  top: 101px;
+  left: 0;
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: 500;
+  font-size: 18px;
+  color: white;
+  text-align: center;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+
+/* 날짜 필터 (1일, 1주, 1달, 1년) */
+.date-filter-group {
+  position: absolute;
+  width: 383px;
+  height: 44px; /* 11px * 4 = 44px */
+  top: 991px;
+  left: 974px;
+}
+
+.date-filter-calendar-icon {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  font-family: 'Noto Sans KR', Helvetica;
+  font-weight: 500;
+  font-size: 32px;
+  letter-spacing: 0.5px;
+  line-height: 40px;
+  color: black;
+  white-space: nowrap;
+}
+
+.date-filter-option {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px; /* 2.5 * 4 = 10px */
+  padding: 6px 20px; /* 1.5 * 4 = 6px, 5 * 4 = 20px */
+  position: absolute;
+  top: 0;
+  border-radius: 8px; /* rounded-lg */
+}
+
+.date-filter-option:nth-of-type(2) { /* 1일 */
+  left: 56px; /* 14 * 4 = 56px */
+}
+.date-filter-option:nth-of-type(3) { /* 1주 */
+  left: 140px;
+  background-color: #ffe2e4; /* bg-[#ffe2e4] */
+}
+.date-filter-option:nth-of-type(4) { /* 1달 */
+  left: 224px; /* 56 * 4 = 224px */
+}
+.date-filter-option:nth-of-type(5) { /* 1년 */
+  left: 308px;
+}
+
+.date-filter-option .date-filter-text {
+  position: relative;
+  width: fit-content;
+  margin-top: -1px;
+  font-family: 'Noto Sans KR', Helvetica;
+  color: black;
+  font-size: 22px;
+  letter-spacing: 0;
+  line-height: 31.9px;
+  white-space: nowrap;
+}
+
+.date-filter-option:nth-of-type(3) .date-filter-text { /* 1주 텍스트 */
+  font-weight: bold;
+}
+.date-filter-option:not(:nth-of-type(3)) .date-filter-text { /* 1일, 1달, 1년 텍스트 */
+  font-weight: 500; /* medium */
+}

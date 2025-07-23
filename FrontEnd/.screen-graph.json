@@ -6,7 +6,6 @@
       "routes": [
         "/"
       ],
-      "dataModelId": "318:669",
       "isRoot": true
     },
     {
@@ -14,6 +13,27 @@
       "label": "Join",
       "routes": [
         "/join"
+      ]
+    },
+    {
+      "id": "src/components/Main.jsx",
+      "label": "Main",
+      "routes": [
+        "/main"
+      ]
+    },
+    {
+      "id": "src/components/MyPage.jsx",
+      "label": "MyPage",
+      "routes": [
+        "/mypage"
+      ]
+    },
+    {
+      "id": "src/components/Sub.jsx",
+      "label": "Sub",
+      "routes": [
+        "/sub"
       ]
     }
   ],
