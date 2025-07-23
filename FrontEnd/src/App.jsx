@@ -5,7 +5,7 @@ import Join from "./components/Join";
 import Main from "./components/Main";
 import Sub from "./components/Sub";
 import MyPage from "./components/MyPage";
-import Sub from "./components/Sub";
+
 
 function App() {
   return (
