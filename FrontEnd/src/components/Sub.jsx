@@ -4,12 +4,12 @@ import { InsightsSection } from "../UI/Detail_title";
 import { KeywordHighlightSection } from "../UI/Detail_kote";
 import { NavigationBarSection } from "../common/menu_bar";
 import { TrendAnalysisSection } from "../UI/Detail_same";
-import chatgptImage20257160255421 from "./chatgpt-image-2025-7-16-02-55-42-1.png";
-import group410 from "./group-410.png";
-import messageBot from "./message-bot.png";
-import oval from "./oval.svg";
-import path14 from "./path-14.svg";
-import rectangle112 from "./rectangle-112.png";
+import chatgptImage20257160255421 from "../assets/img/common/footer_img.png";
+import group410 from "../assets/img/common/Group 410.png";
+import messageBot from "../assets/img/common/message-bot.png";
+// import oval from "./oval.svg";
+// import path14 from "./path-14.svg";
+// import rectangle112 from "./rectangle-112.png";
 
 export const Sub = () => {
   const timeFilterOptions = [
@@ -64,7 +64,7 @@ export const Sub = () => {
           <img
             className="absolute w-[558px] h-[558px] top-[165px] left-[1020px]"
             alt="Rectangle"
-            src={rectangle112}
+            //src={rectangle112}
           />
 
           <button
@@ -80,13 +80,13 @@ export const Sub = () => {
                 <img
                   className="absolute w-[11px] h-[11px] top-0 left-0"
                   alt=""
-                  src={oval}
+                  //src={oval}
                 />
 
                 <img
                   className="absolute w-[5px] h-[5px] top-[9px] left-[9px]"
                   alt=""
-                  src={path14}
+                  //src={path14}
                 />
               </div>
             </div>

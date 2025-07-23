@@ -39,7 +39,7 @@
   ],
   "edges": [
     {
-      "id": "src\\components\\Login.jsx:18:31-to-src\\components\\Join.jsx",
+      "id": "src\\components\\Login.jsx:18:6-to-src\\components\\Join.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\components\\Join.jsx",
       "data": {
@@ -48,8 +48,8 @@
           "element": "navigate(\"/join\")",
           "line": 18,
           "endLine": 18,
-          "column": 31,
-          "endColumn": 48,
+          "column": 6,
+          "endColumn": 23,
           "sourceFile": "src\\components\\Login.jsx"
         }
       }
