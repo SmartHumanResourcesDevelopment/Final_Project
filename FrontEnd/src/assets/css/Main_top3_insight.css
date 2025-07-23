@@ -71,15 +71,11 @@
 
 /* X축 날짜 레이블 */
 .xlabels {
+  margin: 1.25rem 3rem 0;  /* 그래프와 간격만 유지 */
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  position: absolute;
-  left: 3rem;
-  right: 3rem;
-   bottom: 1rem; 
-  font-size: 0.75rem;
-  color: #555;
-  margin: 1.25rem 3rem 0; 
+  font-size: .8rem;
+  color: #666;
 }
 .xlabels li {
   text-align: center;
@@ -111,7 +107,7 @@
   font-size: 1rem;
   line-height: 1.6;
   margin: 1.8rem 0 0;   
-  margin: 0;
+  margin: 1.5rem 3rem 0;
 }
 
 /* ── 반응형 ──────────────────────────────────── */

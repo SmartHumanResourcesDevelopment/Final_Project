@@ -51,19 +51,21 @@ export default function Main_top3_insight() {
             </li>
           ))}
         </ul>
+
+        {/* ★ 날짜 레이블 : 그래프와 설명 사이 */}
+          <ul className="xlabels">
+            {dateLabels.map((d) => (
+              <li key={d}>{d}</li>
+            ))}
+          </ul>
+          {/* 설명문 */}
+          <p className="insight__caption">
+            탕후루는 비주얼 중심 SNS 유행과 함께 급상승, 마라탕은 여전히 MZ세대의
+            꾸준한 선택, 제로음료는 건강함을 중시하는 흐름 속 점진적 성장 중입니다.
+          </p>
       </div>
 
-      {/* ★ 날짜 레이블 : 그래프와 설명 사이 */}
-      <ul className="xlabels">
-        {dateLabels.map((d) => (
-          <li key={d}>{d}</li>
-        ))}
-      </ul>
- {/* 설명문 */}
-      <p className="insight__caption">
-        탕후루는 비주얼 중심 SNS 유행과 함께 급상승, 마라탕은 여전히 MZ세대의
-        꾸준한 선택, 제로음료는 건강함을 중시하는 흐름 속 점진적 성장 중입니다.
-      </p>
+      
      
       
     </section>
