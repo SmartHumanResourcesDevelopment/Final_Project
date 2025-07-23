@@ -119,10 +119,10 @@ export const Main = () => {
 
   return (
     <div className="bg-white flex flex-row justify-center w-full">
-      <div className="bg-white overflow-hidden w-[1560px] h-[5341px] relative">
+      <div className="bg-white overflow-hidden w-[1440px] h-[5341px] relative">
         <div className="absolute w-[273px] h-[165px] top-[1670px] left-[-1053px] bg-[#6ff8a8] rounded-[136.63px/82.32px] rotate-[22.65deg]" />
 
-        <div className="absolute w-[1560px] h-[200px] top-[5141px] left-0 bg-black">
+        <div className="absolute w-[1440px] h-[200px] top-[5141px] left-0 bg-black">
           <div className="relative w-[493px] h-[145px] top-[11px] left-[500px]">
             <img
               className="absolute w-[257px] h-[136px] top-0 left-[118px]"
@@ -138,7 +138,7 @@ export const Main = () => {
           </div>
         </div>
 
-        <div className="absolute w-[1446px] h-[618px] top-0 left-0">
+        <div className="absolute w-[1440px] h-[618px] top-0 left-0">
           <NavigationSection />
           <img
             className="absolute w-[736px] h-[500px] top-12 left-[662px]"
