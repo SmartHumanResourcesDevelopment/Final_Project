@@ -123,7 +123,7 @@ export const Main = () => {
         <div className="absolute w-[273px] h-[165px] top-[1670px] left-[-1053px] bg-[#6ff8a8] rounded-[136.63px/82.32px] rotate-[22.65deg]" />
 
         <div className="absolute w-[1440px] h-[200px] top-[5141px] left-0 bg-black">
-          <div className="relative w-[493px] h-[145px] top-[11px] left-[500px]">
+          <div className="relative w-[493px] h-[145px] top-[11px] left-[480px]">
             <img
               className="absolute w-[257px] h-[136px] top-0 left-[118px]"
               alt="footer"
@@ -173,7 +173,7 @@ export const Main = () => {
         {rankingData.map((item, index) => (
           <div
             key={index}
-            className="absolute w-[823px] h-10 left-[640px]"
+            className="absolute w-[823px] h-10 left-[620px]"
             style={{ top: `${1055 + index * 50}px` }}
           >
             {item.trend === "↔" ? (
@@ -222,7 +222,7 @@ export const Main = () => {
 
        
 
-        <div className="absolute w-[1260px] h-[718px] top-[2519px] left-[128px]">
+        <div className="absolute w-[1260px] h-[718px] top-[2519px] left-[108px]">
           <div className="absolute w-[1260px] h-[713px] top-[5px] left-0 bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
             <p className="absolute w-[1148px] top-[558px] left-[54px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-black text-[22px] tracking-[0.50px] leading-10">
               탕후루는 비주얼 중심 SNS 유행과 함께 급상승, 마라탕은 여전히
@@ -267,7 +267,7 @@ export const Main = () => {
         
 
 
-        <div className="absolute w-[1260px] h-[713px] top-[4291px] left-[128px] bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
+        <div className="absolute w-[1260px] h-[713px] top-[4291px] left-[108px] bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
             <InsightsSection />
           <p className="absolute w-[1148px] top-[518px] left-[60px] [font-family:'Noto_Sans_KR-Regular',Helvetica] font-normal text-black text-[22px] tracking-[0.50px] leading-10">
             AI 푸드는 개인 맞춤형 식단 추천과 3D 푸드 프린팅 기술 발전이

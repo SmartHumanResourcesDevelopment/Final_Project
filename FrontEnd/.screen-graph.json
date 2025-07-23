@@ -21,6 +21,13 @@
       "routes": [
         "/main"
       ]
+    },
+    {
+      "id": "src/components/MyPage.jsx",
+      "label": "MyPage",
+      "routes": [
+        "/mypage"
+      ]
     }
   ],
   "edges": [

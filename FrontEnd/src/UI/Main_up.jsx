@@ -44,7 +44,7 @@ export const KeywordSection = () => {
       role="main"
       aria-labelledby="keyword-section-title"
     >
-      <div className="absolute w-[853px] h-[500px] top-0 left-[488px]">
+      <div className="absolute w-[853px] h-[500px] top-0 left-[468px]">
         {keywordData.map((keyword, index) => (
           <article
             key={keyword.id}
