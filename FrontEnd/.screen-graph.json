@@ -76,6 +76,70 @@
           "sourceFile": "src\\components\\Login.jsx"
         }
       }
+    },
+    {
+      "id": "src\\common\\menu_bar.jsx:26:25-to-src\\components\\Login.jsx",
+      "source": "src\\components\\Main.jsx",
+      "target": "src\\components\\Login.jsx",
+      "data": {
+        "viaRoute": "/",
+        "trigger": {
+          "element": "navigate(\"/\")",
+          "line": 26,
+          "endLine": 26,
+          "column": 25,
+          "endColumn": 38,
+          "sourceFile": "src\\common\\menu_bar.jsx"
+        }
+      }
+    },
+    {
+      "id": "src\\common\\menu_bar.jsx:26:25-to-src\\components\\Login.jsx",
+      "source": "src\\components\\Main.jsx",
+      "target": "src\\components\\Login.jsx",
+      "data": {
+        "viaRoute": "/",
+        "trigger": {
+          "element": "navigate(\"/\")",
+          "line": 26,
+          "endLine": 26,
+          "column": 25,
+          "endColumn": 38,
+          "sourceFile": "src\\common\\menu_bar.jsx"
+        }
+      }
+    },
+    {
+      "id": "src\\common\\menu_bar.jsx:26:25-to-src\\components\\Login.jsx",
+      "source": "src\\components\\Main.jsx",
+      "target": "src\\components\\Login.jsx",
+      "data": {
+        "viaRoute": "/",
+        "trigger": {
+          "element": "navigate(\"/\")",
+          "line": 26,
+          "endLine": 26,
+          "column": 25,
+          "endColumn": 38,
+          "sourceFile": "src\\common\\menu_bar.jsx"
+        }
+      }
+    },
+    {
+      "id": "src\\common\\menu_bar.jsx:26:25-to-src\\components\\Login.jsx",
+      "source": "src\\components\\Main.jsx",
+      "target": "src\\components\\Login.jsx",
+      "data": {
+        "viaRoute": "/",
+        "trigger": {
+          "element": "navigate(\"/\")",
+          "line": 26,
+          "endLine": 26,
+          "column": 25,
+          "endColumn": 38,
+          "sourceFile": "src\\common\\menu_bar.jsx"
+        }
+      }
     }
   ]
 }

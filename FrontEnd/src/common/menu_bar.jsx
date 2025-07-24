@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ChevronDown from "../assets/img/common/chevron_down.png";
 import notifIcon from "../assets/img/common/notif-icon.png";
 
 export const NavigationSection = () => {
+  const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState("메인페이지");
 
   const navigationItems = [
@@ -21,7 +23,10 @@ export const NavigationSection = () => {
       {/* 가운데 정렬용 래퍼 */}
       <div className="container mx-auto flex items-center justify-between h-[77px] px-12">
         {/* 로고 */}
-        <h1 className="font-['Racing_Sans_One',Helvetica] text-[28px]">
+         <h1
+          onClick={() => navigate("/main")}
+          className="font-['Racing_Sans_One',Helvetica] text-[28px] cursor-pointer select-none"
+        >
           EAT PICk
         </h1>
 
