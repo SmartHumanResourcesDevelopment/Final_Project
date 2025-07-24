@@ -18,15 +18,15 @@
   ],
   "edges": [
     {
-      "id": "src\\components\\Login.jsx:18:31-to-src\\components\\Join.jsx",
+      "id": "src\\components\\Login.jsx:31:31-to-src\\components\\Join.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\components\\Join.jsx",
       "data": {
         "viaRoute": "/join",
         "trigger": {
           "element": "navigate(\"/join\")",
-          "line": 18,
-          "endLine": 18,
+          "line": 31,
+          "endLine": 31,
           "column": 31,
           "endColumn": 48,
           "sourceFile": "src\\components\\Login.jsx"

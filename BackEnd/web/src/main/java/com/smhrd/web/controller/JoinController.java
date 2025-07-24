@@ -1,30 +1,37 @@
 package com.smhrd.web.controller;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import com.smhrd.web.DTO.SignUpRequest;
+import com.smhrd.web.DTO.SignUpResponse;
+import com.smhrd.web.service.LoginService;
+
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")   // ★ CORS(포트는 상황에 맞게)
+@CrossOrigin(origins = "http://localhost:5173")   // ★ CORS(포트는 상황에 맞게)
 public class JoinController {
+    LoginService id_check = new LoginService();
+    @Autowired
+    private LoginService loginService;
+
     @PostMapping("/join")
     public ResponseEntity<SignUpResponse> join(@RequestBody SignUpRequest req) {
-        // ① 아이디 중복 체크, 비밀번호 암호화 등 비즈니스 로직 수행
-        boolean ok = /* 서비스 계층 결과 */ true;
+        
+        System.out.println("가입 요청 데이터: " + req.getId() );
 
-        if (오케이)
+
+        
+            
+        if (loginService.register(req))
             return ResponseEntity.ok(new SignUpResponse(true, "회원가입 완료"));
-        else
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new SignUpResponse(false, "이미 존재하는 아이디입니다."));
+        else 
+            return ResponseEntity.ok(new SignUpResponse(false, "이미 존재하는 아이디입니다."));
     }
 }
 

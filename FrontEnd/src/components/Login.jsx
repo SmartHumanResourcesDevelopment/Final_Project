@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../api/authApi"; 
 import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
 import mint_bg_color from "../assets/img/common/mint_bg_color.png"
 import google_login from "../assets/img/login_join/google_login.png" // Assuming you have an image for the background
@@ -11,9 +12,21 @@ export const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Login attempt:", { id, password, rememberMe });
+    try {
+      const response = await login({ id, password });
+      if (response.success) {
+        console.log("로그인 성공:", response.user);
+        alert("로그인 성공!");
+        navigate("/main"); // 홈 또는 마이페이지 이동
+      } else {
+        alert(`로그인 실패: ${response.message}`);
+      }
+    } catch (error) {
+      console.error("로그인 중 오류 발생:", error);
+      alert("서버 오류로 로그인에 실패했습니다.");
+    }
   };
   const handleGoToJoin = () => navigate("/join");
 

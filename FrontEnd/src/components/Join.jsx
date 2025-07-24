@@ -77,7 +77,10 @@ export const Join = () => {
       alert("모든 항목을 입력해주세요.");
       return;
     }
-    if (!formData.agreeToTerms) return alert("정책에 동의해주세요.");
+    if (!formData.agreeToTerms) {
+      alert("정책에 동의해주세요.");
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       setPasswordError("비밀번호가 일치하지 않습니다.");
       return;
@@ -85,12 +88,15 @@ export const Join = () => {
     try {
 -    setShowSuccessModal(true);  /* 실제 API 호출 자리 */
       const { success, message } = await signUp(formData);
+      console.log("응답:", success, message);
       if (success) {
         setShowSuccessModal(true);            // ★ 성공 모달
       } else {
         alert(message || "회원가입 실패입니다.");
         }
       } catch (err) {
+        setShowSuccessModal(false); 
+        console.err("회원가입 중 오류", err);
         alert("서버 오류가 발생했습니다.");
       }
   };
