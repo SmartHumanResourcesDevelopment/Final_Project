@@ -14,24 +14,182 @@ import messageBot from "../assets/img/common/Message Bot.png";
 // import path14 from "./path-14.svg";
 import rectangle112 from "../assets/img/common/녹차.png";
 
-const Sub = () => {
-  // const timeFilterOptions = [
-  //   { label: "1일", active: false },
-  //   { label: "1주", active: true },
-  //   { label: "1달", active: false },
-  //   { label: "1년", active: false },
-  // ];
-return (
-    <div className="detail-root">
-      {/* 상단바 */}
-      <NavigationSection />
+export const Sub = () => {
+  return (
+    <div
+      className="bg-white flex flex-row justify-center w-full"
+      data-model-id="414:689"
+    >
+      <div className="bg-white overflow-hidden w-[1440px] h-[4247px] relative">
+        <div className="absolute w-[373px] h-[109px] top-[1970px] left-[100px]">
+          <div className="absolute w-[373px] h-[29px] top-[26px] left-0 bg-[#e0faff]" />
 
-      {/* 상세 페이지 키워드 상단 정보 */}
-      <DetailKeyword/>
+          <div className="flex flex-col w-[369px] items-start gap-[17px] absolute top-0 left-0">
+            <div className="relative w-fit mt-[-1.00px] font-bold text-5xl leading-[58px] [font-family:'Noto_Sans_KR',Helvetica] text-black tracking-[0.50px] whitespace-nowrap">
+              KOTE 감성분석
+            </div>
 
+            <p className="relative w-fit mr-[-237.00px] font-normal text-2xl leading-[34px] [font-family:'Noto_Sans_KR',Helvetica] text-black tracking-[0.50px] whitespace-nowrap">
+              내가 주목한 키워드가 어떤 감성을 가지고 있는지 알아보아요
+            </p>
+          </div>
+        </div>
 
-   </div>
+        <div className="absolute w-[473px] h-[109px] top-[3012px] left-[100px]">
+          <div className="absolute w-[469px] h-[29px] top-[26px] left-1 bg-[#fff6bf]" />
+
+          <div className="flex flex-col w-[369px] items-start gap-[17px] absolute top-0 left-0">
+            <div className="relative w-fit mt-[-1.00px] mr-[-49.00px] font-bold text-5xl leading-[58px] [font-family:'Noto_Sans_KR',Helvetica] text-black tracking-[0.50px] whitespace-nowrap">
+              비슷한 키워드 TOP5
+            </div>
+
+            <div className="relative w-fit mr-[-205.00px] font-normal text-2xl leading-[34px] [font-family:'Noto_Sans_KR',Helvetica] text-black tracking-[0.50px] whitespace-nowrap">
+              쩝쩝박사님이 고르신 키워드로 EatPICK이&nbsp;&nbsp;만들어드려요
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute w-[1647px] h-[723px] top-0 left-[-207px]">
+          <div className="absolute w-[1647px] h-[658px] top-0 left-0">
+            <NavigationBarSection />
+            <div className="absolute w-[923px] h-[595px] top-[63px] left-0">
+              <div className="absolute w-[687px] h-[414px] top-[82px] left-[42px] bg-[#fffbe0] rounded-[343.48px/206.94px] rotate-[-15.00deg]" />
+
+              <KoteRankingSection />
+              <KeywordTopSection />
+            </div>
+          </div>
+
+          <img
+            className="absolute w-[558px] h-[558px] top-[165px] left-[1020px]"
+            alt="Rectangle"
+            src="/img/rectangle-112.png"
+          />
+
+          <div className="absolute w-[90px] h-[50px] top-[88px] left-[1514px] bg-black rounded-[200px]">
+            <div className="absolute top-[17px] left-[22px] [font-family:'Noto_Sans_KR',Helvetica] font-bold text-white text-xs tracking-[0.50px] leading-[13px] whitespace-nowrap">
+              검색
+            </div>
+
+            <div className="absolute w-3 h-3 top-[19px] left-[62px]">
+              <div className="relative w-[13px] h-[13px] -top-px -left-px">
+                <img
+                  className="absolute w-[11px] h-[11px] top-0 left-0"
+                  alt="Oval"
+                  src="/img/oval.svg"
+                />
+
+                <img
+                  className="absolute w-[5px] h-[5px] top-[9px] left-[9px]"
+                  alt="Path"
+                  src="/img/path-14.svg"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute w-[1260px] h-[713px] top-[1087px] left-[90px] bg-white rounded-[30px] shadow-[0px_4px_10px_2px_#00000040]">
+          <p className="absolute w-[1148px] top-[564px] left-14 [font-family:'Noto_Sans_KR',Helvetica] font-normal text-black text-[22px] tracking-[0.50px] leading-10">
+            말차는 20XX년 XX월경 특정 인플루언서의 챌린지를 시작으로
+            급부상했으며, &#39;맛있는 건강&#39;을 추구하는 잘파세대의 취향과
+            &#39;인증샷 문화&#39;에 부합하며 빠르게 확산되었습니다. 특히, 기존의
+            커피 위주 음료 시장에 대한 대안이자 새로운 미식 경험으로 인식되며
+            인기를 얻었습니다.&#34;
+          </p>
+
+          <img
+            className="absolute w-[1087px] h-[442px] top-[61px] left-[77px]"
+            alt="Group"
+            src="/img/group-410.png"
+          />
+        </div>
+
+        <TrendAnalysisSection />
+        <KeywordSection />
+        <div className="absolute w-[491px] h-[109px] top-[928px] left-[100px]">
+          <div className="absolute w-[491px] h-[29px] top-[29px] left-0 bg-[#ffe0e2]" />
+
+          <div className="flex flex-col w-[369px] items-start gap-[17px] absolute top-0 left-0">
+            <div className="relative w-fit mt-[-1.00px] mr-[-67.00px] font-bold text-5xl leading-[58px] [font-family:'Noto_Sans_KR',Helvetica] text-black tracking-[0.50px] whitespace-nowrap">
+              말차 트렌드 확산 배경
+            </div>
+
+            <div className="relative w-fit font-normal text-2xl leading-[34px] [font-family:'Noto_Sans_KR',Helvetica] text-black tracking-[0.50px] whitespace-nowrap">
+              EAT PICK이 분석해드려요
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute w-[239px] h-[188px] top-[763px] left-[1162px]">
+          <div className="absolute w-[120px] h-[120px] top-[68px] left-[68px] bg-white rounded-[200px] shadow-[1px_1px_10px_1px_#00000040]">
+            <img
+              className="absolute w-[90px] h-[90px] top-[15px] left-[15px]"
+              alt="Message bot"
+              src="/img/message-bot.png"
+            />
+          </div>
+
+          <div className="absolute w-[239px] h-[58px] top-0 left-0">
+            <div className="w-[241px] h-[58px]">
+              <div className="relative w-[239px] h-[58px] bg-[url(/img/rectangle-23.svg)] bg-[100%_100%]">
+                <div className="absolute top-[23px] left-5 [font-family:'Noto_Sans_KR',Helvetica] font-medium text-white text-lg tracking-[0.30px] leading-[13.0px] whitespace-nowrap">
+                  아이디어가 필요하신가요?
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute w-[1440px] h-[200px] top-[4047px] left-0.5 bg-black">
+          <div className="relative w-[493px] h-[145px] top-[11px] left-[474px]">
+            <img
+              className="absolute w-[257px] h-[136px] top-0 left-[118px]"
+              alt="Chatgpt image"
+              src="/img/chatgpt-image-2025-7-16-02-55-42-1.png"
+            />
+
+            <p className="absolute top-[101px] left-0 [font-family:'Noto_Sans_KR',Helvetica] font-medium text-white text-lg text-center tracking-[0] leading-[normal]">
+              박병록 · 김다현 · 차명훈&nbsp;&nbsp;|
+              스마트인재개발원&nbsp;&nbsp;| 0507-1379-9917 <br /> © 2025 Eat
+              Pick
+            </p>
+          </div>
+        </div>
+
+        <div className="absolute w-[383px] h-11 top-[991px] left-[974px]">
+          <div className="absolute top-[3px] left-0 [font-family:'Noto_Sans_KR',Helvetica] font-medium text-black text-[32px] tracking-[0.50px] leading-10 whitespace-nowrap">
+            📅
+          </div>
+
+          <div className="inline-flex items-start gap-2.5 px-5 py-1.5 absolute top-0 left-14 rounded-lg">
+            <div className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans_KR',Helvetica] font-medium text-black text-[22px] tracking-[0] leading-[31.9px] whitespace-nowrap">
+              1일
+            </div>
+          </div>
+
+          <div className="left-[140px] bg-[#ffe2e4] inline-flex items-start gap-2.5 px-5 py-1.5 absolute top-0 rounded-lg">
+            <div className="font-bold relative w-fit mt-[-1.00px] [font-family:'Noto_Sans_KR',Helvetica] text-black text-[22px] tracking-[0] leading-[31.9px] whitespace-nowrap">
+              1주
+            </div>
+          </div>
+
+          <div className="left-56 inline-flex items-start gap-2.5 px-5 py-1.5 absolute top-0 rounded-lg">
+            <div className="font-medium relative w-fit mt-[-1.00px] [font-family:'Noto_Sans_KR',Helvetica] text-black text-[22px] tracking-[0] leading-[31.9px] whitespace-nowrap">
+              1달
+            </div>
+          </div>
+
+          <div className="left-[308px] inline-flex items-start gap-2.5 px-5 py-1.5 absolute top-0 rounded-lg">
+            <div className="font-medium relative w-fit mt-[-1.00px] [font-family:'Noto_Sans_KR',Helvetica] text-black text-[22px] tracking-[0] leading-[31.9px] whitespace-nowrap">
+              1년
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
+
 
 export default Sub;

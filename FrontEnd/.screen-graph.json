@@ -34,7 +34,8 @@
       "label": "Sub",
       "routes": [
         "/sub"
-      ]
+      ],
+      "dataModelId": "414:689"
     },
     {
       "id": "src/components/Admin_page.jsx",
