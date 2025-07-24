@@ -42,6 +42,13 @@
       "routes": [
         "/admin"
       ]
+    },
+    {
+      "id": "src/components/ServicePage.jsx",
+      "label": "ServicePage",
+      "routes": [
+        "/servicepage"
+      ]
     }
   ],
   "edges": [
