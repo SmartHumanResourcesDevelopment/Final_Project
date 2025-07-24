@@ -1,0 +1,121 @@
+/* 전체 오버레이 */
+.chartbot-overlay {
+  position: fixed;
+  bottom: 24px;                              /* 아이콘과 같은 높이 */
+  right: calc(24px + 72px + 8px);            /* 24px(우측 여백) + 72px(아이콘 크기) + 8px(간격) */
+  display: block;                            /* 중앙 정렬용 flex 제거 */
+  z-index: 50;
+   right: 60px;
+}
+
+/* 대화 상자 */
+.chartbot-dialog {
+  width: 550px;
+  max-width: 90%;
+  height: 650px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  /* padding은 header 아래로 충분히 공간 주도록 */
+  padding: 16px 16px 24px;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+
+/* 헤더: 이미지 + 닫기 버튼 */
+.chartbot-header {
+  position: relative;            /* close-btn 절대 배치 기준 */
+  display: flex;
+  justify-content: center;       /* 로고가 가운데 */
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* 챗봇 로고 */
+.message-bot {
+  width: 60px;   /* 크기 축소 */
+  height: 60px;
+}
+
+/* 닫기 버튼 */
+.close-btn {
+  position: absolute;            /* header 안에서 떠 있게 */
+  top: 0;                        /* header y축 최상단 */
+  right: 0;                      /* header x축 우측 끝 */
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.close-btn:hover {
+  opacity: 0.7;
+}
+
+/* 콘텐츠 카드 (검은 버튼들이 담길 박스) */
+.chartbot-content {
+  flex: 1;                     /* 남은 높이를 모두 차지 */
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 10px 10px 10px rgba(0.2, 0, 0, 0.2),
+   0   -10px 10px rgba(0.1, 0, 0, 0.1);    /* 위쪽 */;
+  display: flex;
+  align-items: center;         /* 버튼들을 세로 중앙에 */
+  justify-content: center;
+  height: inherit;
+  overflow: hidden;
+}
+
+/* 메뉴 리스트 */
+.chartbot-menu {
+ list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.chartbot-subcontent {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;        
+}
+/* 스크롤 영역만 잡아주기 */
+.sub-scroll {
+  flex: 1;             /* 남은 공간 모두 차지 */
+  overflow-y: auto;    /* 내용이 길어지면 스크롤 */
+  min-height: 0;       /* flexbox에서 꼭 필요 */
+}
+
+/* 검은 버튼 */
+.chartbot-btn {
+  width: 100%;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.chartbot-btn:hover {
+  background: #333;
+}
+
+/* 버튼 아이콘 */
+.chartbot-btn img {
+  width: 24px;
+  height: 24px;
+}

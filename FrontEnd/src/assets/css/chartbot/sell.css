@@ -1,0 +1,82 @@
+.sell-container {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.sell-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.sell-close img {
+  width: 20px;
+  height: 20px;
+}
+
+.sell-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.sell-title {
+  font-family: "Noto Sans KR Black", sans-serif;
+  font-size: 24px;
+  margin-right: 8px;
+}
+.sell-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.sell-main {
+  flex: 1;
+  overflow-y: auto;
+}
+.sell-section {
+  margin-bottom: 20px;
+}
+.sell-section-title {
+  font-family: "Noto Sans KR Medium", sans-serif;
+  font-size: 20px;
+  color: #1f384c;
+  margin-bottom: 4px;
+}
+.sell-concepts {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sell-concept {
+  font-size: 16px;
+  color: #333;
+  margin: 2px 0;
+}
+
+.sell-footer {
+  text-align: center;
+  margin-top: auto;
+}
+.sell-scrap-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 40px;
+  padding: 12px 32px;
+  font-family: "Noto Sans KR Black", sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+}
+.sell-scrap-btn:hover {
+  background: #333;
+}

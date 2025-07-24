@@ -1,0 +1,40 @@
+/* 전체 캔버스 */
+.bubbleChart {
+  position: relative;
+  width: 358px;    /* 시안 기준 */
+  height: 368px;
+  margin-left: 106px;          /* 카드 패딩 고려 */
+}
+
+/* 각 버블 */
+.bubble {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;        /* 텍스트 선택만 가능 */
+}
+
+.bubble__circle {
+  position: absolute;
+  top: 0; left: 0;
+  border-radius: 50%;
+  opacity: .85;
+}
+
+/* PNG 외곽선 */
+.bubble__stroke {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+
+/* 텍스트 */
+.bubble__pct   { font: 700 1.4rem/1 "Poppins", sans-serif; color:#fff; }
+.bubble__label { margin-top: .25rem; font: 600 .85rem/1 "Poppins", sans-serif; color:#fff; }
+
+/* 크기에 따라 글씨 자동 축소 */
+.bubble[style*="width: 93px"]  .bubble__pct { font-size: .9rem; }
+.bubble[style*="width: 101px"] .bubble__pct { font-size: 1rem; }
+.bubble[style*="width: 138px"] .bubble__pct { font-size: 1.1rem; }
