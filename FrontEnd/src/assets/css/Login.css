@@ -37,34 +37,39 @@
 
 /* ───── 우측 영역 ───── */
 .login-right-panel {
-  position: relative;
+  position: absolute;
+  inset-y: 0; /* top: 0, bottom: 0 */
+  right: 0;
   width: 50%; /* 1/2 너비 */
-  display: flex;
+  overflow: hidden;
+  display: flex; /* 이미지를 중앙에 배치하기 위함 */
   align-items: center;
   justify-content: center;
-  overflow: hidden; /* 이미지 넘침 방지 */
-    order: 2; /* 좌측에 먼저 배치 */
-  
 }
+  
 
 /* 1) 배경색 + 타일 반복 */
 .login-bg-pattern {
   position: absolute;
-  inset: 0; /* top, right, bottom, left 모두 0 */
-  background-color: #E9FFFF; /* 파스텔 배경 */
-  background-repeat: repeat-x; /* 가로 반복 */
-  background-position: top; /* 상단 정렬 */
-  background-size: 320px 100%; /* 가로 320px, 세로 100% */
+  inset: 0;
+  background-color: #E9FFFF;
+  background-repeat: repeat-x;
+  background-position: top;
+  background-size: 320px 100%;
 }
 
 /* 2) 중앙 일러스트 */
 .login-main-illustration {
-  position: relative; /* z-index를 위해 relative */
-  z-index: 10; /* 배경보다 위에 */
   width: 85%;
   max-width: 640px; /* 최대 너비 */
-  height: auto; /* 비율 유지 */
-  object-fit: contain; /* 이미지가 잘리지 않고 포함되도록 */
+  height: 100%; /* 부모에 맞춰 높이 채움 */
+  background-repeat: no-repeat; /* bg-no-repeat */
+  background-position: center; /* bg-center */
+  background-size: cover; /* *** 이 부분을 변경합니다 *** */
+  /* JSX에서 인라인으로 설정했던 backgroundImage는 CSS에서 정의해야 합니다 */
+  /* 예: background-image: url('../assets/img/common/login_join_bg_img.png'); */
+  /* 하지만 React에서 동적으로 이미지를 가져오는 방식이 더 유연합니다. */
+  /* 따라서 JSX의 인라인 style 방식을 유지하는 것이 더 일반적입니다. */
 }
 
 /* ─── 좌측 정보 영역 ─── */
@@ -301,4 +306,11 @@
 
 .signup-link:hover {
   text-decoration: underline;
+}
+
+html, body, #root { /* 또는 앱의 최상위 컨테이너 */
+    height: 100%;
+    min-height: 100vh; /* 뷰포트 전체 높이를 보장 */
+    margin: 0;
+    padding: 0;
 }

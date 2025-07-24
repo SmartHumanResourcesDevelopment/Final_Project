@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
-import mint_bg_color from "../assets/img/common/mint_bg_color.png";
 import google_login from "../assets/img/login_join/google_login.png";
 import apple_login from "../assets/img/login_join/apple_login.png";
-
-// CSS 파일 임포트
-import "../assets/css/Login.css";
+import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
+import mint_bg_color from "../assets/img/common/mint_bg_color.png";
+import "../assets/css/Login.css"; // 경로 주의
 
 const Login = () => {
   const [id, setId] = useState("");
@@ -17,144 +15,139 @@ const Login = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     console.log("Login attempt:", { id, password, rememberMe });
-    // 여기에 실제 로그인 로직 (API 호출 등)을 추가합니다.
-    // 성공 시 navigate("/dashboard"); 등으로 이동.
   };
 
-  const handleGoToJoin = () => navigate("/join");
-  const handleForgotPassword = () => alert("비밀번호 재설정 페이지로 이동");
-  const handleGoogleLogin = () => console.log("Google login initiated");
-  const handleAppleLogin = () => console.log("Apple login initiated");
-
+  const handleGoToJoin = () => {
+    navigate("/join");
+  };
 
   return (
-    <div className="login-full-screen-container">
-      <div className="login-canvas">
-        {/* 우측 영역 */}
-        <div className="login-right-panel">
-          {/* 배경색 + 타일 반복 */}
-          <div
-            className="login-bg-pattern"
-            style={{ backgroundImage: `url(${mint_bg_color})` }}
-          />
-          {/* 중앙 일러스트 */}
-          <img
-            src={login_join_bg_img}
-            alt="Analysts"
-            className="login-main-illustration"
-          />
-        </div>
+    <div className="relative bg-white w-full min-h-screen mx-auto overflow-hidden">
+      {/* 우측 배경 + 이미지 */}
+      <div className="absolute inset-y-0 right-0 w-1/2 h-full flex items-center justify-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-[#E9FFFF] bg-repeat-x bg-top"
+          style={{
+            backgroundImage: `url(${mint_bg_color})`,
+            backgroundSize: "320px 100%",
+          }}
+        />
+        <img
+          src={login_join_bg_img}
+          alt="Illustration"
+          className="relative z-10 w-[85%] max-w-[640px] h-auto object-contain"
+        />
+      </div>
 
-        {/* 좌측 정보 영역 */}
-        <div className="login-left-panel">
-          <div className="login-form-container">
+
+        {/* ─── 좌측 정보 영역 ─── */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 flex justify-center">
+          <div className="w-[540px] flex flex-col items-start gap-1">
+
             {/* 타이틀 */}
-            <div className="login-title-group">
-              <h1 className="login-main-title">만나서 반가워요!🫨</h1>
-              <p className="login-sub-title">당신의 아이디를 입력해주세요</p>
+            <div className="space-y-4">
+              <h1 className="text-[32px] font-semibold">만나서 반가워요!🫨</h1>
+              <p className="text-[15px] font-medium ">당신의 아이디를 입력해주세요</p>
             </div>
 
             {/* 폼 */}
-            <form onSubmit={handleLogin} className="login-form">
+            <form onSubmit={handleLogin} className="w-full space-y-4 mt-5">
               {/* 아이디 */}
-              <div className="form-group">
-                <label htmlFor="id" className="form-label">아이디</label>
-                <div className="input-wrapper">
+              <div>
+                <label className="block mb-1 text-sm font-medium">아이디</label>
+                <div className="flex items-center h-12 pl-3 rounded-lg border border-solid border-gray-300 bg-white focus-within:border-[#5969cf]">
                   <input
-                    id="id"
                     value={id}
                     onChange={(e) => setId(e.target.value)}
                     placeholder="아이디를 입력해주세요."
-                    className="form-input"
+                    className="w-full text-[14px] placeholder:text-gray-400 focus:outline-none"
                     required
                   />
                 </div>
               </div>
 
               {/* 비밀번호 */}
-              <div className="form-group password-group">
-                <label htmlFor="password" className="form-label">비밀번호</label>
-                <div className="input-wrapper">
+              <div className="relative">
+                <label className="block mb-1 text-sm font-medium">비밀번호</label>
+                <div className="flex items-center h-12 pl-3 rounded-lg border border-solid border-gray-300 bg-white focus-within:border-[#5969cf]">
                   <input
-                    id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="비밀번호를 입력해주세요."
-                    className="form-input"
+                    className="w-full text-[14px] placeholder:text-gray-400 focus:outline-none"
                     required
                   />
                 </div>
                 <button
                   type="button"
-                  onClick={handleForgotPassword}
-                  className="forgot-password-link"
+                  className="absolute top-0 right-0 text-[11px] text-action-sec hover:underline"
                 >
                   비밀번호를 잊어버리셨나요?
                 </button>
               </div>
 
               {/* 30일 저장 */}
-              <label htmlFor="rememberMe" className="remember-me-checkbox">
+              <label className="flex items-center gap-2 text-[13px] cursor-pointer">
                 <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="custom-checkbox"
-                  id="rememberMe"
-                />
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-5 h-5 border border-gray-300 rounded-sm accent-blue-500 cursor-pointer appearance-auto"
+                id="rememberMe"
+              />
                 30일동안 아이디 저장하기
               </label>
 
               {/* 로그인 버튼 */}
               <button
                 type="submit"
-                className="login-button"
+                className="h-9 w-full rounded-md bg-[#5969cf] font-semibold text-white hover:bg-[#4a5bb8] transition-colors mb-0"
               >
                 로그인
               </button>
             </form>
 
-            {/* 로그인 ↔ Or ↔ 회원가입 */}
-            <div className="login-or-signup-section">
+            {/* 로그인 ↔ Or ↔ 회원가입 (간격 4 px) */}
+            <div className="w-full flex flex-col gap-1">
               {/* Or */}
-              <div className="divider">
-                <span className="divider-line" />
-                <span className="divider-text">Or</span>
-                <span className="divider-line" />
+              <div className="flex items-center">
+                <span className="flex-1 h-px bg-gray-300" />
+                <span className="px-2 text-[13px] font-medium bg-white">Or</span>
+                <span className="flex-1 h-px bg-gray-300" />
               </div>
 
               {/* 회원가입 버튼 */}
               <button
                 type="button"
                 onClick={handleGoToJoin}
-                className="signup-button"
+                className="h-9 w-full rounded-md bg-[#5969cf] font-semibold text-white hover:bg-[#4a5bb8] transition-colors"
               >
                 회원가입
               </button>
             </div>
 
             {/* SNS 로그인 */}
-            <div className="sns-login-buttons">
-              <button className="sns-button" onClick={handleGoogleLogin}>
-                <img src={google_login} alt="Sign in with Google" />
-              </button>
-              <button className="sns-button" onClick={handleAppleLogin}>
-                <img src={apple_login} alt="Sign in with Apple" />
-              </button>
-            </div>
+              <div className="flex justify-center gap-6 w-full mt-10">
+                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Google login")}>
+                  <img src={google_login} alt="Sign in with Google" />
+                </button>
+                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Apple login")}>
+                  <img src={apple_login} alt="Sign in with Apple" />
+                </button>
+              </div>
 
             {/* 하단 문구 */}
-            <p className="bottom-text">
+            <p className="w-full text-[13px] font-medium mt-4 text-center">
               아이디가 없으신가요?{" "}
-              <button className="signup-link" onClick={handleGoToJoin}>
+              <button className="text-[#0f3cde] hover:underline" onClick={handleGoToJoin}>
                 회원가입
               </button>
             </p>
           </div>
         </div>
       </div>
-    </div>
+
   );
 };
 

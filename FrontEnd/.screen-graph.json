@@ -35,6 +35,13 @@
       "routes": [
         "/sub"
       ]
+    },
+    {
+      "id": "src/components/Admin_page.jsx",
+      "label": "Admin_page",
+      "routes": [
+        "/admin"
+      ]
     }
   ],
   "edges": [
