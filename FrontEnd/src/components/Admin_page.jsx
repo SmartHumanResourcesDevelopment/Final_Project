@@ -1,15 +1,8 @@
 import React from "react";
-import { ApiStatusTableSection } from "../UI/Admin_api_chart";
-import { DataVisualizationSection } from "../UI/Admin_bar_chart";
-import { AdminNavigationBarSection } from "../common/Admin_menu_bar";
-// import image from "../assets/imgs/image.svg";
-import line2 from "../assets/img/admin/line.png";
-import line3 from "../assets/img/admin/line.png";
-import line4 from "../assets/img/admin/line.png";
-import line5 from "../assets/img/admin/line.png";
-import line6 from "../assets/img/admin/line.png";
-import line7 from "../assets/img/admin/line.png";
-import line from "../assets/img/admin/line.png";
+import  ApiStatusTableSection  from "../UI/Admin_api_chart";
+import  DataVisualizationSection  from "../UI/Admin_bar_chart";
+import { NavigationSection } from "../common/menu_bar";
+import FooterSection from "../common/footer";
 
 
 

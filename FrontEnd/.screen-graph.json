@@ -34,8 +34,7 @@
       "label": "Sub",
       "routes": [
         "/sub"
-      ],
-      "dataModelId": "414:689"
+      ]
     },
     {
       "id": "src/components/Admin_page.jsx",
@@ -47,17 +46,33 @@
   ],
   "edges": [
     {
-      "id": "src\\components\\Login.jsx:21:4-to-src\\components\\Join.jsx",
+      "id": "src\\components\\Login.jsx:22:8-to-src\\components\\Main.jsx",
+      "source": "src\\components\\Login.jsx",
+      "target": "src\\components\\Main.jsx",
+      "data": {
+        "viaRoute": "/main",
+        "trigger": {
+          "element": "navigate(\"/main\")",
+          "line": 22,
+          "endLine": 22,
+          "column": 8,
+          "endColumn": 25,
+          "sourceFile": "src\\components\\Login.jsx"
+        }
+      }
+    },
+    {
+      "id": "src\\components\\Login.jsx:31:31-to-src\\components\\Join.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\components\\Join.jsx",
       "data": {
         "viaRoute": "/join",
         "trigger": {
           "element": "navigate(\"/join\")",
-          "line": 21,
-          "endLine": 21,
-          "column": 4,
-          "endColumn": 21,
+          "line": 31,
+          "endLine": 31,
+          "column": 31,
+          "endColumn": 48,
           "sourceFile": "src\\components\\Login.jsx"
         }
       }
