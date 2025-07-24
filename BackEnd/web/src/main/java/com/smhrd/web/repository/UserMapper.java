@@ -1,5 +1,16 @@
 package com.smhrd.web.repository;
 
-public class UserMapper {
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.smhrd.web.DTO.SignUpRequest;
+
+@Mapper
+public interface UserMapper {
     
+    int existsByUserId(@Param("id") String id); // 아이디 중복 확인
+
+    int insertUser(SignUpRequest req); // 회원가입
+
+    SignUpRequest findByUserId(String id); // 사용자 로그인(비교용)
 }
