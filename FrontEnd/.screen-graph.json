@@ -14,10 +14,39 @@
       "routes": [
         "/join"
       ]
+    },
+    {
+      "id": "src/components/Main.jsx",
+      "label": "Main",
+      "routes": [
+        "/main"
+      ]
+    },
+    {
+      "id": "src/components/MyPage.jsx",
+      "label": "MyPage",
+      "routes": [
+        "/mypage"
+      ]
+    },
+    {
+      "id": "src/components/Sub.jsx",
+      "label": "Sub",
+      "routes": [
+        "/sub"
+      ]
+    },
+    {
+      "id": "src/components/Admin_page.jsx",
+      "label": "Admin_page",
+      "routes": [
+        "/admin"
+      ]
     }
   ],
   "edges": [
     {
+      "id": "src\\components\\Login.jsx:24:31-to-src\\components\\Join.jsx",
       "id": "src\\components\\Login.jsx:31:31-to-src\\components\\Join.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\components\\Join.jsx",
@@ -25,8 +54,8 @@
         "viaRoute": "/join",
         "trigger": {
           "element": "navigate(\"/join\")",
-          "line": 31,
-          "endLine": 31,
+          "line": 18,
+          "endLine": 18,
           "column": 31,
           "endColumn": 48,
           "sourceFile": "src\\components\\Login.jsx"

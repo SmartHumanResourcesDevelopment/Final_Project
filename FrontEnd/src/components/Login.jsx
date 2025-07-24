@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi"; 
+import google_login from "../assets/img/login_join/google_login.png";
+import apple_login from "../assets/img/login_join/apple_login.png";
 import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
-import mint_bg_color from "../assets/img/common/mint_bg_color.png"
-import google_login from "../assets/img/login_join/google_login.png" // Assuming you have an image for the background
-import apple_login from "../assets/img/login_join/apple_login.png" // Assuming you have an image for the background
+import mint_bg_color from "../assets/img/common/mint_bg_color.png";
+import "../assets/css/Login.css"; // 경로 주의
 
-export const Login = () => {
+const Login = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -31,30 +32,23 @@ export const Login = () => {
   const handleGoToJoin = () => navigate("/join");
 
   return (
-    /* ① 전체 화면 세로 중앙 */
-    <div className="bg-white flex flex-col items-center justify-center min-h-screen w-full font-poppins">
-      {/* ② 1440×720(2:1) 캔버스 */}
-      <div className="relative bg-white
-            w-full  h-[650px] lg:h-[692px] mx-auto overflow-hidden">
-       {/* ───── 우측 영역 ───── */}
-        <div className="absolute inset-y-0 right-0 w-1/2 flex items-center justify-center overflow-hidden">
+    <div className="relative bg-white w-full min-h-screen mx-auto overflow-hidden">
+      {/* 우측 배경 + 이미지 */}
+      <div className="absolute inset-y-0 right-0 w-1/2 h-full flex items-center justify-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-[#E9FFFF] bg-repeat-x bg-top"
+          style={{
+            backgroundImage: `url(${mint_bg_color})`,
+            backgroundSize: "320px 100%",
+          }}
+        />
+        <img
+          src={login_join_bg_img}
+          alt="Illustration"
+          className="relative z-10 w-[85%] max-w-[640px] h-auto object-contain"
+        />
+      </div>
 
-          {/* 1) 배경색 + 타일 반복 */}
-          <div
-            className="absolute inset-0 bg-[#E9FFFF] bg-repeat-x bg-top"   /* 파스텔 배경·가로 반복·상단 정렬 */
-            style={{
-              backgroundImage: `url(${mint_bg_color})`,  // React 변수를 사용해야 빌드 시 경로가 정확히 매핑됩니다
-              backgroundSize : "320px 100%",          // 가로 320 px, 세로 100 %
-            }}
-          />
-
-          {/* 2) 중앙 일러스트 */}
-          <img
-            src={login_join_bg_img}
-            alt="Analysts"
-            className="relative z-10 w-[85%] max-w-[640px] h-auto object-contain"
-          />
-        </div>
 
         {/* ─── 좌측 정보 영역 ─── */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 flex justify-center">
@@ -163,7 +157,7 @@ export const Login = () => {
           </div>
         </div>
       </div>
-    </div>
+
   );
 };
 

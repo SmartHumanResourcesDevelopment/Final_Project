@@ -1,0 +1,98 @@
+/* ───────── 섹션 전체 ───────── */
+.trend-insight {
+  max-width: 1260px;
+  margin: 5rem auto 10rem;
+  padding-inline: 1rem;
+  font-family: "Noto Sans KR", sans-serif;
+
+  /* 헤더와 카드 사이 일관된 여백을 위한 flex container */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ───────── 헤더 (제목·부제·탭) ──────── */
+.ti-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 2rem;
+  /* margin-bottom 삭제 */
+}
+
+.ti-titlebox {
+  flex: 1;               /* 남는 폭을 왼쪽 제목 영역에 할당 */
+}
+
+.ti-head h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.hl {
+  position: relative;
+}
+.hl::after {
+  content: "";
+  position: absolute;
+  inset: 65% 0 0;
+  background: #fff4b8;
+  z-index: -1;
+}
+
+.ti-sub {
+  flex-basis:100%; font-size:1.125rem; margin:0;
+}
+
+/* 기간 탭 – 헤더 안에서 오른쪽 정렬 */
+.period-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
+}
+.period-tabs button {
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #f0f0f0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.period-tabs button.is-active {
+  background: #FFFBE1;
+}
+.period-tabs button:hover:not(.is-active) {
+  background: #FFFBE1;
+}
+
+/* ───────── 그래프 + 설명 카드 ───────── */
+.ti-card {
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px 2px rgba(0, 0, 0, 0.25);
+  padding: 3rem 3.5rem 4rem;
+}
+.ti-summary {
+  margin-top: 2rem;
+  font-size: 1.375rem;
+  line-height: 1.6;
+}
+
+/* ───────── 모바일 대응 ───────── */
+@media (max-width: 768px) {
+  .ti-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .period-tabs {
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+  .ti-summary {
+    font-size: 1.125rem;
+  }
+}
