@@ -1,36 +1,100 @@
-import React from "react";
+// src/pages/Sub.jsx
+import React, { useState, useEffect } from "react";
 import { NavigationSection }  from "../common/menu_bar";
-import { DetailKeyword } from "../UI/Detail_keyword";
-import "../assets/css/Sub.css"; // Assuming you have a CSS file for styling
-
-import { InsightsSection } from "../UI/Detail_title";
+import { DetailKeyword }      from "../UI/Detail_keyword";
+import { DetailInsightsSection } from "../UI/Detail_title";
 import { KeywordHighlightSection } from "../UI/Detail_kote";
-
 import { TrendAnalysisSection } from "../UI/Detail_same";
-import chatgptImage20257160255421 from "../assets/img/common/footer_img.png";
-import group410 from "../assets/img/common/Group 410.png";
-import messageBot from "../assets/img/common/Message Bot.png";
-// import oval from "./oval.svg";
-// import path14 from "./path-14.svg";
-import rectangle112 from "../assets/img/common/녹차.png";
+import FooterSection           from "../common/footer";
 
-const Sub = () => {
-  // const timeFilterOptions = [
-  //   { label: "1일", active: false },
-  //   { label: "1주", active: true },
-  //   { label: "1달", active: false },
-  //   { label: "1년", active: false },
-  // ];
-return (
-    <div className="detail-root">
+import ChartBotIcon            from "../assets/img/Chart_Bot/ChartBotIcon.png";
+import ChartBot                from "../components/ChartBot";
+
+import "../assets/css/Sub.css";
+
+const Sub = ({ onClose }) => {
+  const [openChat, setOpenChat]     = useState(false);
+  const [showBubble, setShowBubble] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+
+  // 말풍선 타이밍 로직
+  useEffect(() => {
+    const iv = setInterval(() => {
+      if (!openChat) {
+        setShowBubble(true);
+        setTimeout(() => setShowBubble(false), 3000);
+      }
+    }, 15000);
+    return () => clearInterval(iv);
+  }, [openChat]);
+
+  // 페이지 빈 영역 클릭 시 챗봇 닫기
+  const handleBackgroundClick = () => {
+    if (openChat) {
+      setOpenChat(false);
+      onClose?.();
+    }
+  };
+
+  return (
+    <div className="detail-root" onClick={handleBackgroundClick}>
       {/* 상단바 */}
       <NavigationSection />
+      {/* 키워드 소개 */}
+      <DetailKeyword />
+      {/* 키워드 그래프소개 */}
+      <DetailInsightsSection />
+      {/* 감성분석 */}
+      <KeywordHighlightSection />
+      {/* 유사도 */}
+      <TrendAnalysisSection />
+      <FooterSection />
 
-      {/* 상세 페이지 키워드 상단 정보 */}
-      <DetailKeyword/>
+      {/* 말풍선 */}
+      {showBubble && !isHovering && !openChat && (
+        <div className="chatbot-bubble">
+          아이디어가 필요하신가요?
+        </div>
+      )}
 
+      {/* 챗봇 아이콘 */}
+      <button
+        type="button"
+        className="chatbot-fab"
+        onClick={e => {
+          e.stopPropagation();
+          setOpenChat(true);
+        }}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        aria-label="챗봇 열기"
+      >
+        <img src={ChartBotIcon} alt="챗봇 아이콘" />
+      </button>
 
-   </div>
+      {/* 챗봇 다이얼로그 (한 번만 렌더링) */}
+      {openChat && (
+        <div
+          className="chartbot-overlay-wrapper"
+          onClick={e => {
+            // overlay 클릭으로도 닫기
+            e.stopPropagation();
+            setOpenChat(false);
+            onClose?.();
+          }}
+        >
+          <div
+            className="chartbot-dialog-wrapper"
+            onClick={e => e.stopPropagation()}
+          >
+            <ChartBot onClose={() => {
+              setOpenChat(false);
+              onClose?.();
+            }} />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

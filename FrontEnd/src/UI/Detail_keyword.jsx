@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import matchaImg from "../assets/img/common/녹차.png";
 import search from "../assets/img/common/search.png";
 import "../assets/css/Detail_keyword.css"; // Assuming you have a CSS file for styling
@@ -11,6 +12,7 @@ const keywordData = {
 };
 
 export default function DetailKeyword() {
+  const [query, setQuery] = useState("");
   return (
     <section className="detailKeyword">
       {/* ① 왼쪽 : 텍스트  */}
@@ -35,10 +37,28 @@ export default function DetailKeyword() {
       </figure>
 
       {/* ③ 검색 버튼 (페이지 우측 상단 고정) */}
-      <button className="detailKeyword__searchBtn" aria-label="검색">
-        <img src={search} alt="" />
-        <span color="white">검색</span>
-      </button>
+            <div className="detailKeyword__searchBtn">
+            {/* 아이콘만 클릭했을 때 이동 */}
+             <span className="searchBtn__label">검색</span>
+            <img
+              src={search}
+              alt="검색"
+              onClick={() => {
+                /* TODO: 상세 서브 페이지로 이동
+                  예: navigate(`/search/${query}`);
+                */
+              }}
+            />
+
+            {/* 텍스트 입력창 – 버튼 hover/focus 시만 펼쳐짐 */}
+            <input
+              type="text"
+              placeholder="키워드를 입력하세요!"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onClick={(e) => e.stopPropagation()}      // 아이콘 클릭과 구분
+            />
+          </div>
     </section>
   );
 }

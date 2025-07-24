@@ -8,10 +8,11 @@
   flex-direction: column;
   gap: 2.5rem;
   font-family: "Noto Sans KR", sans-serif;
+  margin-bottom: 20px; 
 }
 
 .detailKeyword__info > * { margin: 0 0 0.75rem; }
-.detailKeyword__intro    { font-weight: 700; font-size: 1.25rem; }
+.detailKeyword__intro    { font-weight: 700; font-size: 2rem; }
 .detailKeyword__sub      { font-size: 0.95rem; color: #666; }
 .detailKeyword__keyword  { font-weight: 800; font-size: 2rem; }
 .detailKeyword__rank,
@@ -39,8 +40,8 @@
   position: absolute;
   top: 6rem;
   right: 0rem;
-  width: 90px;
-  height: 50px;
+  width: 100px;
+  height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,13 +49,92 @@
   border: none;
   border-radius: 200px;
   background: #000000;
+  color: #ffffff;
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
-  border-radius: 13px;
+  border-radius: 20px;
+  gap: 1rem;             /* 요소 간 간격 */
+
+}
+.searchBtn__label {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+  padding-bottom: 1.7px;
 }
 
-.detailKeyword__searchBtn img { width: 16px; height: 16px; }
+/* ---------- 인풋 ---------- */
+.searchBtn__input {
+  width: 0;
+  flex: 0 0 auto;                        /* 기본: 숨김 */
+  opacity: 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 0.85rem;
+  outline: none;
+  transition: width 0.3s ease, opacity 0.25s ease;
+}
+
+.detailKeyword__searchBtn img { width: 16px; height: 16px; filter: brightness(0) invert(1);   font-size: 1em;  justify-content: center; }
+
+
+/* 호버하거나 인풋에 포커스가 들어오면 버튼이 좌우로 확장됨 */
+.detailKeyword__searchBtn:hover,
+.detailKeyword__searchBtn:focus-within {
+  width: 360px;               /* 원하는 전체 폭 */
+  justify-content: flex-start;/* ⬅ 왼쪽 정렬로 변경 */
+  padding-left: 1rem;                  /* 원하는 확장 폭 */
+}
+
+/* 아이콘 */
+.detailKeyword__searchBtn img {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1); /* 흰색으로 반전 */
+}
+
+/* 인풋 필드 – 기본은 0 → 호버 시 등장 */
+.detailKeyword__searchBtn input {
+  width: 0;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 0.85rem;
+  outline: none;
+  transition: width 0.3s ease, opacity 0.25s ease;
+}
+
+/* 라벨 숨김 */
+.detailKeyword__searchBtn:hover .searchBtn__label,
+.detailKeyword__searchBtn:focus-within .searchBtn__label {
+  opacity: 0;
+}
+
+/* 인풋 등장 */
+.detailKeyword__searchBtn:hover .searchBtn__input,
+.detailKeyword__searchBtn:focus-within .searchBtn__input {
+  flex: 1 1 auto;             /* ← 남은 폭 전부 사용 */
+  opacity: 1; 
+}
+
+/* 버튼을 hover/focus하면 인풋이 천천히 펼쳐짐 */
+.detailKeyword__searchBtn:hover input,
+.detailKeyword__searchBtn:focus-within input {
+  width: 140px;                 /* 펼쳐졌을 때 너비 */
+  opacity: 1;
+}
+
+/* placeholder 색상도 흰색으로 */
+.detailKeyword__searchBtn input::placeholder {
+  color: #ccc;
+}
+
 
 /* ---------- 반응형 ---------- */
 @media (min-width: 768px) {
@@ -75,7 +155,8 @@
     grid-template-columns: minmax(auto, 460px) auto; /* 텍스트 ≤460px */
     column-gap: 25rem;                /* 간격 2rem (=32px) */
     align-items: center;
-    min-height: calc(100vh - 120px);             /* 수직 가운데 맞춤 */
+    min-height: calc(100vh - 120px);  
+    margin-bottom: 20px;           /* 수직 가운데 맞춤 */
   }
 
   /* 텍스트 영역은 고정폭(FLEX 해제) */

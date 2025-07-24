@@ -1,0 +1,50 @@
+.detailSame {
+  width: 1260px;
+  margin: 0 auto;
+  padding: 3rem 1rem 4rem;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+/* ② 제목 하이라이트 */
+.detailSame__title {
+  display: inline-block; 
+  position: relative;
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+}
+.detailSame__title::after {
+  content: "";
+  position: absolute;
+  inset: 65% 0 0 0;   /* 밑줄 위치 */
+  background: #fff5b3; /* 연노랑 (#fff5b3) */
+  z-index: -1;
+}
+
+/* 부제 */
+.detailSame__subtitle {
+  margin: 0.75rem 0 2rem;
+  font-size: 1rem;
+  color: #444;
+}
+
+
+/* 카드 컨테이너 */
+.trendCard {
+  position: relative;
+  height: 556px;
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px 2px rgba(0,0,0,.15);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+/* 오른쪽 설명글 */
+.trendCard__desc {
+  max-width: 500px;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}

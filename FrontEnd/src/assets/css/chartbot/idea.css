@@ -1,0 +1,93 @@
+/* 컨테이너 전체 */
+.idea-container {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* 닫기 버튼 */
+.idea-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.idea-close img {
+  width: 20px;
+  height: 20px;
+}
+
+/* 헤더 */
+.idea-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.idea-title {
+  font-family: "Noto Sans KR Black", sans-serif;
+  font-size: 24px;
+  margin-right: 8px;
+}
+.idea-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* 메인 컨텐츠 */
+.idea-main {
+  flex: 1;
+  overflow-y: auto;
+}
+.idea-section {
+  margin-bottom: 24px;
+}
+.idea-section:last-child {
+  margin-bottom: 0;
+}
+.idea-section-title {
+  font-family: "Noto Sans KR Medium", sans-serif;
+  font-size: 20px;
+  color: #1f384c;
+  margin-bottom: 8px;
+}
+.idea-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.idea-feature {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+/* 푸터 */
+.idea-footer {
+  text-align: center;
+  margin-top: auto;
+}
+.idea-scrap-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 40px;
+  padding: 12px 32px;
+  font-family: "Noto Sans KR Black", sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+}
+.idea-scrap-btn:hover {
+  background: #333;
+}
+
+
