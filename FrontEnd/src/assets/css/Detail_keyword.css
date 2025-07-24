@@ -1,0 +1,99 @@
+/* ---------- 공통 ---------- */
+.detailKeyword {
+  position: relative;
+  max-width:1440px;
+  margin: 0 auto;
+  padding: clamp(10rem, 10vh, 13rem) 1rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.detailKeyword__info > * { margin: 0 0 0.75rem; }
+.detailKeyword__intro    { font-weight: 700; font-size: 1.25rem; }
+.detailKeyword__sub      { font-size: 0.95rem; color: #666; }
+.detailKeyword__keyword  { font-weight: 800; font-size: 2rem; }
+.detailKeyword__rank,
+.detailKeyword__labels,
+.detailKeyword__desc     { font-size: 1rem; }
+
+.detailKeyword__labels span { font-weight: 600; }
+
+.detailKeyword__thumb {
+  flex: 0 0 300px;              /* 기본 너비 */
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  align-self: center;
+}
+
+.detailKeyword__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 검색 버튼 – 화면 어디서든 같은 위치 */
+.detailKeyword__searchBtn {
+  position: absolute;
+  top: 6rem;
+  right: 0rem;
+  width: 90px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  border-radius: 200px;
+  background: #000000;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 13px;
+}
+
+.detailKeyword__searchBtn img { width: 16px; height: 16px; }
+
+/* ---------- 반응형 ---------- */
+@media (min-width: 768px) {
+  .detailKeyword {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .detailKeyword__thumb { flex-basis: 35%; max-width: 420px; }
+  .detailKeyword__info  { flex: 1; padding-right: 2rem; }
+}
+
+
+/* ---------- 데스크톱(1024px~) : 그리드로 전환 + 간격/폭 조정 ---------- */
+@media (min-width: 1024px) {
+  .detailKeyword {
+    display: grid;                   /* flex → grid */
+    grid-template-columns: minmax(auto, 460px) auto; /* 텍스트 ≤460px */
+    column-gap: 25rem;                /* 간격 2rem (=32px) */
+    align-items: center;
+    min-height: calc(100vh - 120px);             /* 수직 가운데 맞춤 */
+  }
+
+  /* 텍스트 영역은 고정폭(FLEX 해제) */
+  .detailKeyword__info {
+    flex: unset;
+  }
+
+  /* 이미지 살짝 키워도 여백 줄어듦 (선택) */
+  .detailKeyword__thumb {
+    flex: unset;
+    width: 360px;
+    height: 360px;                   /* 비율 유지 위해 */
+  }
+}
+
+.detail-root > .detailKeyword {
+  flex: 1;                   /* 헤더를 뺀 남은 공간 100 % 차지 */
+  display: flex;             /* 가운데 정렬용 Flex 컨테이너 */
+  align-items: center;       /* 수직(세로) 중앙 */
+  justify-content: center;   /* 수평(가로) 중앙 */
+}

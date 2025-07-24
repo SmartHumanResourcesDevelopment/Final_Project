@@ -94,7 +94,7 @@
 @media (min-width:1024px){
   .trending-section{
     flex-direction:row;
-    column-gap:4em;
+
   }
 }
 

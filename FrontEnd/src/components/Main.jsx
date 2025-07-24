@@ -37,8 +37,8 @@ const Main = () => {
      {/* 키워드 TOP3 */}
       <Main_top3 />
 
-    {/* 키워드TOP3 그래프 */}
-    <Main_top3_insight />
+      {/* 키워드TOP3 그래프 */}
+      <Main_top3_insight />
 
       {/* 잠재키워드 */}
       <Main_Trending />
@@ -46,12 +46,9 @@ const Main = () => {
       {/* 급상승 인사이트 */}
       <Main_Trending_insight />
 
-      
-
-     
       {/* footer */}
-        <FooterSection />
-      
+      <FooterSection />
+
     </div>
   );
 }
