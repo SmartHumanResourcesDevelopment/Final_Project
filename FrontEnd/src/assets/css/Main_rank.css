@@ -1,0 +1,103 @@
+/************ 레이아웃 ************/
+.stats {
+  display: grid;
+  grid-template-columns: minmax(320px, 430px) 1fr; /* 카드·차트 폭 ↑ */
+  gap: 8rem;
+  max-width: 1400px;          /* 전체 폭 ↑ */
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+/* ----- 왼쪽 카드 ----- */
+.stats__card {
+  font-family: "Noto Sans KR", sans-serif;
+  padding: 2rem 1.5rem;
+}
+
+.stats__card h2   { font: 700 2.5rem/1.2 "Noto Sans KR", sans-serif; margin-bottom: 1.5rem; }
+.stats__card p    { font: 1.125rem/1.4 "Noto Sans KR", sans-serif;    margin-bottom: 1rem;   }
+.stats__card a    { font-weight: 700; text-decoration: none; color: #000; }
+.stats__card a:hover { text-decoration: underline; }
+
+/* ----- 기간 탭 ----- */
+.stats__tabs {
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+  margin-bottom: .75rem;
+}
+.stats__tabs button {
+  font: 600 .9rem/1 "Noto Sans KR", sans-serif;
+  padding: 4px 12px;
+  background: #f0f0f0;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.stats__tabs .is-active { background:#ffdddd; }
+
+/* ----- 랭킹 리스트 ----- */
+.ranking-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  width: 100%;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+/* ① 순위·키워드 / ② 막대 / ③ 건수 */
+.ranking-item {
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) 1fr 70px; /* 건수 공간 더 좁게 */
+  align-items: center;
+  gap: 1rem;
+}
+
+/* 긴 키워드 대응: 줄바꿈 허용 + 자동 높이 */
+.ranking-item__label {
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+
+/* ③ 건수 */
+.ranking-item__count {
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: right;
+  padding-left: 0.25em
+}
+
+/* ----- 반응형 (≤768 px) ----- */
+@media (max-width: 768px) {
+  .stats           { grid-template-columns: 1fr; gap: 2rem; }
+  .stats__card     { order: 2; text-align: center; }
+  .stats__tabs     { justify-content: center; }
+  .ranking-item    { grid-template-columns: 1fr auto; }
+  .ranking-item__count { display: none; } /* 좁을 때 건수 숨김 */
+}
+
+.ranking-item__bar-wrapper {
+  width: 100%;
+  height: 26px;
+  background: #e9edff;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  /* 오른쪽 정렬 */
+  justify-content: flex-end;
+}
+
+.ranking-item__bar {
+  height: 100%;
+  background: #4f6ff5;
+  border-radius: 0 4px 4px 0; /* 오른쪽만 둥글게 */
+  /* margin-left: auto; // 필요 없음, wrapper에 justify-content: flex-end로 충분 */
+}

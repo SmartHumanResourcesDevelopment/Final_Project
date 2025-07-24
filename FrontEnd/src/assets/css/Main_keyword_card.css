@@ -1,0 +1,113 @@
+/* ===================== ① 그래프 영역 (.insight) ===================== */
+.insight{
+  max-width:1440px;
+  margin:5rem auto 0;
+  padding:0 1rem;
+  font-family:"Noto Sans KR",sans-serif;
+  display:flex; flex-direction:column; gap:2rem;
+  align-items:center;
+}
+.insight__header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:1rem 2rem;}
+.insight__header h2{font-size:2.5rem;font-weight:700;margin:0;}
+.highlight{position:relative;}
+.highlight::after{content:"";position:absolute;inset:60% 0 0;background:#e0faff;z-index:-1;}
+.insight__sub{flex-basis:100%;font-size:1.125rem;margin:0;}
+.insight__tabs{display:flex;gap:.5rem;margin-left:auto;}
+.insight__tabs button{padding:4px 12px;border:0;border-radius:4px;background:#f0f0f0;font-weight:600;cursor:pointer;}
+.insight__tabs .is-active{background:#b3ecff;color:#000;}
+
+.insight__canvas{position:relative;background:#fff;border-radius:18px;box-shadow:0 4px 12px rgba(0,0,0,.08);padding:2rem 3rem;}
+.insight__canvas img{width:100%;height:auto;display:block;}
+.xlabels{margin:1.25rem 3rem 0;display:grid;grid-template-columns:repeat(7,1fr);font-size:.8rem;color:#666;}
+.xlabels li{text-align:center;}
+.legend{position:absolute;top:2rem;right:2.5rem;display:flex;flex-direction:column;gap:.5rem;font-size:.75rem;}
+.legend li{display:flex;align-items:center;gap:.35rem;}
+.legend span{width:12px;height:12px;border-radius:50%;}
+.insight__caption{font-size:1rem;line-height:1.6;margin:1.5rem 3rem 0;}
+
+@media (max-width:768px){
+  .insight__header h2{font-size:2rem;}
+  .insight__canvas{padding:1.5rem;}
+}
+
+/* ===================== ② 카드 공통 규격 ===================== */
+.card-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;   /* ← 가로 중앙 정렬 */
+  column-gap:3em;           /* 카드 간 3em */
+  row-gap:1.5em;
+  flex:1;
+}
+
+.keyword-card{
+  width:300px;             /* 카드 폭 */
+  height:500px;            /* 카드 높이 */
+  background:#fff;
+  border-radius:20px;
+  box-shadow:4px 4px 10px 2px rgba(0,0,0,.25);
+  display:flex;flex-direction:column;
+  transition:transform .25s ease, box-shadow .25s ease;
+  position:relative;
+}
+.keyword-card img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-top-left-radius:20px;
+  border-top-right-radius:20px;
+}
+.keyword-card .card-body{
+  flex:1;
+  padding:1rem 1.25rem;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+}
+.keyword-card h3{font-size:1.375rem;font-weight:700;margin-bottom:1rem;}
+.card-summary{font-size:1rem;line-height:1.6;margin-bottom:1.5rem;}
+.keyword-card button{
+  width:100%;height:50px;
+  border:1px solid #000;border-radius:100px;
+  background:#fff;font-size:1rem;font-weight:600;
+  cursor:pointer;transition:background .2s,color .2s;
+}
+.keyword-card button:hover{background:#000;color:#fff;}
+
+.keyword-card.is-hover{           /* 호버 시 */
+  transform:scale(1.05);          /* 300 → 315px, gap=1.5em≈24px → 겹침X */
+  z-index:5;
+  box-shadow:8px 8px 18px 4px rgba(0,0,0,.28);
+}
+
+
+/* ===================== ③ 트렌딩 섹션 레이아웃 ===================== */
+.trending-section{
+  width:100%;  
+  max-width:1700px;
+  margin:4rem 0;                    /* 좌우 auto 불필요 */
+  padding-inline:clamp(1rem,5vw,3rem); /* 해상도 따라 1–3rem 가변 여백 */
+  display:flex;
+  flex-direction:column;
+  row-gap:4em;
+}
+@media (min-width:1024px){
+  .trending-section{
+    flex-direction:row;
+
+  }
+}
+
+/* 왼쪽 설명 박스 */
+.intro-box{
+  flex:0 0 370px;
+  display:flex;flex-direction:column;gap:1.2rem;
+}
+.intro-box h1{font-size:2.5rem;font-weight:700;line-height:1.2;margin:0;}
+.intro-box p{font-size:1.25rem;line-height:1.4;margin:0;}
+.note{font-size:1rem;font-weight:700;}
+
+@media (max-width:768px){
+  .intro-box h1{font-size:2rem;}
+  .intro-box p{font-size:1.125rem;}
+}

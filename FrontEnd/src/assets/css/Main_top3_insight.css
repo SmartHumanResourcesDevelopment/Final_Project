@@ -1,0 +1,214 @@
+/* ── 레이아웃 컨테이너 ─────────────────────────── */
+.insight {
+  max-width: 1260px;
+  margin: 5rem auto 10rem;
+  padding: 0 1rem;
+  font-family: "Noto Sans KR", sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+
+
+/* ── 제목 + 탭 영역 ───────────────────────────── */
+.insight__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 2rem;
+}/* ── 1) 그래프 영역 (.insight) ─────────────────────────── */
+
+
+/* 제목·탭 */
+.insight__header h2 { font-size:2.5rem; font-weight:700; margin:0; }
+.highlight{ position:relative; }
+.highlight::after{ content:""; position:absolute; inset:60% 0 0; background:#e0faff; z-index:-1; }
+.insight__sub { flex-basis:100%; font-size:1.125rem; margin:0; }
+.insight__tabs{ display:flex; gap:.5rem; margin-left:auto; }
+.insight__tabs button{ padding:4px 12px; border:0; border-radius:4px; background:#f0f0f0; font-weight:600; cursor:pointer; }
+.insight__tabs .is-active{ background:#b3ecff; color:#000; }
+
+/* 그래프 캔버스 */
+.insight__canvas{ position:relative; background:#fff; border-radius:18px; box-shadow:0 4px 12px rgba(0,0,0,.08); padding:2rem 3rem;}
+.insight__canvas img{ width:100%; height:auto; display:block; }
+
+/* X축 */
+.xlabels{ margin:1.25rem 3rem 0; display:grid; grid-template-columns:repeat(7,1fr); font-size:.8rem; color:#666; }
+.xlabels li{ text-align:center; }
+
+/* 범례 */
+.legend{ position:absolute; top:2rem; right:2.5rem; display:flex; flex-direction:column; gap:.5rem; font-size:.75rem; }
+.legend li{ display:flex; align-items:center; gap:.35rem; }
+.legend span{ width:12px; height:12px; border-radius:50%; }
+
+/* 캡션 */
+.insight__caption{ font-size:1rem; line-height:1.6; margin:1.5rem 3rem 0; }
+
+/* ── 2) 잠재 키워드 TOP3 영역 ─────────────────────────── */
+.hot-top3-container{
+  max-width:1200px;
+  margin:4rem auto 0;
+  padding:0 1rem;
+  display:flex;
+  flex-direction:column;
+  gap:2.5rem;
+}
+@media (min-width:1024px){  /* 데스크탑 */
+  .hot-top3-container{ flex-direction:row; align-items:flex-start; }
+}
+
+/* 왼쪽 설명 박스 */
+.intro-box{ flex:0 0 370px; display:flex; flex-direction:column; gap:1.2rem; }
+.intro-box h1{ font-size:2.5rem; font-weight:700; line-height:1.2; margin:0; }
+.intro-box p{ font-size:1.25rem; line-height:1.4; margin:0; }
+.intro-box .note{ font-size:1rem; font-weight:700; }
+
+/* 카드 래퍼 */
+.cards-wrapper{ display:flex; gap:2rem; overflow-x:auto; }  /* 모바일에서 옆으로 스크롤 가능 */
+
+/* 카드 */
+.hot-card{
+  width:300px; height:500px;
+  display:flex; flex-direction:column;
+  background:#fff; border-radius:20px;
+  box-shadow:4px 4px 10px 2px rgba(0,0,0,.25);
+  transition:transform .25s ease, box-shadow .25s ease;
+  position:relative;
+}
+.hot-card.is-front{ z-index:5; }          /* 첫 카드 기본 앞으로 */
+.hot-card.is-hover{
+  transform:scale(1.05);
+  z-index:10;
+  box-shadow:8px 8px 18px 4px rgba(0,0,0,.28);
+}
+.hot-card img{ width:100%; height:200px; object-fit:cover; border-top-left-radius:20px; border-top-right-radius:20px; }
+
+/* 카드 내용 */
+.card-body{ flex:1; padding:1rem 1.25rem; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.card-body h3{ font-size:1.375rem; font-weight:700; margin-bottom:1rem; }
+.card-summary{ font-size:1rem; line-height:1.6; margin-bottom:1.5rem; }
+
+/* 버튼 */
+.card-body button{
+  width:100%; height:50px;
+  border:1px solid #000; border-radius:100px;
+  background:#fff; font-size:1rem; font-weight:600; cursor:pointer;
+  transition:background .2s;
+}
+.card-body button:hover{ background:#000; color:#fff; }
+
+/* ── 3) 공통 반응형 ─────────────────────────── */
+@media (max-width:768px){
+  .insight__header h2{ font-size:2rem; }
+  .insight__canvas{ padding:1.5rem; }
+  .intro-box h1{ font-size:2rem; }
+  .intro-box p{ font-size:1.125rem; }
+}
+
+.insight__header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+.highlight {
+  position: relative;
+}
+.highlight::after {
+  content: "";
+  position: absolute;
+  inset: 60% 0 0;
+  background: #e0faff;
+  z-index: -1;
+}
+.insight__sub {
+  flex-basis: 100%;
+  font-size: 1.125rem;
+  margin: 0;
+}
+.insight__tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+.insight__tabs button {
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: #f0f0f0;
+  font-weight: 600;
+  cursor: pointer;
+}
+.insight__tabs .is-active {
+  background: #b3ecff;
+  color: #000;
+}
+.insight__tabs button:hover:not(.is-active){
+  background:#b3ecff;       /* 호버(비활성) */
+}
+
+
+/* ── 그래프 캔버스 ─────────────────────────────── */
+.insight__canvas {
+  position: relative;
+  border-radius: 18px;  /* ti-card 와 동일 패딩 */  
+  background:#fff;border-radius:30px;
+  box-shadow:0 4px 10px 2px rgba(0,0,0,.25);
+  padding:3rem 3.5rem 4rem;
+
+}
+.insight__canvas img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* X축 날짜 레이블 */
+.xlabels {
+  margin: 1.25rem 3rem 0;  /* 그래프와 간격만 유지 */
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: .8rem;
+  color: #666;
+}
+.xlabels li {
+  text-align: center;
+}
+
+/* 범례 */
+.legend {
+  position: absolute;
+  top: 2rem;
+  right: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.legend span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* ── 설명문 ───────────────────────────────────── */
+.insight__caption {
+    margin-top:2rem;
+  font-size:1.375rem;
+  line-height:1.6;
+}
+
+/* ── 반응형 ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .insight__header h2 {
+    font-size: 2rem;
+  }
+  .insight__canvas {
+    padding: 1.5rem;
+  }
+}
