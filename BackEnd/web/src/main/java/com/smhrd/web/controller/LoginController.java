@@ -26,9 +26,11 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest req, HttpSession session) {
+        
         LoginResponse response = loginService.login(req);
 
-        log.info("로그인 요청 데이터: {}", req.getId() + " " + req.getNickname() );
+        
+        log.info("로그인 요청 결과: {}", response.getUser()); 
 
         if (!response.isSuccess()) {
         return ResponseEntity
