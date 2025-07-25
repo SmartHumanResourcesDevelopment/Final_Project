@@ -6,12 +6,14 @@ import apple_login from "../assets/img/login_join/apple_login.png";
 import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
 import mint_bg_color from "../assets/img/common/mint_bg_color.png";
 import "../assets/css/Login.css"; // 경로 주의
+import { useUser } from "../contexts/UserContext";
 
 const Login = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,6 +21,7 @@ const Login = () => {
       const response = await login({ id, password });
       if (response.success) {
         console.log("로그인 성공:", response.user.nickname);
+        setUser(data.user);
         navigate("/main"); // 홈 또는 마이페이지 이동
       } else {
         alert(`로그인 실패: ${response.message}`);
