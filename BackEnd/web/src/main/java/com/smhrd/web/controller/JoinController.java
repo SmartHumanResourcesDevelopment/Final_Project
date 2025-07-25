@@ -25,9 +25,6 @@ public class JoinController {
         
         System.out.println("가입 요청 데이터: " + req.getId() );
 
-
-        
-            
         if (loginService.register(req))
             return ResponseEntity.ok(new SignUpResponse(true, "회원가입 완료"));
         else 

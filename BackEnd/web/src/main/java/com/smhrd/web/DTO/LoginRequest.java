@@ -4,6 +4,7 @@ public class LoginRequest {
     
     private String id;
     private String password;
+    private String nickname;
 
     // 기본 생성자
     public LoginRequest() {}
@@ -23,5 +24,13 @@ public class LoginRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNicknamed(String nickname) {
+        this.nickname = nickname;
     }
 }

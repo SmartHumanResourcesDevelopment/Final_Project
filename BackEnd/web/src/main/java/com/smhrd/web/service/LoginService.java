@@ -62,12 +62,13 @@ public class LoginService {
                 return new LoginResponse(false, "아이디 또는 비밀번호가 일치하지 않습니다.", null);
             }
 
-            log.info("로그인 성공: 사용자 이름 = {}", user.getName()); // 로그인 성공 로그
-            return new LoginResponse(true, "로그인 성공", user.getName());
+            log.info("로그인 성공: 사용자 이름 = {}", user.getUsername() + " " + user.getNickname() ); // 로그인 성공 로그
+            return new LoginResponse(true, "로그인 성공", user.getUsername());
 
         } catch (Exception e) {
             log.error("로그인 처리 중 오류 발생", e); // 로그인 처리중 오류 로그
             return new LoginResponse(false, "시스템 오류가 발생했습니다", null);
         }
+        
     }
 }
