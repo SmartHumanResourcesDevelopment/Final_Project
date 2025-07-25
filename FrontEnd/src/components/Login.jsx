@@ -1,4 +1,6 @@
-import axios from "axios";         
+import axios from "axios";       
+//npm install jwt-decode
+import {jwtDecode} from "jwt-decode";  
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi"; 
@@ -17,27 +19,40 @@ const Login = () => {
   const { setUser } = useUser();
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  try {
-    const data = await login({ id, password });
+    e.preventDefault();
+    try {
+      const data = await login({ id, password });
+      if (!data.success) {
+        alert(`로그인 실패: ${data.message}`);
+        return navigate("/");
+      }
 
-    if (!data.success || !data.user) {
-      alert(`로그인 실패: ${data.message}`);
-      return navigate("/");
+      const { token } = data;
+
+      // 토큰만 저장
+      localStorage.setItem("jwtToken", token);
+
+      // axios 기본 헤더 설정
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      // 토큰에서 유저 정보 디코딩 후 Context에 설정
+      const decoded = jwtDecode(token);
+      setUser({
+        userId: decoded.sub,
+        username: decoded.username,
+        phoneNumber: decoded.phoneNumber,
+        nickname: decoded.nickname,
+        role: decoded.role,
+      });
+
+      // 메인 페이지로 이동
+      navigate("/main");
+    } catch (error) {
+      console.error("로그인 중 오류:", error);
+      alert("서버 오류로 로그인에 실패했습니다.");
+      navigate("/");
     }
-
-    const { token, user } = data;
-    localStorage.setItem("jwtToken", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    setUser(user);
-    navigate("/main");
-  } catch (error) {
-    console.error("로그인 중 오류:", error);
-    alert("서버 오류로 로그인에 실패했습니다.");
-    navigate("/");
-  }
-};
+  };
   const handleGoToJoin = () => navigate("/join");
 
   return (

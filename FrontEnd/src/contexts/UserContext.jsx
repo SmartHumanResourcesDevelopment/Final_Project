@@ -1,45 +1,53 @@
 // src/contexts/UserContext.jsx
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 export const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [initialized, setInitialized] = useState(false); // ← 추가
 
-  // 1) 앱 마운트 시에: 토큰을 axios 헤더에 세팅하고, 저장된 유저 정보 읽기
+  // 1) 앱 마운트 시: 토큰 복원 & user 설정
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
+      try {
+        const decoded = jwtDecode(token);
+        setUser({
+          userId: decoded.sub,
+          username: decoded.username,
+          phoneNumber: decoded.phoneNumber,
+          nickname: decoded.nickname,
+          role: decoded.role,
+        });
+      } catch {
+        localStorage.removeItem("jwtToken");
+      }
     }
-
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    setInitialized(true); // ← 복원 로직 끝나면 초기화 완료
   }, []);
 
-  // 2) user 상태가 바뀔 때마다 localStorage와 axios 헤더 동기화
-  useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
-    if (token) axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-    const saved = localStorage.getItem("user");
-    if (saved) setUser(JSON.parse(saved));
-  }, []);
-
-  useEffect(() => {
-    if (user) localStorage.setItem("user", JSON.stringify(user));
-    else {
-      localStorage.removeItem("user");
-      localStorage.removeItem("jwtToken");
-      delete axios.defaults.headers.common["Authorization"];
-    }
-  }, [user]);
+  // 로그아웃 토큰 지워버러기
+  const logout = () => {
+    localStorage.removeItem("jwtToken");
+    delete axios.defaults.headers.common["Authorization"];
+    setUser(null);
+  };
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider
+      value={{ user, setUser, initialized, logout }}
+    >
       {children}
     </UserContext.Provider>
   );
