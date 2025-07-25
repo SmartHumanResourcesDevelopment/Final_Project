@@ -12,5 +12,5 @@ public interface UserMapper {
 
     int insertUser(SignUpRequest req); // 회원가입
 
-    SignUpRequest findByUserId(String id); // 사용자 로그인(비교용)
+    SignUpRequest findByUserId(String user_input_id); // 사용자 로그인(비교용)
 }

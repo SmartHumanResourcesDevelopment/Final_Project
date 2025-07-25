@@ -5,12 +5,12 @@
 
 <mapper namespace="com.smhrd.web.repository.UserMapper">
 
-
+    <!-- 아이디 중복 -->
     <select id="existsByUserId" resultType="int">
         SELECT COUNT(*) FROM user_tbl WHERE user_id = #{id}
     </select>
 
-
+    <!-- 회원가입 -->
     <insert id="insertUser">
     INSERT INTO user_tbl
     (user_id, username, password, phone_number, nickname, role, created_at)
@@ -18,8 +18,20 @@
     (#{id}, #{name}, #{password}, #{phone}, #{nickname}, #{role}, SYSDATE)
     </insert>
 
-    <select id="findByUserId" resultType="com.smhrd.web.DTO.SignUpRequest">
-        SELECT * FROM user_tbl WHERE user_id = #{id}
+    <resultMap id="signUpResultMap" type="com.smhrd.web.DTO.SignUpRequest">
+        <result property="user_id" column="USER_ID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="phone_number" column="PHONE_NUMBER"/>
+        <result property="nickname" column="NICKNAME"/>
+        <result property="role" column="ROLE"/>
+    </resultMap>
+
+
+
+    <!-- 로그인 -->
+    <select id="findByUserId" resultMap="signUpResultMap">
+        SELECT * FROM user_tbl WHERE user_id = #{user_input_id}
     </select>
 
 

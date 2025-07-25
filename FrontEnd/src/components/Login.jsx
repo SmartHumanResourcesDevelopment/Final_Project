@@ -18,7 +18,7 @@ const Login = () => {
     try {
       const response = await login({ id, password });
       if (response.success) {
-        console.log("로그인 성공:", response.user);
+        console.log("로그인 성공:", response.user.nickname);
         navigate("/main"); // 홈 또는 마이페이지 이동
       } else {
         alert(`로그인 실패: ${response.message}`);
