@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi"; 
 import google_login from "../assets/img/login_join/google_login.png";
-import apple_login from "../assets/img/login_join/apple_login.png";
+import kakao_login_medium_narrow from "../assets/img/login_join/kakao_login_medium_narrow.png";
 import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
 import mint_bg_color from "../assets/img/common/mint_bg_color.png";
 import "../assets/css/Login.css"; // 경로 주의
@@ -144,8 +144,8 @@ const Login = () => {
                 <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Google login")}>
                   <img src={google_login} alt="Sign in with Google" />
                 </button>
-                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Apple login")}>
-                  <img src={apple_login} alt="Sign in with Apple" />
+                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("kakoa login")}>
+                  <img src={kakao_login_medium_narrow} alt="Sign in with kakao" />
                 </button>
               </div>
 

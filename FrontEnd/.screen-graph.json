@@ -53,15 +53,15 @@
   ],
   "edges": [
     {
-      "id": "src\\components\\Login.jsx:22:8-to-src\\components\\Main.jsx",
+      "id": "src\\components\\Login.jsx:25:8-to-src\\components\\Main.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\components\\Main.jsx",
       "data": {
         "viaRoute": "/main",
         "trigger": {
           "element": "navigate(\"/main\")",
-          "line": 22,
-          "endLine": 22,
+          "line": 25,
+          "endLine": 25,
           "column": 8,
           "endColumn": 25,
           "sourceFile": "src\\components\\Login.jsx"
@@ -69,15 +69,15 @@
       }
     },
     {
-      "id": "src\\components\\Login.jsx:31:31-to-src\\components\\Join.jsx",
+      "id": "src\\components\\Login.jsx:34:31-to-src\\components\\Join.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\components\\Join.jsx",
       "data": {
         "viaRoute": "/join",
         "trigger": {
           "element": "navigate(\"/join\")",
-          "line": 31,
-          "endLine": 31,
+          "line": 34,
+          "endLine": 34,
           "column": 31,
           "endColumn": 48,
           "sourceFile": "src\\components\\Login.jsx"
