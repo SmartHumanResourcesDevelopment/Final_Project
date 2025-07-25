@@ -15,15 +15,17 @@ import ServicePage from "./components/ServicePage";
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/join" element={<Join />} />
-        <Route path="/main" element={<Main />} />
-        <Route path="/mypage" element={<MyPage />} />
-        <Route path="/sub" element={<Sub />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/servicepage" element={<ServicePage />} />
-      </Routes>
+      <UserProvider>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/join" element={<Join />} />
+          <Route path="/main" element={<Main />} />
+          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/sub" element={<Sub />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/servicepage" element={<ServicePage />} />
+        </Routes>
+      </UserProvider>
     </BrowserRouter>
   );
 }
