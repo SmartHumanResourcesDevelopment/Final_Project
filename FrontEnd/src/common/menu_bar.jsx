@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import ChevronDown from "../assets/img/common/chevron_down.png";
 import notifIcon from "../assets/img/common/notif-icon.png";
 import { useUser } from "../contexts/UserContext";
 
 export const NavigationSection = () => {
   const navigate = useNavigate();
-  const [activeMenu, setActiveMenu] = useState("메인페이지");
+  const location = useLocation();
   const { user } = useUser();
 
   const navigationItems = [
@@ -16,6 +16,14 @@ export const NavigationSection = () => {
     "마이페이지",
   ];
 
+  const pathToMenu = {
+    "/main": "메인페이지",
+    "/sub": "심층분석페이지",
+    "/servicepage": "서비스소개",
+    "/mypage": "마이페이지",
+  };
+
+  const currentMenu = pathToMenu[location.pathname] || "메인페이지";
   return (
     <nav
       role="navigation"
@@ -37,11 +45,32 @@ export const NavigationSection = () => {
           {navigationItems.map((label) => (
             <li key={label}>
               <button
-                onClick={() => setActiveMenu(label)}
-                aria-current={label === activeMenu ? "page" : undefined}
+                onClick={() => { 
+                  //  메인 페이지로 이동 하기
+                  if (label === "메인페이지"){
+                    navigate("/main");
+                  }
+
+                  /*
+                    // 상세 페이지 이동
+                    if (label === "상세페이지"){
+                      navigate("/sub");
+                    }
+                  */
+                  // 서비스 페이지 이동
+                  if (label === "서비스소개"){
+                    navigate("/servicepage");
+                  }
+                  
+                  // 마이페이지 이동
+                  if (label === "마이페이지") {
+                    navigate("/mypage");
+                  }
+                }}
+                aria-current={label === currentMenu  ? "page" : undefined}
                 className={`text-base leading-[30px] hover:opacity-80 transition
                   ${
-                    label === activeMenu
+                    label === currentMenu
                       ? "font-black"
                       : "font-normal"
                   }`}
@@ -60,7 +89,7 @@ export const NavigationSection = () => {
           </div>
 
           {/* 닉네임 */}
-          <span className="text-xs text-[#1f384c]">{ user.nickname }</span>
+          <span className="text-xs text-[#1f384c]">{user?.nickname}</span>
 
           {/* 드롭다운 버튼 */}
           <button

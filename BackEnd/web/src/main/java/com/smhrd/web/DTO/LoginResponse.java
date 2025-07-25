@@ -16,5 +16,6 @@ public class LoginResponse {
     private boolean success;
     private String message;
     private UserDTO user;
+    private String token;
 
 }

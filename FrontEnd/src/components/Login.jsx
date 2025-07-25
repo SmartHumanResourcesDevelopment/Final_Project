@@ -1,3 +1,4 @@
+import axios from "axios";         
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi"; 
@@ -16,21 +17,27 @@ const Login = () => {
   const { setUser } = useUser();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await login({ id, password });
-      if (response.success) {
-        console.log("로그인 성공:", response.user.nickname);
-        setUser(response.user);
-        navigate("/main"); // 홈 또는 마이페이지 이동
-      } else {
-        alert(`로그인 실패: ${response.message}`);
-      }
-    } catch (error) {
-      console.error("로그인 중 오류 발생:", error);
-      alert("서버 오류로 로그인에 실패했습니다.");
+  e.preventDefault();
+  try {
+    const data = await login({ id, password });
+
+    if (!data.success || !data.user) {
+      alert(`로그인 실패: ${data.message}`);
+      return navigate("/");
     }
-  };
+
+    const { token, user } = data;
+    localStorage.setItem("jwtToken", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    setUser(user);
+    navigate("/main");
+  } catch (error) {
+    console.error("로그인 중 오류:", error);
+    alert("서버 오류로 로그인에 실패했습니다.");
+    navigate("/");
+  }
+};
   const handleGoToJoin = () => navigate("/join");
 
   return (
