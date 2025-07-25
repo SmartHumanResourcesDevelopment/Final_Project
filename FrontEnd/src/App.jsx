@@ -9,23 +9,21 @@ import Main from "./components/Main";
 import Sub from "./components/Sub";
 import MyPage from "./components/MyPage";
 import Admin from "./components/Admin_page";
+import ServicePage from "./components/ServicePage";
 
 
 function App() {
   return (
     <BrowserRouter>
-      <UserProvider>
-       
-
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/join" element={<Join />} />
-          <Route path="/main" element={<Main />} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/sub" element={<Sub />} />
-          <Route path="/admin" element={<Admin />} />
-        </Routes>
-      </UserProvider>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/join" element={<Join />} />
+        <Route path="/main" element={<Main />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/sub" element={<Sub />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/servicepage" element={<ServicePage />} />
+      </Routes>
     </BrowserRouter>
   );
 }
