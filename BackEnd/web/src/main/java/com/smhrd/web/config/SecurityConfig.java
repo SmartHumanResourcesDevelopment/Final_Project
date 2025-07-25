@@ -17,16 +17,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-         return http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 적용
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/zal/**").permitAll()
-                .anyRequest().permitAll()
-                
-            )
-            .httpBasic(httpBasic -> {}) // 기본 인증 사용, 람다로 처리
-            .build();
+          return http
+        .csrf(csrf -> csrf.disable())
+        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 적용
+        .authorizeHttpRequests(auth -> auth
+            // === Swagger 관련 경로 추가 ===
+            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+            // === 기존 public 경로 ===
+            .requestMatchers("/zal/**").permitAll()
+            // === 기타 경로 처리 ===
+            .anyRequest().permitAll()
+        )
+        .httpBasic(httpBasic -> {}) // 기본 인증
+        .build();
     }
 
     @Bean
@@ -43,4 +46,7 @@ public class SecurityConfig {
 
         return source;
     }
+
+
+    
 }

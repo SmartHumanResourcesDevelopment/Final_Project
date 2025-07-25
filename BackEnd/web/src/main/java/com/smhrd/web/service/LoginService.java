@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.smhrd.web.DTO.LoginRequest;
 import com.smhrd.web.DTO.LoginResponse;
 import com.smhrd.web.DTO.SignUpRequest;
+import com.smhrd.web.DTO.UserDTO;
 import com.smhrd.web.repository.UserMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +27,9 @@ public class LoginService {
     @Transactional
     public boolean register(SignUpRequest req) { // 회원가입 로직
 
-        System.out.println("가입 요청 데이터: " + req.getId()); // 로그 확인용
+        System.out.println("가입 요청 데이터: " + req.getUser_id()); // 로그 확인용
 
-        int exists = userMapper.existsByUserId(req.getId());
+        int exists = userMapper.existsByUserId(req.getUser_id());
 
         System.out.println(" 아이디 중복 결과: " + exists); // 로그 확인용
 
@@ -47,27 +48,30 @@ public class LoginService {
     }
 
     public LoginResponse login(LoginRequest req) {
+        
         try {
             log.info("로그인 시도: 사용자 ID = {}", req.getId()); // 로그인 시도 로그
 
-            SignUpRequest user = userMapper.findByUserId(req.getId());
+            SignUpRequest user = userMapper.findByUserId( req.getId());
 
             if (user == null) {
-                log.warn("로그인 실패: 존재하지 않는 ID {}", req.getId()); // 아이디가 없다 로그
+                log.warn("로그인 실패: 존재하지 않는 ID {}",  req.getId()); // 아이디가 없다 로그
                 return new LoginResponse(false, "아이디 또는 비밀번호가 일치하지 않습니다.", null);
             }
 
-            if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
-                log.warn("로그인 실패: 비밀번호 불일치 - ID {}", req.getId()); // 비밀번호가 불일치하다 로그
+            if (!passwordEncoder.matches( req.getPassword(), user.getPassword())) {
+                log.warn("로그인 실패: 비밀번호 불일치 - ID {}", req.getPassword()); // 비밀번호가 불일치하다 로그
                 return new LoginResponse(false, "아이디 또는 비밀번호가 일치하지 않습니다.", null);
             }
 
-            log.info("로그인 성공: 사용자 이름 = {}", user.getName()); // 로그인 성공 로그
-            return new LoginResponse(true, "로그인 성공", user.getName());
+            log.info("로그인 성공: 사용자 이름 = {}", user); // 로그인 성공 로그
+            UserDTO userinfo = new UserDTO(user.getUser_id(),user.getUsername(),user.getPhone_number(),user.getNickname(),user.getRole());
+            return new LoginResponse(true, "로그인 성공", userinfo);
 
         } catch (Exception e) {
             log.error("로그인 처리 중 오류 발생", e); // 로그인 처리중 오류 로그
             return new LoginResponse(false, "시스템 오류가 발생했습니다", null);
         }
+        
     }
 }

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { AccountManagementSection } from "../UI/AccountManagement";
+import  AccountManagementSection  from "../UI/AccountManagement";
 import { ActivityFeedSection } from "../UI/MyFeed";
 import { NavigationSection } from "../common/menu_bar";
 import FooterSection from "../common/footer";
