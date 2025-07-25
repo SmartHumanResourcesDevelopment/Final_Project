@@ -119,8 +119,8 @@ def crawl_account_with_next(driver, username, limit=5):
             break
 
 if __name__ == "__main__":
-    ig_id = "alfowko3258@gmail.com"
-    ig_pw = "thdnf798A!@"
+    ig_id = ""
+    ig_pw = ""
     target_account = "anunu.eat"
 
     options = webdriver.ChromeOptions()
