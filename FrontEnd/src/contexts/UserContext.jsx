@@ -5,7 +5,7 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState({
-    nickname: " " // 임시 설정값으로
+    nickname: "null" // 임시 설정값으로
   });
 
   return (

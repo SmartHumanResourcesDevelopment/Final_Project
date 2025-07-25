@@ -65,7 +65,7 @@ public class LoginService {
             }
 
             log.info("로그인 성공: 사용자 이름 = {}", user); // 로그인 성공 로그
-            UserDTO userinfo = new UserDTO(user.getUser_id(),user.getUsername(),user.getNickname(),user.getPhone_number(),user.getRole());
+            UserDTO userinfo = new UserDTO(user.getUser_id(),user.getUsername(),user.getPhone_number(),user.getNickname(),user.getRole());
             return new LoginResponse(true, "로그인 성공", userinfo);
 
         } catch (Exception e) {
