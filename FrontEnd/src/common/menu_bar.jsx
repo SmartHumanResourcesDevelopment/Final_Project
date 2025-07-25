@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import ChevronDown from "../assets/img/common/chevron_down.png";
 import notifIcon from "../assets/img/common/notif-icon.png";
+import { useUser } from "../contexts/UserContext";
 
 export const NavigationSection = () => {
   const [activeMenu, setActiveMenu] = useState("메인페이지");
+  const { user } = useUser();
 
   const navigationItems = [
     "메인페이지",
@@ -53,7 +55,7 @@ export const NavigationSection = () => {
           </div>
 
           {/* 닉네임 */}
-          <span className="text-xs text-[#1f384c]">쩝쩝박사선생님</span>
+          <span className="text-xs text-[#1f384c]">{ user.nickname }</span>
 
           {/* 드롭다운 버튼 */}
           <button
