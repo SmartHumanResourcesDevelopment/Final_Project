@@ -6,11 +6,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import com.smhrd.web.DTO.JwtResponse;
+import com.smhrd.web.service.JwtService;
+
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -19,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/naver")
 public class SocialLoginController{
 
     @Value("${naver.client.id}")
@@ -31,38 +35,48 @@ public class SocialLoginController{
     @Value("${naver.redirect.uri}")
     private String redirectUri;
 
-    @PostMapping("/naver/callback")
-    public ResponseEntity<?> naverCallback(@RequestBody Map<String, String> param) {
-        
-        String code = param.get("code");
-        String state = param.get("state");
+    private final JwtService jwtService;
 
-        try {
-            // 네이버에 액세스 토큰을 요청 
-            String accessToken = getNaverAccessToken(code, state);
-            
-            if (accessToken == null) {
-                return ResponseEntity.status(401)
-                    .body(Map.of("success", false, "message", "토큰 발급 실패"));
-            }
-
-            // 네이버에 사용자 정보를 요청
-            Map<String, Object> userInfo = getNaverUserInfo(accessToken);
-            
-            if (userInfo != null) {
-                
-                return ResponseEntity.ok(Map.of("success", true, "user", userInfo));
-            } else {
-                return ResponseEntity.status(401)
-                    .body(Map.of("success", false, "message", "사용자 정보 획득 실패"));
-            }
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500)
-                .body(Map.of("success", false, "message", "서버 오류"));
-        }
+    public SocialLoginController(JwtService jwtService){
+        this.jwtService = jwtService;
     }
+
+    
+    @GetMapping("/callback")
+    public ResponseEntity<?> naverCallback(@RequestParam String code, @RequestParam String state) {
+    
+    try {
+        String accessToken = getNaverAccessToken(code, state);
+
+        if (accessToken == null) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("success", false, "message", "토큰 발급 실패"));
+        }
+
+        Map<String, Object> userInfo = getNaverUserInfo(accessToken);
+
+        if (userInfo != null) {
+            // 사용자 식별자 추출 (ex. 이메일 or id)
+            String userId = (String) userInfo.get("id"); // 또는 "email"
+
+            // JWT 발급
+            String jwtToken = jwtService.createToken(userId);
+
+            return ResponseEntity.ok(
+                    new JwtResponse(true, jwtToken, userInfo)
+            );
+        } else {
+            return ResponseEntity.status(401)
+                    .body(Map.of("success", false, "message", "사용자 정보 획득 실패"));
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(500)
+                .body(Map.of("success", false, "message", "서버 오류"));
+    }
+}
+
 
     // 네이버 액세스 토큰 요청 메서드
     private String getNaverAccessToken(String code, String state) {

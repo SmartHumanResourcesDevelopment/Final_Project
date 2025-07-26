@@ -101,11 +101,25 @@
 			<version>2.5.0</version>
 		</dependency>
 
-		<!-- 네이버 로그인 토큰 의존성 -->
+		<!-- 네이버 로그인 토큰 의존성 - api -->
 		<dependency>
-  			<groupId>io.jsonwebtoken</groupId>
-  			<artifactId>jjwt</artifactId>
-  			<version>0.9.1</version>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-api</artifactId>
+    		<version>0.11.5</version>
+		</dependency>
+		<!-- 네이버 로그인 토큰 의존성 - impl -->
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-impl</artifactId>
+    		<version>0.11.5</version>
+    		<scope>runtime</scope>
+		</dependency>
+		<!-- 네이버 로그인 토큰 의존성 - jackson -->
+		<dependency>
+    		<groupId>io.jsonwebtoken</groupId>
+    		<artifactId>jjwt-jackson</artifactId>
+    		<version>0.11.5</version>
+    		<scope>runtime</scope>
 		</dependency>
 
 		<!-- Jackson 의존성 -->

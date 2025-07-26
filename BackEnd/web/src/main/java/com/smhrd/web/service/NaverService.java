@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class NaverService {
     
     private final String clientId = "5BTv6gBgZA61McgvsB6X";
-    private final String clientSecret = "ju7yg1Qk4n";
+    private final String clientSecret = "8cF2!xvU$z29Jkq!hd74kXp%Qw91nZp@";
     private final String redirectUri = "http://localhost:8075/auth/naver/callback";
 
     private final ObjectMapper mapper = new ObjectMapper();
