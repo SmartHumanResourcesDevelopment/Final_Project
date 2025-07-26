@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi"; 
 import google_login from "../assets/img/login_join/google_login.png";
-import kakao_login_medium_narrow from "../assets/img/login_join/kakao_login_medium_narrow.png";
 import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
 import mint_bg_color from "../assets/img/common/mint_bg_color.png";
 import "../assets/css/Login.css"; // 경로 주의
@@ -14,6 +13,28 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useUser();
+useEffect(() => {
+  const script = document.createElement("script");
+  script.src = "https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js";
+  script.type = "text/javascript";
+  script.async = true;
+  script.charset = "utf-8";
+  document.body.appendChild(script);
+
+  script.onload = () => {
+    const naverLogin = new window.naver.LoginWithNaverId({
+      clientId : "5BTv6gBgZA61McgvsB6X",
+      callbackUrl: "http://localhost:8095/auth/naver/callback",
+      isPopup: false,
+      loginButton: {color: "green", type:3, height: 60}
+    });
+    naverLogin.init();
+  };
+
+  return () => {
+    document.body.removeChild(script);
+  };
+}, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -142,12 +163,11 @@ const Login = () => {
             {/* SNS 로그인 */}
               <div className="flex justify-center gap-6 w-full mt-10">
                 <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Google login")}>
-                  <img src={google_login} alt="Sign in with Google" />
+                <img src={google_login} alt="Sign in with Google" />
                 </button>
-                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("kakoa login")}>
-                  <img src={kakao_login_medium_narrow} alt="Sign in with kakao" />
-                </button>
+                <div id="naverIdLogin" className="w-[190px] hover:opacity-80"></div>
               </div>
+
 
             {/* 하단 문구 */}
             <p className="w-full text-[13px] font-medium mt-4 text-center">
