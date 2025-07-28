@@ -22,6 +22,7 @@ public class UserInfoUpdate {
     /** 기존 회원정보 수정 메서드 */
     @PostMapping("/update")
     public ResponseEntity<?> updateUserInfo(@RequestBody UserInfoUpdate_DTO dto) {
+         System.out.println("🟡 [DEBUG] 전달된 DTO: " + dto);
         boolean result = userInfoService.user_info_update_service(dto);
         if (result) {
             return ResponseEntity.ok("수정 성공");
