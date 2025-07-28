@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.smhrd.web.DTO.SignUpRequest;
+import com.smhrd.web.DTO.UserInfoUpdate_DTO;
+
 
 @Mapper
 public interface UserMapper {
@@ -13,4 +15,11 @@ public interface UserMapper {
     int insertUser(SignUpRequest req); // 회원가입
 
     SignUpRequest findByUserId(String user_input_id); // 사용자 로그인(비교용)
+
+    // 사용자 정보 수정
+    int UserInfoUpdate(UserInfoUpdate_DTO dto);
+
+    /** 이미지 수정  */
+    int updateUserProfileById(String userId, String imageUrl);
+
 }

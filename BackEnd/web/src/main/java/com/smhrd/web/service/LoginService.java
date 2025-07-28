@@ -48,6 +48,8 @@ public class LoginService {
 
         // 데이터 베이스에 저장
         req.setRole("팀원");
+        req.setUserprofile("/img/user.png");
+
         int result = userMapper.insertUser(req);
         return result > 0;
 
@@ -67,7 +69,8 @@ public class LoginService {
             userEntity.getUsername(),
             userEntity.getPhone_number(),
             userEntity.getNickname(),
-            userEntity.getRole()
+            userEntity.getRole(),
+            userEntity.getUserprofile()
         );
 
         // 3) 토큰 만들기 (클레임에 유저 정보 포함)

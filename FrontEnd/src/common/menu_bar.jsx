@@ -4,6 +4,9 @@ import ChevronDown from "../assets/img/common/chevron_down.png";
 import notifIcon from "../assets/img/common/notif-icon.png";
 import { useUser } from "../contexts/UserContext";
 import { AnimatePresence, motion } from "framer-motion";
+import defaultUser from "../assets/img/user.png"; 
+const DEFAULT_PROFILE = defaultUser;
+
 
 export const NavigationSection = () => {
   const navigate = useNavigate();
@@ -13,7 +16,6 @@ export const NavigationSection = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // 바깥 클릭시 드롭다운 닫힘
   useEffect(() => {
     const handleClick = (e) => {
       if (open && dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -37,7 +39,6 @@ export const NavigationSection = () => {
     "/servicepage": "서비스소개",
     "/mypage": "마이페이지",
   };
-
   const currentMenu = pathToMenu[location.pathname] || "메인페이지";
 
   return (
@@ -62,9 +63,9 @@ export const NavigationSection = () => {
               <button
                 onClick={() => {
                   if (label === "메인페이지") navigate("/main");
+                  if (label === "심층분석페이지") navigate("/sub");
                   if (label === "서비스소개") navigate("/servicepage");
                   if (label === "마이페이지") navigate("/mypage");
-                  // if (label === "심층분석페이지") navigate("/sub");
                 }}
                 aria-current={label === currentMenu ? "page" : undefined}
                 className={`text-base leading-[30px] hover:opacity-80 transition ${
@@ -79,9 +80,17 @@ export const NavigationSection = () => {
 
         {/* 우측 유저 영역 */}
         <div className="flex items-center gap-4 relative" ref={dropdownRef}>
-          {/* 이모지 아바타 */}
-          <div className="w-8 h-8 rounded-2xl bg-[#ffe6cc] grid place-content-center text-white text-base">
-            🍔
+          {/* 프로필 이미지 */}
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
+            <img
+              src={user?.userProfile || DEFAULT_PROFILE}
+              alt="User profile"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = DEFAULT_PROFILE;
+              }}
+            />
           </div>
 
           {/* 닉네임 */}

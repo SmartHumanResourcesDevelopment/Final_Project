@@ -13,4 +13,10 @@ export default defineConfig(({ mode }) => ({
       plugins: [tailwind()],
     },
   },
+   server: {
+    proxy: {
+      '/zal': 'http://localhost:8095',   // ← Spring 서버 주소
+      
+    }
+  },
 }));

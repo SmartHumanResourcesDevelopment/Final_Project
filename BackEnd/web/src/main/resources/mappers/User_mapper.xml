@@ -34,5 +34,25 @@
         SELECT * FROM user_tbl WHERE user_id = #{user_input_id}
     </select>
 
+    
+
+    <!-- 유저 정보  수정 -->
+    <update id="UserInfoUpdate" parameterType="com.smhrd.web.DTO.UserInfoUpdate_DTO">
+    UPDATE user_tbl
+    SET
+        password = #{password},
+        username = #{username},
+        phone_number = #{phone_number},
+        nickname = #{nickname}
+    WHERE user_id = #{user_id}
+    </update>
+
+<!-- 유저 프로필 사진 변경 -->
+   <update id="updateUserProfile" parameterType="com.smhrd.web.DTO.UserProfileUpdateDTO">
+        UPDATE USER_TBL
+        SET    USERPROFILE = #{userProfile}
+        WHERE  USER_ID    = #{userId}
+    </update>
+
 
 </mapper>
