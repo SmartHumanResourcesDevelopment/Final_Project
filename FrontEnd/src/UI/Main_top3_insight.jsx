@@ -12,8 +12,8 @@ export default function Main_top3_insight() {
     <section className="insight">
       {/* ── 제목 + 기간 탭 ─────────────────── */}
       <header className="insight__header">
-        <h2>
-          핫한 이유, <span className="highlight">숫자가 말해요</span>
+        <h2 className="highlight">
+          핫한 이유, <span >숫자가 말해요</span>
         </h2>
         <p className="insight__sub">
           일주일간 언급량 변화를 통해 인기 상승세를 확인하세요

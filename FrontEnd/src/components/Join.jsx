@@ -86,17 +86,20 @@ export const Join = () => {
       return;
     }
     try {
--    setShowSuccessModal(true);  /* 실제 API 호출 자리 */
-      const { success, message } = await signUp(formData);
-      console.log("응답:", success, message);
-      if (success) {
-        setShowSuccessModal(true);            // ★ 성공 모달
-      } else {
-        alert(message || "회원가입 실패입니다.");
+        // ① API 호출 전엔 모달 상태를 건드리지 않습니다.
+        const { success, message } = await signUp(formData);
+        console.log("응답:", success, message);
+
+        if (success) {
+          // ② 성공한 경우에만 모달을 띄웁니다.
+          setShowSuccessModal(true);
+        } else {
+          // 실패한 경우엔 alert만, 모달 상태는 그대로 유지(기본 false)
+          alert(message || "회원가입 실패입니다.");
         }
       } catch (err) {
-        setShowSuccessModal(false); 
-        console.err("회원가입 중 오류", err);
+        // ③ catch 블록에서 console.error를 쓰고, 모달은 띄우지 않습니다.
+        console.error("회원가입 중 오류", err);
         alert("서버 오류가 발생했습니다.");
       }
   };
