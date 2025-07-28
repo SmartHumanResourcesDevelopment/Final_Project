@@ -29,7 +29,7 @@
   ],
   "edges": [
     {
-      "id": "src\\components\\Login.jsx:26:6-to-src\\components\\Login.jsx",
+      "id": "src\\components\\Login.jsx:26:13-to-src\\components\\Login.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\components\\Login.jsx",
       "data": {
@@ -38,8 +38,8 @@
           "element": "navigate(\"/\")",
           "line": 26,
           "endLine": 26,
-          "column": 6,
-          "endColumn": 19,
+          "column": 13,
+          "endColumn": 26,
           "sourceFile": "src\\components\\Login.jsx"
         }
       }

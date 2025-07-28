@@ -24,7 +24,7 @@ public class JwtUtil {
         return Jwts.builder()
             .setSubject(userId)
             .setIssuedAt(new Date(now))
-            .setExpiration(new Date(now + 1000 * 60 * 60 * 24)) // 24시간
+            .setExpiration(new Date(now + 1000 * 60 * 60 * 1)) // 1시간
             .signWith(key, SignatureAlgorithm.HS256)
             .compact();
     }

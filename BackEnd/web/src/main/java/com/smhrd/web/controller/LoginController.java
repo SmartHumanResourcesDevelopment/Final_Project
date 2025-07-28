@@ -37,7 +37,7 @@ public class LoginController {
             .status(401) // 혹은 400, 403  선택
             .body(response);
     }
-        session.setAttribute("loginUser", response.getUser());
+        // session.setAttribute("loginUser", response.getUser());
         return ResponseEntity.ok(response);
     }
 }
