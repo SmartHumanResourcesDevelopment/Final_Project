@@ -30,14 +30,14 @@ public class LoginController {
         LoginResponse response = loginService.login(req);
 
         
-        log.info("로그인 요청 결과: {}", response.getUser()); 
+        log.info("로그인 요청 결과: {}", response); 
 
         if (!response.isSuccess()) {
         return ResponseEntity
             .status(401) // 혹은 400, 403  선택
             .body(response);
     }
-        // session.setAttribute("loginUser", response.getUser());
+    
         return ResponseEntity.ok(response);
     }
 }

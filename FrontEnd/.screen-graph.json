@@ -29,7 +29,7 @@
   ],
   "edges": [
     {
-      "id": "src\\components\\Login.jsx:26:13-to-src\\components\\Login.jsx",
+      "id": "src\\components\\Login.jsx:26:6-to-src\\components\\Login.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\components\\Login.jsx",
       "data": {
@@ -38,73 +38,73 @@
           "element": "navigate(\"/\")",
           "line": 26,
           "endLine": 26,
-          "column": 13,
-          "endColumn": 26,
+          "column": 6,
+          "endColumn": 19,
           "sourceFile": "src\\components\\Login.jsx"
         }
       }
     },
     {
-      "id": "src\\components\\Login.jsx:34:4-to-src\\contexts\\ProtectedRoute.jsx",
-      "source": "src\\components\\Login.jsx",
-      "target": "src\\contexts\\ProtectedRoute.jsx",
+      "id": "src/components/Login.jsx:49:6-to-src/contexts/ProtectedRoute.jsx",
+      "source": "src/components/Login.jsx",
+      "target": "src/contexts/ProtectedRoute.jsx",
       "data": {
         "viaRoute": "/main",
         "trigger": {
           "element": "navigate(\"/main\")",
-          "line": 34,
-          "endLine": 34,
-          "column": 4,
-          "endColumn": 21,
-          "sourceFile": "src\\components\\Login.jsx"
+          "line": 49,
+          "endLine": 49,
+          "column": 6,
+          "endColumn": 23,
+          "sourceFile": "src/components/Login.jsx"
         }
       }
     },
     {
-      "id": "src\\components\\Login.jsx:38:4-to-src\\components\\Login.jsx",
-      "source": "src\\components\\Login.jsx",
-      "target": "src\\components\\Login.jsx",
+      "id": "src/components/Login.jsx:53:6-to-src/components/Login.jsx",
+      "source": "src/components/Login.jsx",
+      "target": "src/components/Login.jsx",
       "data": {
         "viaRoute": "/",
         "trigger": {
           "element": "navigate(\"/\")",
-          "line": 38,
-          "endLine": 38,
-          "column": 4,
-          "endColumn": 17,
-          "sourceFile": "src\\components\\Login.jsx"
+          "line": 53,
+          "endLine": 53,
+          "column": 6,
+          "endColumn": 19,
+          "sourceFile": "src/components/Login.jsx"
         }
       }
     },
     {
-      "id": "src\\components\\Login.jsx:41:31-to-src\\components\\Join.jsx",
-      "source": "src\\components\\Login.jsx",
-      "target": "src\\components\\Join.jsx",
+      "id": "src/components/Login.jsx:56:31-to-src/components/Join.jsx",
+      "source": "src/components/Login.jsx",
+      "target": "src/components/Join.jsx",
       "data": {
         "viaRoute": "/join",
         "trigger": {
           "element": "navigate(\"/join\")",
-          "line": 41,
-          "endLine": 41,
+          "line": 56,
+          "endLine": 56,
           "column": 31,
           "endColumn": 48,
-          "sourceFile": "src\\components\\Login.jsx"
+          "sourceFile": "src/components/Login.jsx"
         }
       }
     },
     {
-      "id": "src\\contexts\\ProtectedRoute.jsx:8:11-to-src\\components\\Login.jsx",
-      "source": "src\\contexts\\ProtectedRoute.jsx",
-      "target": "src\\components\\Login.jsx",
+      "id": "src/contexts/ProtectedRoute.jsx:16:11-to-src/components/Login.jsx",
+      "source": "src/contexts/ProtectedRoute.jsx",
+      "target": "src/components/Login.jsx",
       "data": {
         "viaRoute": "/",
         "trigger": {
           "element": "<Navigate to=\"/\" replace />",
-          "line": 8,
-          "endLine": 8,
+          "line": 16,
+          "endLine": 16,
           "column": 11,
           "endColumn": 38,
-          "sourceFile": "src\\contexts\\ProtectedRoute.jsx"
+          "sourceFile": "src/contexts/ProtectedRoute.jsx"
         }
       }
     }
