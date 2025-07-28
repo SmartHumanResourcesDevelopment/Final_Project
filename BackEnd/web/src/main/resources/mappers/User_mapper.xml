@@ -48,7 +48,7 @@
     </update>
 
 <!-- 유저 프로필 사진 변경 -->
-   <update id="updateUserProfile" parameterType="com.smhrd.web.DTO.UserProfileUpdateDTO">
+   <update id="updateUserProfileById" parameterType="com.smhrd.web.DTO.UserProfileUpdateDTO">
         UPDATE USER_TBL
         SET    USERPROFILE = #{userProfile}
         WHERE  USER_ID    = #{userId}

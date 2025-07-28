@@ -22,4 +22,5 @@ public interface UserMapper {
     /** 이미지 수정  */
     int updateUserProfileById(String userId, String imageUrl);
 
+
 }

@@ -1,108 +1,112 @@
-  import React, { useState } from "react";
-  import { fetchWithAuth } from "../util/fetchWithAuth";
-  import { useUser } from "../contexts/UserContext"; // ← 추가
-  import { useNavigate } from "react-router-dom";     // ← 추가
+// src/UI/MyPage_Profil.jsx
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import fetchWithAuth from "../util/fetchWithAuth";
+import defaultUser from "../assets/img/user.png";
+import { useUser } from "../contexts/UserContext";
 
-  const MyPage_Personal = ({ onClose }) => {
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [username, setUsername] = useState("");
-    const [phone_number, setPhoneNumber] = useState("");
-    const [nickname, setNickname] = useState("");
-    const { setUser } = useUser();      // ← 추가
-    const navigate = useNavigate();     // ← 추가
+const DEFAULT_PROFILE = "/img/user.png"; // 실제 서버 기본 이미지 경로
 
+const MyPage_Profil = ({ onClose }) => {
+  const navigate = useNavigate();
+  const { user: contextUser, logout } = useUser();  // ← user를 contextUser로 받음
 
-    
-    const handleUpdate = async () => {
-      if (password !== confirmPassword) {
-        alert("비밀번호가 일치하지 않습니다.");
-        return;
-      }
-      try { 
-        const user = JSON.parse(localStorage.getItem("user"));
-        const user_id = user?.userId;
+  useEffect(() => {
+    if (!contextUser) navigate("/login");
+  }, [contextUser, navigate]);
 
-        const res = await fetchWithAuth("/zal/api/update", {
-          method: "POST",
-          body: JSON.stringify({
-            user_id,
-            password,
-            username,
-            phone_number,
-            nickname,
-          }),
-        });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(
+    contextUser?.userProfile || DEFAULT_PROFILE
+  );
 
-        if (res.ok) {
-          // 1. localStorage와 context에서 토큰/유저 삭제
-          localStorage.removeItem("jwtToken");
-          localStorage.removeItem("user");
-          setUser(null); // ← Context에서 user 상태도 초기화
-
-          // 2. 알림 후 로그인 페이지로 이동
-          alert("회원 정보가 변경되어 다시 로그인해야 합니다.");
-          navigate("/");
-        } else {
-          alert("수정에 실패했습니다.");
-        }
-      } catch (e) {
-        alert("서버 오류!");
-      }
-    };
-      return (
-      <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-        <div className="bg-white rounded-[20px] w-[600px] max-w-full p-8 relative">
-          <button onClick={onClose} className="absolute top-6 right-6 text-2xl font-bold">×</button>
-          <h2 className="text-center text-2xl font-bold mb-6">개인정보 수정</h2>
-          <div className="space-y-4 mb-6">
-            <input
-              type="password"
-              placeholder="새로운 비밀번호를 입력해주세요"
-              className="w-full border rounded-md p-3 text-sm outline-none"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="다시 한번 당신의 비밀번호를 입력해주세요"
-              className="w-full border rounded-md p-3 text-sm outline-none"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="당신의 이름을 입력해주세요"
-              className="w-full border rounded-md p-3 text-sm outline-none"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="당신의 휴대폰번호를 입력해주세요"
-              className="w-full border rounded-md p-3 text-sm outline-none"
-              value={phone_number}
-              onChange={e => setPhoneNumber(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="닉네임을 입력해주세요"
-              className="w-full border rounded-md p-3 text-sm outline-none"
-              value={nickname}
-              onChange={e => setNickname(e.target.value)}
-            />
-          </div>
-          <button
-            onClick={handleUpdate}
-            className="w-full bg-black text-white py-4 rounded-full font-bold text-lg"
-          >
-            수정하기
-          </button>
-        </div>
-      </div>
-    );
-
+  const handleProfileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
   };
 
-  export default MyPage_Personal;
+  const handleUpdateProfile = async () => {
+    // 1) 로그인된 유저 없으면 종료
+    if (!contextUser) return;
 
+    // 2) 파일이 없으면 모달 닫기만
+    if (!selectedFile) {
+      onClose();
+      return;
+    }
+
+    // 3) FormData에 user_id와 file만 담기
+    const form = new FormData();
+    form.append("user_id", contextUser.userId);  // ← 여기에 실제 userId를 붙여야 합니다
+    form.append("file", selectedFile);
+
+    try {
+      const res = await fetchWithAuth("/zal/api/updateProfile", {
+        method: "POST",
+        body: form, // Content-Type 헤더는 fetchWithAuth가 자동 처리
+      });
+
+      if (res.ok) {
+        const { imageUrl } = await res.json();
+        // 4) 컨텍스트와 로컬스토리지 갱신
+        const updatedUser = { ...contextUser, userProfile: imageUrl };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        logout();     // 기존 로그인 초기화
+        setTimeout(() => { 
+          // 다시 로그인 흐름 타서 사용자 정보 갱신
+          // 혹은 contextUser를 직접 setUser(updatedUser)로 업데이트
+        }, 0);
+        onClose();
+        navigate("/");
+      } else {
+        alert("프로필 변경 실패: " + res.status);
+      }
+    } catch (e) {
+      alert("서버 오류 발생: " + e.message);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+      <div className="bg-white rounded-lg w-full max-w-md p-8 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-2xl"
+        >
+          ×
+        </button>
+        <h2 className="text-center text-2xl mb-6">프로필 사진 변경</h2>
+        <div className="w-40 h-40 rounded-full mx-auto mb-6 overflow-hidden border">
+          <img
+            src={previewUrl}
+            alt="프로필 미리보기"
+            className="w-full h-full object-cover"
+            onError={(e) => { e.currentTarget.src = DEFAULT_PROFILE; }}
+          />
+        </div>
+        <div className="flex flex-col gap-2 mb-6">
+          <label className="cursor-pointer bg-gray-100 py-2 px-4 rounded-md text-center">
+            사진 선택
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleProfileChange}
+              className="hidden"
+            />
+          </label>
+        </div>
+        <button
+          onClick={handleUpdateProfile}
+          className="w-full bg-black text-white py-3 rounded-full font-bold"
+        >
+          수정하기
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default MyPage_Profil;

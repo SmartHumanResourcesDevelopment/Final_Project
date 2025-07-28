@@ -6,8 +6,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.smhrd.web.DTO.UserInfoUpdate_DTO;
 import com.smhrd.web.repository.UserMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+@Slf4j
 @Service
 public class UserInfoUpdate_Service {
     @Autowired
@@ -31,18 +35,35 @@ public class UserInfoUpdate_Service {
     
         return false;
     }
-    // 멀티파트 파일 저장 후 URL 리턴
+   
     public String storeProfileImageAndGetUrl(MultipartFile file) {
-        // fileStorageService.store() 메서드가 실제 저장하고 public URL을 리턴
-        return fileStorageService.store(file);
-    }
+        // ① 주입된 빈이 null 인지 확인
+        log.info("[DEBUG] fileStorageService == null? {}", fileStorageService == null);
+        log.info("[DEBUG] userMapper == null? {}", userMapper == null);
 
+        // ② 기존 로그
+        log.info("[storeProfileImage] filename={}, size={}", 
+                 file.getOriginalFilename(), file.getSize());
+
+        // ③ 실제 저장 호출 (혹시 주석 처리했다면 다시 복원)
+        String url = fileStorageService.store(file);
+        log.info("[storeProfileImage] completed: url={}", url);
+        return url;
+    }
 
     public boolean updateUserProfile(String userId, String imageUrl) {
-        return userMapper.updateUserProfileById(userId, imageUrl) > 0;
+        log.info("[updateUserProfile] userId={}, imageUrl={}", userId, imageUrl);
+        log.info("[DEBUG] userMapper == null? {}", userMapper == null);
+
+        int updated = userMapper.updateUserProfileById(userId, imageUrl);
+        boolean success = (updated > 0);
+        log.info("[updateUserProfile] completed: success={}", success);
+        return success;
     }
 
-
-   
+    public String getCurrentProfileUrl(String userId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCurrentProfileUrl'");
+    }
 
 }
