@@ -25,42 +25,67 @@
         "/admin",
         "/servicepage"
       ]
-    },
-    {
-      "id": "src/components/NaverCallback.jsx",
-      "label": "NaverCallback",
-      "routes": [
-        "/naver/callback"
-      ]
     }
   ],
   "edges": [
     {
-      "id": "src\\components\\Login.jsx:25:8-to-src\\contexts\\ProtectedRoute.jsx",
+      "id": "src\\components\\Login.jsx:27:15-to-src\\components\\Login.jsx",
+      "source": "src\\components\\Login.jsx",
+      "target": "src\\components\\Login.jsx",
+      "data": {
+        "viaRoute": "/",
+        "trigger": {
+          "element": "navigate(\"/\")",
+          "line": 27,
+          "endLine": 27,
+          "column": 15,
+          "endColumn": 28,
+          "sourceFile": "src\\components\\Login.jsx"
+        }
+      }
+    },
+    {
+      "id": "src\\components\\Login.jsx:50:6-to-src\\contexts\\ProtectedRoute.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\contexts\\ProtectedRoute.jsx",
       "data": {
         "viaRoute": "/main",
         "trigger": {
           "element": "navigate(\"/main\")",
-          "line": 25,
-          "endLine": 25,
-          "column": 8,
-          "endColumn": 25,
+          "line": 50,
+          "endLine": 50,
+          "column": 6,
+          "endColumn": 23,
           "sourceFile": "src\\components\\Login.jsx"
         }
       }
     },
     {
-      "id": "src\\components\\Login.jsx:34:31-to-src\\components\\Join.jsx",
+      "id": "src\\components\\Login.jsx:54:6-to-src\\components\\Login.jsx",
+      "source": "src\\components\\Login.jsx",
+      "target": "src\\components\\Login.jsx",
+      "data": {
+        "viaRoute": "/",
+        "trigger": {
+          "element": "navigate(\"/\")",
+          "line": 54,
+          "endLine": 54,
+          "column": 6,
+          "endColumn": 19,
+          "sourceFile": "src\\components\\Login.jsx"
+        }
+      }
+    },
+    {
+      "id": "src\\components\\Login.jsx:57:31-to-src\\components\\Join.jsx",
       "source": "src\\components\\Login.jsx",
       "target": "src\\components\\Join.jsx",
       "data": {
         "viaRoute": "/join",
         "trigger": {
           "element": "navigate(\"/join\")",
-          "line": 34,
-          "endLine": 34,
+          "line": 57,
+          "endLine": 57,
           "column": 31,
           "endColumn": 48,
           "sourceFile": "src\\components\\Login.jsx"
