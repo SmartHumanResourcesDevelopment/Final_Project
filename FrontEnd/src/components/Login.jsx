@@ -43,6 +43,7 @@ const Login = () => {
         phoneNumber: decoded.phoneNumber,
         nickname: decoded.nickname,
         role: decoded.role,
+        userProfile: decoded.userProfile
       });
 
       // 메인 페이지로 이동

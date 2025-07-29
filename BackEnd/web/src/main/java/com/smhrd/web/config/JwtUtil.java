@@ -22,6 +22,7 @@ public class JwtUtil {
     public String generateToken(UserDTO user) {
         byte[] keyBytes = Base64.getDecoder().decode(secretKey);
         Key key = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
+        System.out.println("이미지 경로"+user.getUserProfile());
 
         long now = System.currentTimeMillis();
         return Jwts.builder()
@@ -30,6 +31,7 @@ public class JwtUtil {
             .claim("phoneNumber", user.getPhone_number())
             .claim("nickname", user.getNickname())
             .claim("role", user.getRole())
+            .claim("userProfile",user.getUserProfile())
             .setIssuedAt(new Date(now))
             .setExpiration(new Date(now + 1000 * 60 * 60 * 1)) // 1시간
             .signWith(key, SignatureAlgorithm.HS256)

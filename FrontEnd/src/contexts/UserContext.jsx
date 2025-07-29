@@ -6,38 +6,46 @@ import React, {
   useEffect,
 } from "react";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-
+import {jwtDecode} from "jwt-decode";  
 export const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [initialized, setInitialized] = useState(false); // ← 추가
+  const [initialized, setInitialized] = useState(false);
 
-  // 1) 앱 마운트 시: 토큰 복원 & user 설정
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) {
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${token}`;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       try {
         const decoded = jwtDecode(token);
+
+        // ② sub → userId 로 매핑
+        const userId      = decoded.sub;
+        const username    = decoded.username;    // 커스텀 클레임으로 넣으셨다면
+        const phoneNumber = decoded.phoneNumber; // 마찬가지
+        const nickname    = decoded.nickname;
+        const role        = decoded.role;
+        const userProfile = decoded.userProfile; // "/uploads/..."
+
         setUser({
-          userId: decoded.sub,
-          username: decoded.username,
-          phoneNumber: decoded.phoneNumber,
-          nickname: decoded.nickname,
-          role: decoded.role,
+          userId,
+          username,
+          phoneNumber,
+          nickname,
+          role,
+          userProfile,
         });
-      } catch {
+      } catch (e) {
+        console.error("Invalid token:", e);
         localStorage.removeItem("jwtToken");
+        delete axios.defaults.headers.common["Authorization"];
+        setUser(null);
       }
     }
-    setInitialized(true); // ← 복원 로직 끝나면 초기화 완료
+    setInitialized(true);
   }, []);
 
-  // 로그아웃 토큰 지워버러기
   const logout = () => {
     localStorage.removeItem("jwtToken");
     delete axios.defaults.headers.common["Authorization"];

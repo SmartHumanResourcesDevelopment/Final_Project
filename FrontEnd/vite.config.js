@@ -1,16 +1,29 @@
-import { screenGraphPlugin } from "@animaapp/vite-plugin-screen-graph";
+// FrontEnd/vite.config.js
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwind from "tailwindcss";
-import { defineConfig } from "vite";
+import { screenGraphPlugin } from "@animaapp/vite-plugin-screen-graph";
 
-// https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), mode === "development" && screenGraphPlugin()],
+  plugins: [
+    react(),
+    mode === "development" && screenGraphPlugin()
+  ].filter(Boolean),
   publicDir: "./static",
   base: "./",
   css: {
-    postcss: {
-      plugins: [tailwind()],
+    postcss: { plugins: [tailwind()] },
+  },
+  server: {
+    proxy: {
+      // 기존 API proxy
+      '/zal': 'http://localhost:8095',
+
+      // ★ 이걸 proxy 객체 안으로 옮겨야 합니다
+      '/uploads': {
+        target: 'http://localhost:8095/zal',
+        changeOrigin: true,
+      },
     },
   },
 }));
