@@ -1,20 +1,24 @@
 // src/util/buildProfileUrl.js
 
 /**
- * DB에 저장된 "/uploads/…" 또는 "/img/default/user.png" 경로를
- * (vite proxy 설정에 따라) 그대로 반환합니다.
+ * DB에 저장된 "/uploads/…" 또는 기본 "/uploads/default/user.png" 경로에
+ * 반드시 "/zal" 컨텍스트를 붙여서 반환합니다.
  *
- * @param {string} path
- * @returns {string}
+ * @param {string} path DB에 저장된 상대경로 (예: "/uploads/abc.jpg")
+ * @returns {string} "/zal/uploads/abc.jpg" 또는 기본 "/zal/uploads/default/user.png"
  */
 export function buildProfileUrl(path) {
-  // path가 없으면 기본 이미지로
-  if (!path) {
-    return "/uploads/default/user.png";
+  const CONTEXT = "/zal";
+
+  // DB에 path 없으면 기본 이미지
+  const p = path && path !== "" 
+    ? path 
+    : "/uploads/default/user.png";
+
+  // 절대 URL이면 그대로
+  if (p.startsWith("http")) {
+    return p;
   }
-  // 이미 http://… 라면 그대로, 아니면 상대경로를 그대로
-  if (path.startsWith("http")) {
-    return path;
-  }
-  return path;
+  // 상대경로인 경우 "/zal" 붙여서 리턴
+  return `${CONTEXT}${p}`;
 }

@@ -13,9 +13,6 @@ export const NavigationSection = () => {
   const location = useLocation();
   const { user, logout } = useUser();
 
-  console.log("NavigationSection user:", user);
-  const profileSrc = buildProfileUrl(user?.userProfile);
-  console.log("profileSrc ->", profileSrc);
 
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -89,13 +86,13 @@ export const NavigationSection = () => {
           {/* 프로필 이미지 */}
           <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
             <img
-                src={profileSrc}
+                src={buildProfileUrl(user?.userProfile)}
                 alt="User profile"
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = buildProfileUrl(); // 기본 이미지 URL
-                }}
+                // onError={(e) => {
+                //   e.currentTarget.onerror = null;
+                //   e.currentTarget.src = buildProfileUrl(); // 기본 이미지 URL
+                // }}
               />
           </div>
 
