@@ -12,10 +12,10 @@
 
     <!-- 회원가입 -->
     <insert id="insertUser">
-    INSERT INTO user_tbl
-    (user_id, username, password, phone_number, nickname, role, created_at)
-    VALUES
-    (#{id}, #{name}, #{password}, #{phone}, #{nickname}, #{role}, SYSDATE)
+        INSERT INTO user_tbl
+        (user_id, username, password, phone_number, nickname,  created_at)
+        VALUES
+        (#{user_id}, #{username}, #{password}, #{phone_number}, #{nickname} ,SYSDATE)
     </insert>
 
     <resultMap id="signUpResultMap" type="com.smhrd.web.DTO.SignUpRequest">
@@ -24,8 +24,6 @@
         <result property="password" column="PASSWORD"/>
         <result property="phone_number" column="PHONE_NUMBER"/>
         <result property="nickname" column="NICKNAME"/>
-        <result property="role" column="ROLE"/>
-        <result property="userprofile" column="USERPROFILE"/>
     </resultMap>
 
 
@@ -35,7 +33,22 @@
         SELECT * FROM user_tbl WHERE user_id = #{user_input_id}
     </select>
 
-    
+
+ <resultMap id="signUpResultMap2" type="com.smhrd.web.DTO.UserDTO">
+        <result property="user_id" column="USER_ID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="phone_number" column="PHONE_NUMBER"/>
+        <result property="nickname" column="NICKNAME"/>
+        <result property="role" column="ROLE"/>
+        <result property="userProfile" column="USERPROFILE"/>
+    </resultMap>
+
+    <!-- 로그인 정보 가져오기 -->
+    <select id="loginUserInfo" resultMap="signUpResultMap2">
+        SELECT * FROM user_tbl WHERE user_id = #{user_id}
+    </select>
+
+
 
     <!-- 유저 정보  수정 -->
     <update id="UserInfoUpdate" parameterType="com.smhrd.web.DTO.UserInfoUpdate_DTO">

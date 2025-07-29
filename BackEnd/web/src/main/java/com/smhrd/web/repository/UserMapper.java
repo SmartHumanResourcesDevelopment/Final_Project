@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.smhrd.web.DTO.SignUpRequest;
+import com.smhrd.web.DTO.UserDTO;
 import com.smhrd.web.DTO.UserInfoUpdate_DTO;
 
 
@@ -27,6 +28,10 @@ public interface UserMapper {
     
     /**회원 탈퇴  */
     void userInfoDelete(String userId);
+
+
+    // 로그인 후 유저 정보 가져오기
+    UserDTO loginUserInfo(String user_id);
 
 
 }

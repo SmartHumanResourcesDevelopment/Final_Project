@@ -33,7 +33,7 @@ public class LoginService {
     @Transactional
     public boolean register(SignUpRequest req) { // 회원가입 로직
 
-        System.out.println("가입 요청 데이터: " + req.getUser_id()); // 로그 확인용
+        System.out.println("가입 요청 데이터: " + req); // 로그 확인용
 
         int exists = userMapper.existsByUserId(req.getUser_id());
 
@@ -45,9 +45,6 @@ public class LoginService {
         // 비밀번호 암호화
         String encPw = passwordEncoder.encode(req.getPassword());
         req.setPassword(encPw);
-
-        // 데이터 베이스에 저장
-        req.setRole("팀원");
 
         int result = userMapper.insertUser(req);
         return result > 0;
@@ -62,16 +59,18 @@ public class LoginService {
             return new LoginResponse(false, "아이디 또는 비밀번호가 일치하지 않습니다.",null);
         }
 
-           
+        System.out.println(" 입력한정보 : "+req);
+        UserDTO user = userMapper.loginUserInfo(req.getId());
+
         // 2) UserDTO 생성
-        UserDTO user = new UserDTO(
-            userEntity.getUser_id(),
-            userEntity.getUsername(),
-            userEntity.getPhone_number(),
-            userEntity.getNickname(),
-            userEntity.getRole(),
-            userEntity.getUserprofile()
-        );
+        // UserDTO user = new UserDTO(
+        //     userEntity.getUser_id(),
+        //     userEntity.getUsername(),
+        //     userEntity.getPhone_number(),
+        //     userEntity.getNickname(),
+        //     userEntity.getRole(),
+        //     userEntity.getUserProfile()
+        // );
         // 3) 토큰 만들기 (클레임에 유저 정보 포함)
         String token = jwtUtil.generateToken(user);
 

@@ -17,5 +17,5 @@ public class UserDTO {
     private String phone_number;  // 전화번호
     private String nickname;     // 닉네임
     private String role;       // 관리자 or 사용자
-    private String userprofile;     //프사 경로
+    private String userProfile;     //프사 경로
 }
