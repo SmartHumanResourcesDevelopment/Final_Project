@@ -17,8 +17,8 @@ export default function Main_Trending_insight() {
       {/* ───────── 헤더 (제목+부제+탭) ───────── */}
       <header className="ti-head">
 
-          <h2>
-            급상승 중! <span className="hl">놓치면 늦는 키워드</span>
+          <h2 className="hl">
+            급상승 중! <span >놓치면 늦는 키워드</span>
           </h2>
           <p className="ti-sub">
             깜짝스러운 검색량 증가는 새로운 트렌드의 신호일 수 있어요

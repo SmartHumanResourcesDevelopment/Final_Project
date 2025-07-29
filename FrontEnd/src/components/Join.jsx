@@ -7,8 +7,8 @@ import mint_bg_color from "../assets/img/common/mint_bg_color.png"
 export const Join = () => {
   /* ---------- 상태 ---------- */
   const [formData, setFormData] = useState({
-    id: "", password: "", confirmPassword: "",
-    name: "", nickname: "", phone: "", agreeToTerms: false,
+    user_id: "", password: "", confirmPassword: "",
+    username: "", nickname: "", phone_number: "", agreeToTerms: false,
   });
   const [passwordError, setPasswordError] = useState("");
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -71,7 +71,7 @@ export const Join = () => {
     e.preventDefault();
 
     // 모든 필수값 체크
-    const required = ["id", "password", "confirmPassword", "name", "nickname", "phone"];
+    const required = ["user_id", "password", "confirmPassword", "username", "nickname", "phone_number"];
     const emptyKey = required.find((k) => !formData[k].trim());
     if (emptyKey) {
       alert("모든 항목을 입력해주세요.");
@@ -86,17 +86,20 @@ export const Join = () => {
       return;
     }
     try {
--    setShowSuccessModal(true);  /* 실제 API 호출 자리 */
-      const { success, message } = await signUp(formData);
-      console.log("응답:", success, message);
-      if (success) {
-        setShowSuccessModal(true);            // ★ 성공 모달
-      } else {
-        alert(message || "회원가입 실패입니다.");
+        // ① API 호출 전엔 모달 상태를 건드리지 않습니다.
+        const { success, message } = await signUp(formData);
+        console.log("응답:", success, message);
+
+        if (success) {
+          // ② 성공한 경우에만 모달을 띄웁니다.
+          setShowSuccessModal(true);
+        } else {
+          // 실패한 경우엔 alert만, 모달 상태는 그대로 유지(기본 false)
+          alert(message || "회원가입 실패입니다.");
         }
       } catch (err) {
-        setShowSuccessModal(false); 
-        console.err("회원가입 중 오류", err);
+        // ③ catch 블록에서 console.error를 쓰고, 모달은 띄우지 않습니다.
+        console.error("회원가입 중 오류", err);
         alert("서버 오류가 발생했습니다.");
       }
   };
@@ -121,12 +124,12 @@ export const Join = () => {
 
             {/* 입력 필드 모음 */}
             {[
-              { id: "id", label: "아이디", ph: "당신의 아이디를 입력해주세요", type: "text" },
+              { id: "user_id", label: "아이디", ph: "당신의 아이디를 입력해주세요", type: "text" },
               { id: "password", label: "비밀번호", ph: "당신의 비밀번호를 입력해주세요", type: "password" },
               { id: "confirmPassword", label: "비밀번호 재확인", ph: "당신의 비밀번호를 입력해주세요", type: "password" },
-              { id: "name", label: "이름", ph: "당신의 이름을 입력해주세요", type: "text" },
+              { id: "username", label: "이름", ph: "당신의 이름을 입력해주세요", type: "text" },
               { id: "nickname", label: "닉네임", ph: "사용하실 닉네임을입력하세요", type: "text" },
-              { id: "phone", label: "휴대폰번호", ph: "당신의 휴대폰번호를 입력해주세요", type: "tel" },
+              { id: "phone_number", label: "휴대폰번호", ph: "당신의 휴대폰번호를 입력해주세요", type: "tel" },
             ].map((f) => (
               <div key={f.id} className="w-full">
                 <label htmlFor={f.id} className="text-sm font-semibold">{f.label}</label>

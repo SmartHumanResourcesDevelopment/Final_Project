@@ -7,6 +7,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime
 import time
 import re
+import pandas as pd
 
 def extract_date_from_kor_format(text):
     match = re.search(r'(\d{4})[\uAC00-\uD7A3]*\s*(\d{1,2})[\uAC00-\uD7A3]*\s*(\d{1,2})[\uAC00-\uD7A3]*', text)
@@ -119,8 +120,8 @@ def crawl_account_with_next(driver, username, limit=5):
             break
 
 if __name__ == "__main__":
-    ig_id = ""
-    ig_pw = ""
+    ig_id = "da.da.k200"
+    ig_pw = "Dh2000"
     target_account = "anunu.eat"
 
     options = webdriver.ChromeOptions()

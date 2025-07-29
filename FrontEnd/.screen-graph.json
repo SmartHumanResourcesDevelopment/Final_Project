@@ -16,37 +16,13 @@
       ]
     },
     {
-      "id": "src/components/Main.jsx",
-      "label": "Main",
+      "id": "src/contexts/ProtectedRoute.jsx",
+      "label": "ProtectedRoute",
       "routes": [
-        "/main"
-      ]
-    },
-    {
-      "id": "src/components/MyPage.jsx",
-      "label": "MyPage",
-      "routes": [
-        "/mypage"
-      ]
-    },
-    {
-      "id": "src/components/Sub.jsx",
-      "label": "Sub",
-      "routes": [
-        "/sub"
-      ]
-    },
-    {
-      "id": "src/components/Admin_page.jsx",
-      "label": "Admin_page",
-      "routes": [
-        "/admin"
-      ]
-    },
-    {
-      "id": "src/components/ServicePage.jsx",
-      "label": "ServicePage",
-      "routes": [
+        "/main",
+        "/mypage",
+        "/sub",
+        "/admin",
         "/servicepage"
       ]
     },
@@ -60,9 +36,9 @@
   ],
   "edges": [
     {
-      "id": "src\\components\\Login.jsx:25:8-to-src\\components\\Main.jsx",
+      "id": "src\\components\\Login.jsx:25:8-to-src\\contexts\\ProtectedRoute.jsx",
       "source": "src\\components\\Login.jsx",
-      "target": "src\\components\\Main.jsx",
+      "target": "src\\contexts\\ProtectedRoute.jsx",
       "data": {
         "viaRoute": "/main",
         "trigger": {
@@ -92,18 +68,18 @@
       }
     },
     {
-      "id": "src\\components\\NaverCallback.jsx:32:8-to-src\\components\\Main.jsx",
-      "source": "src\\components\\NaverCallback.jsx",
-      "target": "src\\components\\Main.jsx",
+      "id": "src\\contexts\\ProtectedRoute.jsx:16:11-to-src\\components\\Login.jsx",
+      "source": "src\\contexts\\ProtectedRoute.jsx",
+      "target": "src\\components\\Login.jsx",
       "data": {
-        "viaRoute": "/main",
+        "viaRoute": "/",
         "trigger": {
-          "element": "navigate(\"/main\")",
-          "line": 32,
-          "endLine": 32,
-          "column": 8,
-          "endColumn": 25,
-          "sourceFile": "src\\components\\NaverCallback.jsx"
+          "element": "<Navigate to=\"/\" replace />",
+          "line": 16,
+          "endLine": 16,
+          "column": 11,
+          "endColumn": 38,
+          "sourceFile": "src\\contexts\\ProtectedRoute.jsx"
         }
       }
     }

@@ -1,11 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import ChevronDown from "../assets/img/common/chevron_down.png";
 import notifIcon from "../assets/img/common/notif-icon.png";
 import { useUser } from "../contexts/UserContext";
+import { AnimatePresence, motion } from "framer-motion";
+import { buildProfileUrl } from "../util/buildProfileUrl";
+
+
 
 export const NavigationSection = () => {
-  const [activeMenu, setActiveMenu] = useState("메인페이지");
-  const { user } = useUser();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, logout } = useUser();
+
+  console.log("NavigationSection user:", user);
+  const profileSrc = buildProfileUrl(user?.userProfile);
+  console.log("profileSrc ->", profileSrc);
+
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (open && dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("mousedown", handleClick);
+    return () => window.removeEventListener("mousedown", handleClick);
+  }, [open]);
 
   const navigationItems = [
     "메인페이지",
@@ -14,16 +38,27 @@ export const NavigationSection = () => {
     "마이페이지",
   ];
 
+  const pathToMenu = {
+    "/main": "메인페이지",
+    "/sub": "심층분석페이지",
+    "/servicepage": "서비스소개",
+    "/mypage": "마이페이지",
+  };
+  const currentMenu = pathToMenu[location.pathname] || "메인페이지";
+
   return (
+    
     <nav
       role="navigation"
       aria-label="Main navigation"
-      className="fixed top-0 left-0 w-full z-50 bg-white shadow"  // ← 항상 상단 고정
+      className="fixed top-0 left-0 w-full z-50 bg-white shadow"
     >
-      {/* 가운데 정렬용 래퍼 */}
       <div className="container mx-auto flex items-center justify-between h-[77px] px-12">
         {/* 로고 */}
-        <h1 className="font-['Racing_Sans_One',Helvetica] text-[28px]">
+        <h1
+          onClick={() => navigate("/main")}
+          className="font-['Racing_Sans_One',Helvetica] text-[28px] cursor-pointer select-none"
+        >
           EAT PICk
         </h1>
 
@@ -32,14 +67,16 @@ export const NavigationSection = () => {
           {navigationItems.map((label) => (
             <li key={label}>
               <button
-                onClick={() => setActiveMenu(label)}
-                aria-current={label === activeMenu ? "page" : undefined}
-                className={`text-base leading-[30px] hover:opacity-80 transition
-                  ${
-                    label === activeMenu
-                      ? "font-black"
-                      : "font-normal"
-                  }`}
+                onClick={() => {
+                  if (label === "메인페이지") navigate("/main");
+                  if (label === "심층분석페이지") navigate("/sub");
+                  if (label === "서비스소개") navigate("/servicepage");
+                  if (label === "마이페이지") navigate("/mypage");
+                }}
+                aria-current={label === currentMenu ? "page" : undefined}
+                className={`text-base leading-[30px] hover:opacity-80 transition ${
+                  label === currentMenu ? "font-black" : "font-normal"
+                }`}
               >
                 {label}
               </button>
@@ -48,22 +85,52 @@ export const NavigationSection = () => {
         </ul>
 
         {/* 우측 유저 영역 */}
-        <div className="flex items-center gap-4">
-          {/* 이모지 아바타 */}
-          <div className="w-8 h-8 rounded-2xl bg-[#ffe6cc] grid place-content-center text-white text-base">
-            🍔
+        <div className="flex items-center gap-4 relative" ref={dropdownRef}>
+          {/* 프로필 이미지 */}
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
+            <img
+                src={profileSrc}
+                alt="User profile"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = buildProfileUrl(); // 기본 이미지 URL
+                }}
+              />
           </div>
 
           {/* 닉네임 */}
-          <span className="text-xs text-[#1f384c]">{ user.nickname }</span>
+          <span className="text-xs text-[#1f384c]">{user?.nickname}</span>
 
           {/* 드롭다운 버튼 */}
           <button
             aria-label="User menu dropdown"
             className="w-5 h-5 hover:opacity-80 transition"
+            onClick={() => setOpen((v) => !v)}
+            tabIndex={0}
           >
             <img src={ChevronDown} alt="" />
           </button>
+
+          {/* 드롭다운 박스 */}
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.17 }}
+                className="absolute right-0 top-12 w-40 rounded-2xl shadow-lg bg-white ring-1 ring-black/5 z-50 py-2"
+              >
+                <button
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={logout}
+                >
+                  로그아웃
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* 알림 버튼 */}
           <button

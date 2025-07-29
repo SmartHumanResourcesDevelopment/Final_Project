@@ -1,10 +1,40 @@
+// src/UI/MyPage_delete.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import fetchWithAuth from "../util/fetchWithAuth";
+import { useUser } from "../contexts/UserContext";
 
 const MyPage_delete = ({ onClose }) => {
-  const handleWithdraw = () => {
-    // 탈퇴 로직
-    alert("탈퇴 처리되었습니다.");
-    onClose();
+  const navigate = useNavigate();
+  const { user, logout } = useUser();
+
+  const handleWithdraw = async () => {
+    if (!user) return;
+
+    try {
+      const res = await fetchWithAuth(
+        `/zal/api/delete?userId=${encodeURIComponent(user.userId)}`,
+        { method: "POST" }
+      );
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Status ${res.status}: ${text}`);
+      }
+
+      alert("탈퇴 처리되었습니다.");
+
+      // 로그아웃 및 Context/Storage 정리
+      logout();
+      localStorage.removeItem("jwtToken");
+      localStorage.removeItem("user");
+      
+      // 모달 닫고 로그인 페이지로 이동
+      onClose();
+      navigate("/");
+    } catch (e) {
+      console.error("회원 탈퇴 실패:", e);
+      alert("탈퇴 중 오류가 발생했습니다.\n" + e.message);
+    }
   };
 
   return (

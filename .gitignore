@@ -1,7 +1,7 @@
 .vscode/
 # Created by https://www.toptal.com/developers/gitignore/api/java,python,react
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,python,react
-
+screen-graph.json
 ### Java ###
 # Compiled class file
 *.class
