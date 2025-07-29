@@ -14,10 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class NaverService {
-    
+
     private final String clientId = "5BTv6gBgZA61McgvsB6X";
     private final String clientSecret = "8cF2!xvU$z29Jkq!hd74kXp%Qw91nZp@";
-    private final String redirectUri = "http://localhost:8075/auth/naver/callback";
+    private final String redirectUri = "http://localhost:5173//naver/callback";
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -35,10 +35,7 @@ public class NaverService {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream(), "UTF-8")
-            );
-
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = br.readLine()) != null) sb.append(line);
@@ -53,31 +50,30 @@ public class NaverService {
         }
     }
 
-    public Map<String, Object> getUserInfo(String accessToken){
+    public Map<String, Object> getUserInfo(String accessToken) {
         try {
-            String apiURL = "http://openapi.naver.com/v1/nid/me";
+            String apiURL = "https://openapi.naver.com/v1/nid/me";
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setRequestProperty("Authorization", "Bearer" + accessToken);
+            con.setRequestProperty("Authorization", "Bearer " + accessToken);
 
-            BufferedReader br = new BufferedReader(
-                new InputStreamReader(con.getInputStream(), "UTF-8")
-            );
-            
+            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
             StringBuilder sb = new StringBuilder();
             String line;
-            while ((line = br.readLine()) != null ) sb.append(line);
+            while ((line = br.readLine()) != null) sb.append(line);
             br.close();
 
             JsonNode jsonNode = mapper.readTree(sb.toString());
             JsonNode response = jsonNode.get("response");
 
             if (response == null) return null;
-            
+
             Map<String, Object> userInfo = new HashMap<>();
             userInfo.put("email", response.get("email").asText());
             userInfo.put("nickname", response.get("nickname").asText());
+            userInfo.put("id", response.get("id").asText());
+            userInfo.put("profileImage", response.has("profile_image") ? response.get("profile_image").asText() : "");
 
             return userInfo;
 
@@ -86,6 +82,4 @@ public class NaverService {
             return null;
         }
     }
-
-
 }

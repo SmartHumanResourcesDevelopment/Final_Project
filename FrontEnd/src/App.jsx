@@ -11,7 +11,10 @@ import MyPage from "./components/MyPage";
 import Admin from "./components/Admin_page";
 import ServicePage from "./components/ServicePage";
 import NaverCallback from "./components/NaverCallback";
+import axios from 'axios';
 
+axios.defaults.baseURL = "http://localhost:8095";
+axios.defaults.withCredentials = true;
 
 function App() {
   return (
@@ -25,7 +28,7 @@ function App() {
           <Route path="/sub" element={<Sub />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/servicepage" element={<ServicePage />} />
-          <Route path="/auth/naver/callback" element={NaverCallback} />
+          <Route path="/naver/callback" element={<NaverCallback />} />
         </Routes>
       </UserProvider>
     </BrowserRouter>

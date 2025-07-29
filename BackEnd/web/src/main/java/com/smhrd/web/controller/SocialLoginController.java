@@ -11,19 +11,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.smhrd.web.DTO.JwtResponse;
 import com.smhrd.web.service.JwtService;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/naver")
+@RequestMapping("/auth")
 public class SocialLoginController{
 
     @Value("${naver.client.id}")
@@ -42,10 +45,45 @@ public class SocialLoginController{
     }
 
     
-    @GetMapping("/callback")
-    public ResponseEntity<?> naverCallback(@RequestParam String code, @RequestParam String state) {
-    
-    try {
+    @GetMapping("/naver/login")
+    public RedirectView startNaverLogin(HttpSession session) {
+        // 1. state 생성 및 세션에 저장
+        String state = UUID.randomUUID().toString();
+        session.setAttribute("oauth_state", state);
+
+        // 2. 네이버 로그인 URL 생성
+        String naverLoginUrl = UriComponentsBuilder
+        .fromUriString("https://nid.naver.com/oauth2.0/authorize")
+        .queryParam("response_type", "code")
+        .queryParam("client_id", clientId)
+        .queryParam("redirect_uri", redirectUri)
+        .queryParam("state", state)
+        .build()
+        .toUriString();
+
+        // 3. 프론트가 이 URL을 직접 사용하게 처리
+
+        System.out.println("생성된 state: " + state);
+        System.out.println("리디렉션 URL: " + naverLoginUrl);
+
+        return new RedirectView(naverLoginUrl);
+
+    }
+
+    @GetMapping("/naver/callback")
+    public ResponseEntity<?> naverCallback(@RequestParam String code, @RequestParam String state, HttpSession session) {
+        try {
+            
+        // 1. 세션에서 저장된 state 값 꺼내기
+        String sessionState = (String) session.getAttribute("oauth_state");
+        System.out.println("세션 상태 값: " + sessionState);
+        System.out.println("요청 상태 값: " + state);
+
+        // 2. 받은 state와 비교 (일치하지 않으면 401 에러 응답)
+        if (sessionState == null || !sessionState.equals(state)) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "State mismatch!"));
+        }
+
         String accessToken = getNaverAccessToken(code, state);
 
         if (accessToken == null) {
@@ -77,7 +115,6 @@ public class SocialLoginController{
     }
 }
 
-
     // 네이버 액세스 토큰 요청 메서드
     private String getNaverAccessToken(String code, String state) {
         try {
@@ -94,7 +131,7 @@ public class SocialLoginController{
             params.add("client_secret", clientSecret);
             params.add("code", code);
             params.add("state", state);
-            params.add("redirect_uri", URLEncoder.encode(redirectUri, StandardCharsets.UTF_8.toString()));
+            params.add("redirect_uri", redirectUri);
 
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
@@ -105,6 +142,8 @@ public class SocialLoginController{
                 request,
                 Map.class
             );
+
+            System.out.println("응답 본문: " + response.getBody());
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 return (String) response.getBody().get("access_token");

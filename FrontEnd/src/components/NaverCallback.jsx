@@ -15,23 +15,24 @@ const NaverCallback = () => {
 
     const getNaverUser = async () => {
       try {
-        const res = await axios.get("http://localhost:8095/auth/naver/callback", {
+        const res = await axios.get("http://localhost:8095/zal/auth/naver/callback", {
           params: { code, state },
           withCredentials: true, // 쿠키 필요
         });
 
         const data = res.data;
         setUser({
-          id: data.id,
-          nickname: data.nickname,
-          email: data.email,
-          profileImage: data.profileImage,
-          isLogin: true,
+          id: data.user.id || "", // 없으면 빈 문자열
+        nickname: data.user.nickname,
+        email: data.user.email,
+        profileImage: data.user.profileImage || "",
+        isLogin: true,
         });
 
         navigate("/main"); // 로그인 완료 후 이동할 페이지
       } catch (error) {
         console.error("네이버 로그인 실패:", error);
+        alert("네이버 로그인에 실패했습니다. 다시 시도해 주세요.");
       }
     };
 

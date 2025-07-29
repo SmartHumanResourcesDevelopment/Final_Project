@@ -6,6 +6,7 @@ import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
 import mint_bg_color from "../assets/img/common/mint_bg_color.png";
 import "../assets/css/Login.css"; // 경로 주의
 import { useUser } from "../contexts/UserContext";
+import NaverLoginButton from "./NaverLoginButton";
 
 const Login = () => {
   const [id, setId] = useState("");
@@ -13,28 +14,6 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useUser();
-useEffect(() => {
-  const script = document.createElement("script");
-  script.src = "https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js";
-  script.type = "text/javascript";
-  script.async = true;
-  script.charset = "utf-8";
-  document.body.appendChild(script);
-
-  script.onload = () => {
-    const naverLogin = new window.naver.LoginWithNaverId({
-      clientId : "5BTv6gBgZA61McgvsB6X",
-      callbackUrl: "http://localhost:8095/auth/naver/callback",
-      isPopup: false,
-      loginButton: {color: "green", type:3, height: 60}
-    });
-    naverLogin.init();
-  };
-
-  return () => {
-    document.body.removeChild(script);
-  };
-}, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -165,7 +144,8 @@ useEffect(() => {
                 <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Google login")}>
                 <img src={google_login} alt="Sign in with Google" />
                 </button>
-                <div id="naverIdLogin" className="w-[190px] hover:opacity-80"></div>
+                {/* 네이버 로그인 버튼 컴포넌트 */}
+                <NaverLoginButton />
               </div>
 
 
