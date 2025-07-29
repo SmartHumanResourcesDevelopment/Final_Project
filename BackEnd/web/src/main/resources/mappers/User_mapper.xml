@@ -71,7 +71,7 @@
     <!-- 이미지 리셋 -->
     <update id="restUserProfile" parameterType="string">
         UPDATE USER_TBL
-        SET    USERPROFILE = '/img/default/user.png'
+        SET    USERPROFILE = '/uploads/default/user.png'
         WHERE  USER_ID    = #{userId}
         </update>
 
