@@ -22,5 +22,11 @@ public interface UserMapper {
     /** 이미지 수정  */
     int updateUserProfileById(String userId, String imageUrl);
 
+    void  restUserProfile(String user_id);
+
+    
+    /**회원 탈퇴  */
+    void userInfoDelete(String userId);
+
 
 }

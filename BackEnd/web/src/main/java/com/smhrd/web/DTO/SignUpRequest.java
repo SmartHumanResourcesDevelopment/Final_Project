@@ -16,5 +16,5 @@ public class SignUpRequest {
     private String phone_number;  // 전화번호
     private String nickname;     // 닉네임
     private String role;       // 관리자 or 사용자
-    private String userprofile;       // 관리자 or 사용자
+    private String userprofile;     
 }

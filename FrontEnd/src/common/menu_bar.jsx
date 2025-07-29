@@ -4,8 +4,8 @@ import ChevronDown from "../assets/img/common/chevron_down.png";
 import notifIcon from "../assets/img/common/notif-icon.png";
 import { useUser } from "../contexts/UserContext";
 import { AnimatePresence, motion } from "framer-motion";
-import defaultUser from "../assets/img/user.png"; 
-const DEFAULT_PROFILE = defaultUser;
+import { buildProfileUrl } from "../util/buildProfileUrl";
+
 
 
 export const NavigationSection = () => {
@@ -13,8 +13,13 @@ export const NavigationSection = () => {
   const location = useLocation();
   const { user, logout } = useUser();
 
+  console.log("NavigationSection user:", user);
+  const profileSrc = buildProfileUrl(user?.userProfile);
+  console.log("profileSrc ->", profileSrc);
+
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
+
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -42,6 +47,7 @@ export const NavigationSection = () => {
   const currentMenu = pathToMenu[location.pathname] || "메인페이지";
 
   return (
+    
     <nav
       role="navigation"
       aria-label="Main navigation"
@@ -83,14 +89,14 @@ export const NavigationSection = () => {
           {/* 프로필 이미지 */}
           <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
             <img
-              src={user?.userProfile || DEFAULT_PROFILE}
-              alt="User profile"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = DEFAULT_PROFILE;
-              }}
-            />
+                src={profileSrc}
+                alt="User profile"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = buildProfileUrl(); // 기본 이미지 URL
+                }}
+              />
           </div>
 
           {/* 닉네임 */}

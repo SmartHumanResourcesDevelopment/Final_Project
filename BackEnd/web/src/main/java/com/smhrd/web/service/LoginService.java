@@ -48,7 +48,6 @@ public class LoginService {
 
         // 데이터 베이스에 저장
         req.setRole("팀원");
-        req.setUserprofile("/img/user.png");
 
         int result = userMapper.insertUser(req);
         return result > 0;
@@ -63,6 +62,7 @@ public class LoginService {
             return new LoginResponse(false, "아이디 또는 비밀번호가 일치하지 않습니다.",null);
         }
 
+           
         // 2) UserDTO 생성
         UserDTO user = new UserDTO(
             userEntity.getUser_id(),
@@ -72,7 +72,6 @@ public class LoginService {
             userEntity.getRole(),
             userEntity.getUserprofile()
         );
-
         // 3) 토큰 만들기 (클레임에 유저 정보 포함)
         String token = jwtUtil.generateToken(user);
 

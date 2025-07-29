@@ -15,6 +15,7 @@ import com.smhrd.web.service.UserInfoUpdate_Service;
 import lombok.extern.slf4j.Slf4j;
 
 
+
 @Slf4j
 @RestController
 @RequestMapping("/api")
@@ -36,36 +37,58 @@ public class UserInfoUpdate {
     }
 
     /** 프로필 사진 변경: multipart/form-data 처리 */
- @PostMapping(
-  value    = "/updateProfile",
-  consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-)
-public ResponseEntity<?> updateProfile(
-    @RequestParam("user_id") String userId,
-    @RequestPart("file") MultipartFile file     // ← required=true 로 변경
-) {
-    log.info("[updateProfile] userId={}, file present={}", userId, !file.isEmpty());
-    try {
-        if (file.isEmpty()) {
-            // 파일이 없으면 잘못된 요청으로 400 반환
+    @PostMapping(
+    value    = "/updateProfile",
+    consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<?> updateProfile(
+        @RequestParam("user_id") String userId,
+        @RequestPart("file") MultipartFile file     // ← required=true 로 변경
+    ) {
+        log.info("[updateProfile] userId={}, file present={}", userId, !file.isEmpty());
+        try {
+            if (file.isEmpty()) {
+                // 파일이 없으면 잘못된 요청으로 400 반환
+                return ResponseEntity
+                    .badRequest()
+                    .body("업로드할 파일이 없습니다.");
+            }
+            // 새 파일이 들어왔을 때만 저장 및 DB 업데이트
+            String imageUrl = userInfoService.storeProfileImageAndGetUrl(file);
+            boolean ok = userInfoService.updateUserProfile(userId, imageUrl);
+            if (!ok) {
+                return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("프로필 사진 저장 실패");
+            }
+            return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+        } catch (Exception e) {
+            log.error("[updateProfile] error for userId=" + userId, e);
             return ResponseEntity
-                   .badRequest()
-                   .body("업로드할 파일이 없습니다.");
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("서버 오류 발생: " + e.getMessage());
         }
-        // 새 파일이 들어왔을 때만 저장 및 DB 업데이트
-        String imageUrl = userInfoService.storeProfileImageAndGetUrl(file);
-        boolean ok = userInfoService.updateUserProfile(userId, imageUrl);
-        if (!ok) {
-            return ResponseEntity
-                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                   .body("프로필 사진 저장 실패");
-        }
-        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
-    } catch (Exception e) {
-        log.error("[updateProfile] error for userId=" + userId, e);
-        return ResponseEntity
-               .status(HttpStatus.INTERNAL_SERVER_ERROR)
-               .body("서버 오류 발생: " + e.getMessage());
     }
-}
+    /** (추가) 기본 이미지로 리셋 */
+    @PostMapping("/resetProfile")
+    public ResponseEntity<Map<String, String>> resetProfile(@RequestParam("user_id") String userId) {
+        String imageUrl = userInfoService.rest(userId);
+
+        // 200 OK 및 { "imageUrl": "/img/default/user.png" } 형태로 응답
+        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+    }
+
+
+    /** 회원 탈퇴*/
+    @PostMapping("/delete")
+    public ResponseEntity<?> deleteUserInfo(@RequestParam("userId") String userId) {
+        userInfoService.delete(userId);
+        
+        // 204 No Content 로 반환해도 좋고, 200 OK로 빈 바디 반환해도 됩니다
+        return ResponseEntity.noContent().build();
+    }
+    
+    
+
+
 }

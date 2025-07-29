@@ -37,6 +37,7 @@ public class UserInfoUpdate_Service {
     }
    
     public String storeProfileImageAndGetUrl(MultipartFile file) {
+
         // ① 주입된 빈이 null 인지 확인
         log.info("[DEBUG] fileStorageService == null? {}", fileStorageService == null);
         log.info("[DEBUG] userMapper == null? {}", userMapper == null);
@@ -47,23 +48,32 @@ public class UserInfoUpdate_Service {
 
         // ③ 실제 저장 호출 (혹시 주석 처리했다면 다시 복원)
         String url = fileStorageService.store(file);
-        log.info("[storeProfileImage] completed: url={}", url);
         return url;
     }
 
     public boolean updateUserProfile(String userId, String imageUrl) {
-        log.info("[updateUserProfile] userId={}, imageUrl={}", userId, imageUrl);
-        log.info("[DEBUG] userMapper == null? {}", userMapper == null);
+
+        System.out.println("아이디"+userId);
+        System.out.println("바꿀 이미지 경로"+imageUrl);
 
         int updated = userMapper.updateUserProfileById(userId, imageUrl);
+        System.out.println("mapper 실행 결과"+updated);
         boolean success = (updated > 0);
         log.info("[updateUserProfile] completed: success={}", success);
         return success;
     }
 
-    public String getCurrentProfileUrl(String userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCurrentProfileUrl'");
+    public String rest(String user_id) {
+    userMapper.restUserProfile(user_id);
+       return "/upload/default/user.png";
+       
+    }
+    
+    /**회원 탈퇴  */
+    public void delete(String userId) {
+        userMapper.userInfoDelete(userId);
     }
 
+
+    
 }
