@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.beans.factory.annotation.Value;
+import java.nio.file.Paths; 
 
 
 @Configuration
@@ -26,16 +27,26 @@ public class WebConfig implements WebMvcConfigurer {
         return new BCryptPasswordEncoder();
     }
 
-    /** application.properties 에 설정해 둔 절대 업로드 폴더 경로 */
-    @Value("${app.upload-dir}")
-    private String uploadDir;  // 예: C:/Users/.../Final_Project/uploads
+   @Value("${app.upload-dir}")
+    private String uploadDir;  // 이제 "../uploads"
 
-    @Override
+      @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // /uploads/** 요청을 로컬 파일시스템의 uploadDir 폴더와 매핑
-        registry
-          .addResourceHandler("/uploads/**")
-          .addResourceLocations("file:///" + uploadDir.replace("\\", "/") + "/");
+        // 상대경로든 절대경로든 처리하도록 분기
+        String location;
+        if (Paths.get(uploadDir).isAbsolute()) {
+            location = "file://" + uploadDir.replace("\\", "/") + "/";
+        } else {
+            // 상대경로: user.dir 기준으로 resolve
+            location = "file:///" +
+                Paths.get(System.getProperty("user.dir"))
+                     .resolve(uploadDir)
+                     .toAbsolutePath()
+                     .toString()
+                     .replace("\\","/")
+                + "/";
+        }
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations(location);
     }
-    
 }
