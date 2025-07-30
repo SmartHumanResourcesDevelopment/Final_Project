@@ -62,6 +62,12 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/naver/callback"
+            element={
+                <NaverCallback />
+            }
+          />
         </Routes>
       </UserProvider>
     </BrowserRouter>

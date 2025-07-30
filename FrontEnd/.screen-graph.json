@@ -25,6 +25,13 @@
         "/admin",
         "/servicepage"
       ]
+    },
+    {
+      "id": "src/components/NaverCallback.jsx",
+      "label": "NaverCallback",
+      "routes": [
+        "/naver/callback"
+      ]
     }
   ],
   "edges": [
@@ -105,6 +112,22 @@
           "column": 11,
           "endColumn": 38,
           "sourceFile": "src\\contexts\\ProtectedRoute.jsx"
+        }
+      }
+    },
+    {
+      "id": "src\\components\\NaverCallback.jsx:33:8-to-src\\contexts\\ProtectedRoute.jsx",
+      "source": "src\\components\\NaverCallback.jsx",
+      "target": "src\\contexts\\ProtectedRoute.jsx",
+      "data": {
+        "viaRoute": "/main",
+        "trigger": {
+          "element": "navigate(\"/main\")",
+          "line": 33,
+          "endLine": 33,
+          "column": 8,
+          "endColumn": 25,
+          "sourceFile": "src\\components\\NaverCallback.jsx"
         }
       }
     }

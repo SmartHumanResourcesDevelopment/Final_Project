@@ -10,7 +10,14 @@ import {jwtDecode} from "jwt-decode";
 export const UserContext = createContext();
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({
+    id: "", // 아이디
+    nickname: "", // 닉네임
+    email: "", // 이메일
+    profileImage: "", //프로필 사진
+    isLogin: false, // 로그인 여부
+    token: "", // 토큰
+  });
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {

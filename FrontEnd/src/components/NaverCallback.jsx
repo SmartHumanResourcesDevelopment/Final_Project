@@ -23,10 +23,11 @@ const NaverCallback = () => {
         const data = res.data;
         setUser({
           id: data.user.id || "", // 없으면 빈 문자열
-        nickname: data.user.nickname,
-        email: data.user.email,
-        profileImage: data.user.profileImage || "",
-        isLogin: true,
+          nickname: data.user.nickname,
+          email: data.user.email,
+          profileImage: data.user.profileImage || "",
+          isLogin: true,
+          token: data.token, // 토큰 저장
         });
 
         navigate("/main"); // 로그인 완료 후 이동할 페이지
