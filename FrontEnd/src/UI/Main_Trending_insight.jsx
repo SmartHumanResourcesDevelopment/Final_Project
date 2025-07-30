@@ -21,7 +21,7 @@ export default function Main_Trending_insight() {
             급상승 중! <span >놓치면 늦는 키워드</span>
           </h2>
           <p className="ti-sub">
-            깜짝스러운 검색량 증가는 새로운 트렌드의 신호일 수 있어요
+            깜짝스러운 검색량 증가는 새로운 트렌드의 신호일 수 있어요, 그리고 가까운 미래 예측 분석까지 함께 볼수있어요
           </p>
 
         <nav className="period-tabs" aria-label="기간 선택">
