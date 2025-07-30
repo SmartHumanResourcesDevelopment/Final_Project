@@ -1,42 +1,55 @@
 package com.smhrd.web.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.beans.factory.annotation.Value;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+    @Value("${app.upload-dir}")
+    private String uploadDir;
 
-    
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // 모든 경로에 대한 
-                .allowedOrigins("http://localhost:5173") //프론트 경로
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용한 메서드
-                .allowedHeaders("*") //모든 헤더 허용
-                .allowCredentials(true); // 쿠키 / 인증 정보 포함 허용
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:5173")
+                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                .allowCredentials(true);
+        System.out.println("✔ CORS configured");
     }
 
-    @Bean
+     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /** application.properties 에 설정해 둔 절대 업로드 폴더 경로 */
-    @Value("${app.upload-dir}")
-    private String uploadDir;  // 예: C:/Users/.../Final_Project/uploads
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // /uploads/** 요청을 로컬 파일시스템의 uploadDir 폴더와 매핑
+        // 1) 실행 중인 디렉터리(예: .../BackEnd/web)
+        Path cwd = Paths.get(System.getProperty("user.dir"));
+        // 2) 부모의 부모로 올라가서 프로젝트 루트(예: .../Final_Project)
+        Path projectRoot = cwd.getParent().getParent();
+        // 3) 루트 아래 uploads 폴더를 가리키도록 resolve
+        Path uploadPath = projectRoot.resolve(uploadDir).toAbsolutePath();
+
+        // 파일 URL 형식으로 변환 (file:///...)
+        String location = "file:///" + uploadPath.toString().replace("\\", "/") + "/";
+
+        System.out.println("✔ Static uploads location: " + location);
+
+        // /uploads/** 와 /zal/uploads/** 요청 모두 이 위치에서 서빙
         registry
           .addResourceHandler("/uploads/**")
-          .addResourceLocations("file:///" + uploadDir.replace("\\", "/") + "/");
+          .addResourceLocations(location);
+        registry
+          .addResourceHandler("/zal/uploads/**")
+          .addResourceLocations(location);
     }
-    
 }

@@ -95,14 +95,14 @@
           "endLine": 57,
           "column": 31,
           "endColumn": 48,
-          "sourceFile": "src\\components\\Login.jsx"
+          "sourceFile": "src/components/Login.jsx"
         }
       }
     },
     {
-      "id": "src\\contexts\\ProtectedRoute.jsx:16:11-to-src\\components\\Login.jsx",
-      "source": "src\\contexts\\ProtectedRoute.jsx",
-      "target": "src\\components\\Login.jsx",
+      "id": "src/contexts/ProtectedRoute.jsx:16:11-to-src/components/Login.jsx",
+      "source": "src/contexts/ProtectedRoute.jsx",
+      "target": "src/components/Login.jsx",
       "data": {
         "viaRoute": "/",
         "trigger": {
@@ -111,7 +111,7 @@
           "endLine": 16,
           "column": 11,
           "endColumn": 38,
-          "sourceFile": "src\\contexts\\ProtectedRoute.jsx"
+          "sourceFile": "src/contexts/ProtectedRoute.jsx"
         }
       }
     },
