@@ -11,6 +11,8 @@
   "dependencies": {
     "axios": "^1.11.0",
     "clsx": "2.1.1",
+    "framer-motion": "^12.23.9",
+    "jwt-decode": "^4.0.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -12,10 +12,10 @@
 
     <!-- 회원가입 -->
     <insert id="insertUser">
-    INSERT INTO user_tbl
-    (user_id, username, password, phone_number, nickname, role, created_at)
-    VALUES
-    (#{id}, #{name}, #{password}, #{phone}, #{nickname}, #{role}, SYSDATE)
+        INSERT INTO user_tbl
+        (user_id, username, password, phone_number, nickname,  created_at)
+        VALUES
+        (#{user_id}, #{username}, #{password}, #{phone_number}, #{nickname} ,SYSDATE)
     </insert>
 
     <resultMap id="signUpResultMap" type="com.smhrd.web.DTO.SignUpRequest">
@@ -24,7 +24,6 @@
         <result property="password" column="PASSWORD"/>
         <result property="phone_number" column="PHONE_NUMBER"/>
         <result property="nickname" column="NICKNAME"/>
-        <result property="role" column="ROLE"/>
     </resultMap>
 
 
@@ -34,5 +33,52 @@
         SELECT * FROM user_tbl WHERE user_id = #{user_input_id}
     </select>
 
+
+ <resultMap id="signUpResultMap2" type="com.smhrd.web.DTO.UserDTO">
+        <result property="user_id" column="USER_ID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="phone_number" column="PHONE_NUMBER"/>
+        <result property="nickname" column="NICKNAME"/>
+        <result property="role" column="ROLE"/>
+        <result property="userProfile" column="USERPROFILE"/>
+    </resultMap>
+
+    <!-- 로그인 정보 가져오기 -->
+    <select id="loginUserInfo" resultMap="signUpResultMap2">
+        SELECT * FROM user_tbl WHERE user_id = #{user_id}
+    </select>
+
+
+
+    <!-- 유저 정보  수정 -->
+    <update id="UserInfoUpdate" parameterType="com.smhrd.web.DTO.UserInfoUpdate_DTO">
+    UPDATE user_tbl
+    SET
+        password = #{password},
+        username = #{username},
+        phone_number = #{phone_number},
+        nickname = #{nickname}
+    WHERE user_id = #{user_id}
+    </update>
+
+<!-- 유저 프로필 사진 변경 -->
+   <update id="updateUserProfileById" parameterType="com.smhrd.web.DTO.UserProfileUpdateDTO">
+        UPDATE USER_TBL
+        SET    USERPROFILE = #{imageUrl}
+        WHERE  USER_ID    = #{userId}
+    </update>
+
+    <!-- 이미지 리셋 -->
+    <update id="restUserProfile" parameterType="string">
+        UPDATE USER_TBL
+        SET    USERPROFILE = '/uploads/default/user.png'
+        WHERE  USER_ID    = #{userId}
+        </update>
+
+
+        <!-- 화원 탈퇴 -->
+    <delete id="userInfoDelete" parameterType="string">
+       DELETE FROM USER_TBL WHERE  USER_ID = #{userId}
+    </delete>
 
 </mapper>

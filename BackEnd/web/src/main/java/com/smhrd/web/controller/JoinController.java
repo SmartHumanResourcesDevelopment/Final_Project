@@ -23,7 +23,7 @@ public class JoinController {
     @PostMapping("/join")
     public ResponseEntity<SignUpResponse> join(@RequestBody SignUpRequest req) {
         
-        System.out.println("가입 요청 데이터: " + req.getUser_id() );
+        System.out.println("가입 요청 데이터: " + req.getUser_id());
 
         if (loginService.register(req))
             return ResponseEntity.ok(new SignUpResponse(true, "회원가입 완료"));
