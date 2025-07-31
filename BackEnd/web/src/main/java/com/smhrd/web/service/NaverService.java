@@ -4,13 +4,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smhrd.web.DTO.UserDTO;
+import com.smhrd.web.repository.UserMapper;
 
 @Service
 public class NaverService {
@@ -20,6 +21,9 @@ public class NaverService {
     private final String redirectUri = "http://localhost:5173//naver/callback";
 
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    private UserMapper userMapper;
 
     public String getAccessToken(String code, String state) {
         try {
@@ -50,7 +54,7 @@ public class NaverService {
         }
     }
 
-    public Map<String, Object> getUserInfo(String accessToken) {
+    public UserDTO getUserInfo(String accessToken)  {
         try {
             String apiURL = "https://openapi.naver.com/v1/nid/me";
             URL url = new URL(apiURL);
@@ -67,19 +71,44 @@ public class NaverService {
             JsonNode jsonNode = mapper.readTree(sb.toString());
             JsonNode response = jsonNode.get("response");
 
-            if (response == null) return null;
+            System.out.println("응답 JSON: " + jsonNode.toPrettyString());
+            System.out.println("response 노드 존재 여부: " + jsonNode.has("response"));
 
-            Map<String, Object> userInfo = new HashMap<>();
-            userInfo.put("email", response.get("email").asText());
-            userInfo.put("nickname", response.get("nickname").asText());
-            userInfo.put("id", response.get("id").asText());
-            userInfo.put("profileImage", response.has("profile_image") ? response.get("profile_image").asText() : "");
+            if (response == null){
+                System.out.println("response 필드가 null입니다.");
+            return null;
+            }
+            System.out.println("네이버 응답 전체: " + response.toPrettyString());
 
-            return userInfo;
+            UserDTO user = new UserDTO();
+            user.setNaverlogincheck(response.has("id") ? response.get("id").asText() : null); // 네이버의 고유 식별자
+            user.setUsername(response.has("name") ? response.get("name").asText() : null);
+            user.setPhone_number(response.has("mobile") ? response.get("mobile").asText() : null);
+            user.setNickname("네이버유저");
+            user.setUserProfile(response.has("profile_image") ? response.get("profile_image").asText() : null);
+            user.setRole("팀원"); // 기본값
+
+            return user;
 
         } catch (Exception e) {
+            System.out.println("예외 발생: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
+    }
+
+    // 3. 네이버 ID 기준으로 가입 여부 확인
+    public boolean isUserExistsByUserNaver(String userId) {
+        return userMapper.existsByUserNaver(userId) > 0;
+    }
+
+    // 4. 네이버 ID 기준으로 유저 정보 조회
+    public UserDTO getUserByUserNaver(String NaverLoginCheck) {
+        return userMapper.findByUserNaver(NaverLoginCheck);
+    }
+
+    // 5. 네이버 유저 등록
+    public int registerNaverUser(UserDTO user) {
+        return userMapper.insertNaverUser(user);
     }
 }

@@ -1,5 +1,6 @@
 package com.smhrd.web.config;
 
+import io.jsonwebtoken.Claims;
 // JwtUtil.java
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -37,4 +38,23 @@ public class JwtUtil {
             .signWith(key, SignatureAlgorithm.HS256)
             .compact();
     }
+    
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                .setSigningKey(secretKey) // Base64 인코딩된 키
+                .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+            .setSigningKey(secretKey)
+            .parseClaimsJws(token)
+            .getBody();
+        return claims.getSubject(); // userId가 들어감
+}
 }

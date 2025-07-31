@@ -10,6 +10,7 @@ import Admin from "./components/Admin_page";
 import ServicePage from "./components/ServicePage";
 import ProtectedRoute from "./contexts/ProtectedRoute";
 import NaverCallback from "./components/NaverCallback";
+import NaverLoginSuccess from "./components/NaverLoginSuccess";
 import axios from 'axios';
 
 axios.defaults.baseURL = "http://localhost:8095";
@@ -68,6 +69,13 @@ function App() {
                 <NaverCallback />
             }
           />
+          <Route
+            path="/naver/success"
+            element={
+            <NaverLoginSuccess />
+            } 
+          /> 
+          
         </Routes>
       </UserProvider>
     </BrowserRouter>

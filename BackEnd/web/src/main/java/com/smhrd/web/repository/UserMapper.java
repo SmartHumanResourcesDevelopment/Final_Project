@@ -33,5 +33,13 @@ public interface UserMapper {
     // 로그인 후 유저 정보 가져오기
     UserDTO loginUserInfo(String user_id);
 
+    // 네이버 ID 기준으로 가입 여부 확인
+    int existsByUserNaver(@Param("userId") String userId);
+
+    // 네이버 ID 기준으로 유저 정보 조회
+    UserDTO findByUserNaver(@Param("userId") String userId);
+
+    // 네이버 유저 등록
+    int insertNaverUser(UserDTO user);
 
 }

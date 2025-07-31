@@ -1,5 +1,6 @@
 package com.smhrd.web.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,13 +16,18 @@ import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.smhrd.web.DTO.JwtResponse;
+import com.smhrd.web.DTO.UserDTO;
+import com.smhrd.web.repository.UserMapper;
 import com.smhrd.web.service.JwtService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,6 +45,9 @@ public class SocialLoginController{
     private String redirectUri;
 
     private final JwtService jwtService;
+
+    @Autowired
+    private UserMapper userMapper;
 
     public SocialLoginController(JwtService jwtService){
         this.jwtService = jwtService;
@@ -71,7 +80,7 @@ public class SocialLoginController{
     }
 
     @GetMapping("/naver/callback")
-    public ResponseEntity<?> naverCallback(@RequestParam String code, @RequestParam String state, HttpSession session) {
+    public void naverCallback(@RequestParam String code, @RequestParam String state, HttpSession session, HttpServletResponse response) {
         try {
             
         // 1. 세션에서 저장된 state 값 꺼내기
@@ -79,39 +88,47 @@ public class SocialLoginController{
         System.out.println("세션 상태 값: " + sessionState);
         System.out.println("요청 상태 값: " + state);
 
-        // 2. 받은 state와 비교 (일치하지 않으면 401 에러 응답)
+        // 2. 받은 state와 비교 검증
         if (sessionState == null || !sessionState.equals(state)) {
-            return ResponseEntity.status(401).body(Map.of("success", false, "message", "State mismatch!"));
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "State 불일치");
+            return;
         }
 
+        // 엑세스 토큰 발급
         String accessToken = getNaverAccessToken(code, state);
+        System.out.println("accessToken = " + accessToken);
 
         if (accessToken == null) {
-            return ResponseEntity.status(401)
-                    .body(Map.of("success", false, "message", "토큰 발급 실패"));
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰 발급 실패");
+            return;
         }
 
-        Map<String, Object> userInfo = getNaverUserInfo(accessToken);
+        // 사용자의 정보 가져오기
+        UserDTO user = getNaverUserInfo(accessToken);
+        System.out.println("user = " + user);
 
-        if (userInfo != null) {
-            // 사용자 식별자 추출 (ex. 이메일 or id)
-            String userId = (String) userInfo.get("id"); // 또는 "email"
+        // DB에 사용자의 존재 여부를 확인
+        boolean exists = userMapper.existsByUserNaver(user.getUser_id()) > 0;
 
+        if (!exists) {
+            // 신규 사용자면 회원가입 (naverlogincheck 컬럼에 네이버 ID 저장)
+            user.setUser_id(accessToken);
+            System.out.println(user.getUser_id());  // 네이버 ID 저장
+            user.setRole("팀원"); // 기본 역할 설정
+            userMapper.insertNaverUser(user);
+        }
             // JWT 발급
-            String jwtToken = jwtService.createToken(userId);
-
-            return ResponseEntity.ok(
-                    new JwtResponse(true, jwtToken, userInfo)
-            );
-        } else {
-            return ResponseEntity.status(401)
-                    .body(Map.of("success", false, "message", "사용자 정보 획득 실패"));
-        }
+            String jwt = jwtService.createToken(user.getNaverlogincheck());
+            
+            // 프론트로 리다이렉션
+            String redirectUrl = "http://localhost:5173/naver/success?token=" + URLEncoder.encode(jwt, StandardCharsets.UTF_8);
+            response.sendRedirect(redirectUrl);
 
     } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(500)
-                .body(Map.of("success", false, "message", "서버 오류"));
+         e.printStackTrace();
+        try {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "서버 오류");
+        } catch (Exception ignored) {}
     }
 }
 
@@ -156,7 +173,7 @@ public class SocialLoginController{
     }
 
     // 네이버 사용자 정보를 요청 메서드
-    private Map<String, Object> getNaverUserInfo(String accessToken) {
+    private UserDTO getNaverUserInfo(String accessToken) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             
@@ -175,9 +192,20 @@ public class SocialLoginController{
             );
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                Map<String, Object> body = response.getBody();
-                return (Map<String, Object>) body.get("response");
-            }
+            Map<String, Object> body = response.getBody();
+            Map<String, Object> userInfo = (Map<String, Object>) body.get("response");
+
+            // Map → UserDTO 수동 매핑
+            UserDTO user = new UserDTO();
+            user.setUser_id((String) userInfo.get("id")); // 네이버 고유 ID
+            user.setUsername((String) userInfo.get("name")); // 이름
+            user.setPhone_number((String) userInfo.get("mobile")); // 전화번호
+            user.setNickname("네이버유저"); // 닉네임
+            user.setUserProfile((String) userInfo.get("profile_image")); // 프로필
+            user.setRole("팀원"); // 기본 역할 설정
+
+            return user;
+        }
             
         } catch (Exception e) {
             e.printStackTrace();

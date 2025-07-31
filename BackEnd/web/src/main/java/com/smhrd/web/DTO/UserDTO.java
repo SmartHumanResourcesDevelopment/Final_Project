@@ -18,4 +18,5 @@ public class UserDTO {
     private String nickname;     // 닉네임
     private String role;       // 관리자 or 사용자
     private String userProfile;     //프사 경로
+    private String naverlogincheck;     // 네이버 고유 사용자 식별자
 }

@@ -2,6 +2,7 @@ package com.smhrd.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -9,11 +10,21 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.smhrd.web.repository.UserMapper;
+
 import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
+
+    public SecurityConfig(@Lazy JwtUtil jwtUtil, @Lazy UserMapper userMapper) {
+        this.jwtUtil = jwtUtil;
+        this.userMapper = userMapper;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

@@ -81,4 +81,23 @@
        DELETE FROM USER_TBL WHERE  USER_ID = #{userId}
     </delete>
 
+    <!-- 네이버 ID로 회원 여부 확인 -->
+    <select id="existsByUserNaver" resultType="int">
+    SELECT COUNT(*) FROM user_tbl WHERE user_id = #{userId, jdbcType=VARCHAR}
+    </select>
+
+    <!-- 네이버 ID로 회원 정보 조회 -->
+    <select id="findByUserNaver" resultMap="signUpResultMap2">
+    SELECT * FROM user_tbl WHERE user_id = #{userId, jdbcType=VARCHAR}
+    </select>
+
+
+    <!-- 네이버 사용자 신규 가입 -->
+    <insert id="insertNaverUser" parameterType="com.smhrd.web.DTO.UserDTO">
+    INSERT INTO user_tbl
+    (user_id, username, phone_number, nickname)
+    VALUES
+    (#{user_id}, #{username}, #{phone_number}, #{nickname, jdbcType=VARCHAR})
+</insert>
+
 </mapper>
