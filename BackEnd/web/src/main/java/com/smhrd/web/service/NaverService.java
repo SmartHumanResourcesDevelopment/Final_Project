@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smhrd.web.DTO.UserDTO;
+import com.smhrd.web.DTO.LoginResponse;
+import com.smhrd.web.DTO.NaverDTO;
+import com.smhrd.web.config.JwtNaverUtil;
 import com.smhrd.web.repository.UserMapper;
 
 @Service
@@ -18,12 +20,14 @@ public class NaverService {
 
     private final String clientId = "5BTv6gBgZA61McgvsB6X";
     private final String clientSecret = "OmUvyB5reOhOwxgpqUiIEG6FrC9mQ3kLdMEXVjZFMJTe0Rm4MM1JT2h5jOfLVlffWZqdc+EPgH7TkqAs5Tmotw==";
-    private final String redirectUri = "http://localhost:5173//naver/callback";
+    private final String redirectUri = "http://localhost:5173/naver/callback";
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private JwtNaverUtil jwtNaverUtil;
 
     public String getAccessToken(String code, String state) {
         try {
@@ -54,7 +58,7 @@ public class NaverService {
         }
     }
 
-    public UserDTO getUserInfo(String accessToken)  {
+    public NaverDTO getUserInfo(String accessToken)  {
         try {
             String apiURL = "https://openapi.naver.com/v1/nid/me";
             URL url = new URL(apiURL);
@@ -80,8 +84,8 @@ public class NaverService {
             }
             System.out.println("네이버 응답 전체: " + response.toPrettyString());
 
-            UserDTO user = new UserDTO();
-            user.setNaverlogincheck(response.has("id") ? response.get("id").asText() : null); // 네이버의 고유 식별자
+            NaverDTO user = new NaverDTO();
+            user.setNaverId(response.has("id") ? response.get("id").asText() : null); // 네이버의 고유 식별자
             user.setUsername(response.has("name") ? response.get("name").asText() : null);
             user.setPhone_number(response.has("mobile") ? response.get("mobile").asText() : null);
             user.setNickname("네이버유저");
@@ -97,18 +101,34 @@ public class NaverService {
         }
     }
 
-    // 3. 네이버 ID 기준으로 가입 여부 확인
-    public boolean isUserExistsByUserNaver(String userId) {
-        return userMapper.existsByUserNaver(userId) > 0;
+    // 네이버 ID 기준으로 가입 여부 확인
+    public boolean isUserExistsByUserNaver(String naverId) {
+        return userMapper.existsByUserNaver(naverId) > 0;
     }
 
-    // 4. 네이버 ID 기준으로 유저 정보 조회
-    public UserDTO getUserByUserNaver(String NaverLoginCheck) {
-        return userMapper.findByUserNaver(NaverLoginCheck);
+    public LoginResponse handleNaverLogin(NaverDTO userInfo) {
+    boolean exists = isUserExistsByUserNaver(userInfo.getNaverId());
+
+    if (exists) {
+        // 가입된 유저 → 로그인 처리
+        NaverDTO user = getUserByUserNaver(userInfo.getNaverId());
+        String token = jwtNaverUtil.generateToken(user);
+
+        return new LoginResponse(true, "기존 유저 로그인", token);
+    } else {
+        // 미가입 유저 → 프론트로 사용자 정보 반환
+        return new LoginResponse(false, "회원가입 필요", userInfo); // token 대신 userInfo 전달
+    }
+}
+
+
+    // 네이버 ID 기준으로 유저 정보 조회
+    public NaverDTO getUserByUserNaver(String NaverId) {
+        return userMapper.findByUserNaver(NaverId);
     }
 
-    // 5. 네이버 유저 등록
-    public int registerNaverUser(UserDTO user) {
+    // 네이버 유저 등록
+    public int registerNaverUser(NaverDTO user) {
         return userMapper.insertNaverUser(user);
     }
 }

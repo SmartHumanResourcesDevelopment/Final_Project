@@ -123,15 +123,15 @@
       }
     },
     {
-      "id": "src\\components\\NaverCallback.jsx:45:10-to-src\\contexts\\ProtectedRoute.jsx",
+      "id": "src\\components\\NaverCallback.jsx:50:10-to-src\\contexts\\ProtectedRoute.jsx",
       "source": "src\\components\\NaverCallback.jsx",
       "target": "src\\contexts\\ProtectedRoute.jsx",
       "data": {
         "viaRoute": "/main",
         "trigger": {
           "element": "navigate(\"/main\")",
-          "line": 45,
-          "endLine": 45,
+          "line": 50,
+          "endLine": 50,
           "column": 10,
           "endColumn": 27,
           "sourceFile": "src\\components\\NaverCallback.jsx"
@@ -139,31 +139,31 @@
       }
     },
     {
-      "id": "src\\components\\NaverCallback.jsx:47:10-to-src\\components\\Join.jsx",
+      "id": "src\\components\\NaverCallback.jsx:52:10-to-src\\components\\Join.jsx",
       "source": "src\\components\\NaverCallback.jsx",
       "target": "src\\components\\Join.jsx",
       "data": {
         "viaRoute": "/join",
         "trigger": {
-          "element": "navigate(\"/join\", { state: { user } })",
-          "line": 47,
-          "endLine": 47,
+          "element": "navigate(\"/join\", { state: { user:\r\n            { ...user, naverId}} })",
+          "line": 52,
+          "endLine": 53,
           "column": 10,
-          "endColumn": 48,
+          "endColumn": 35,
           "sourceFile": "src\\components\\NaverCallback.jsx"
         }
       }
     },
     {
-      "id": "src\\components\\NaverCallback.jsx:52:8-to-src\\components\\Login.jsx",
+      "id": "src\\components\\NaverCallback.jsx:58:8-to-src\\components\\Login.jsx",
       "source": "src\\components\\NaverCallback.jsx",
       "target": "src\\components\\Login.jsx",
       "data": {
         "viaRoute": "/",
         "trigger": {
           "element": "navigate(\"/\")",
-          "line": 52,
-          "endLine": 52,
+          "line": 58,
+          "endLine": 58,
           "column": 8,
           "endColumn": 21,
           "sourceFile": "src\\components\\NaverCallback.jsx"

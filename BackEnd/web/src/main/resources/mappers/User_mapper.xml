@@ -83,21 +83,31 @@
 
     <!-- 네이버 ID로 회원 여부 확인 -->
     <select id="existsByUserNaver" resultType="int">
-    SELECT COUNT(*) FROM user_tbl WHERE user_id = #{userId, jdbcType=VARCHAR}
+    SELECT COUNT(*) FROM user_tbl WHERE NAVERID = #{naverId,jdbcType=VARCHAR}
     </select>
+
+    <resultMap id="signUpResultMap3" type="com.smhrd.web.DTO.NaverDTO">
+        <result property="user_id" column="USER_ID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="phone_number" column="PHONE_NUMBER"/>
+        <result property="nickname" column="NICKNAME"/>
+        <result property="userProfile" column="USERPROFILE"/>
+        <result property="role" column="ROLE"/>
+        <result property="naverId" column="NAVERID"/>
+    </resultMap>
 
     <!-- 네이버 ID로 회원 정보 조회 -->
-    <select id="findByUserNaver" resultMap="signUpResultMap2">
-    SELECT * FROM user_tbl WHERE user_id = #{userId, jdbcType=VARCHAR}
+    <select id="findByUserNaver" resultMap="signUpResultMap3">
+    SELECT * FROM user_tbl WHERE NAVERID = #{naverId,jdbcType=VARCHAR}
     </select>
 
-
     <!-- 네이버 사용자 신규 가입 -->
-    <insert id="insertNaverUser" parameterType="com.smhrd.web.DTO.UserDTO">
+    <insert id="insertNaverUser" parameterType="com.smhrd.web.DTO.NaverDTO">
     INSERT INTO user_tbl
-    (user_id, username, phone_number, nickname)
+    (user_id, username, phone_number, nickname, created_at, role, userprofile, naverId)
     VALUES
-    (#{user_id}, #{username}, #{phone_number}, #{nickname, jdbcType=VARCHAR})
+    (#{user_id}, #{username}, #{phone_number}, #{nickname,jdbcType=VARCHAR}, SYSDATE, '팀원', '/uploads/default/user.png', #{naverId})
+
 </insert>
 
 </mapper>

@@ -12,6 +12,7 @@ import com.smhrd.web.DTO.UserDTO;
 import com.smhrd.web.config.JwtUtil;
 import com.smhrd.web.repository.UserMapper;
 
+
 import lombok.extern.slf4j.Slf4j;
 
 /** 비밀번화 암호화, 아이디 중복 체크 같은 로직 코드 작성 */
@@ -56,7 +57,7 @@ public class LoginService {
         SignUpRequest userEntity = userMapper.findByUserId(req.getId());
         if (userEntity == null || 
             !passwordEncoder.matches(req.getPassword(), userEntity.getPassword())) {
-            return new LoginResponse(false, "아이디 또는 비밀번호가 일치하지 않습니다.",null);
+            return new LoginResponse(false, "아이디 또는 비밀번호가 일치하지 않습니다.", (String) null);
         }
 
         System.out.println(" 입력한정보 : "+req);

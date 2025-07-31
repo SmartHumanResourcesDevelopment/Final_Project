@@ -1,15 +1,27 @@
 import React, { useState } from "react";
 import LoginSuccess from "./LoginSuccess.jsx";
 import { signUp } from "../api/authApi"; 
+import { useLocation } from "react-router-dom";
 import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
 import mint_bg_color from "../assets/img/common/mint_bg_color.png"
 
 export const Join = () => {
+  const location = useLocation();
+  const state = location.state || {};
+  const naverUser = state.user || {}; // NaverCallback에서 navigate 시 전달한 user
+  const searchParams = new URLSearchParams(location.search);
   /* ---------- 상태 ---------- */
   const [formData, setFormData] = useState({
-    user_id: "", password: "", confirmPassword: "",
-    username: "", nickname: "", phone_number: "", agreeToTerms: false,
+    user_id: "",
+    password: "",
+    confirmPassword: "",
+    username: decodeURIComponent(searchParams.get("username") || ""),
+    nickname: naverUser.nickname || "",
+    phone_number: decodeURIComponent(searchParams.get("phone_number") || ""),
+    naverId: naverUser.naverId || "",
+    agreeToTerms: false,
   });
+  
   const [passwordError, setPasswordError] = useState("");
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -54,7 +66,7 @@ export const Join = () => {
         ? `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`
         : `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 7)}-${onlyNums.slice(7, 11)}`;
 
-    setFormData((p) => ({ ...p, phone: autoHyphen }));
+    setFormData((p) => ({ ...p, phone_number: autoHyphen }));
   };
 
   const handleAgreeClick = (e) => {
@@ -69,6 +81,10 @@ export const Join = () => {
   /* ---------- 제출 ---------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.naverId) {
+      console.warn("⚠️ 네이버 ID 없음, DB에 null로 들어갈 수 있음");
+    }
 
     // 모든 필수값 체크
     const required = ["user_id", "password", "confirmPassword", "username", "nickname", "phone_number"];
@@ -136,9 +152,9 @@ export const Join = () => {
                 <input
                   id={f.id}
                   type={f.type}
-                  inputMode={f.id === "phone" ? "numeric" : undefined}
+                  inputMode={f.id === "phone_number" ? "numeric" : undefined}
                   value={formData[f.id]}
-                  onChange={f.id === "phone"
+                  onChange={f.id === "phone_number"
                     ? handlePhoneChange
                     : (e) => handleInputChange(f.id, e.target.value)}
                   placeholder={f.ph}

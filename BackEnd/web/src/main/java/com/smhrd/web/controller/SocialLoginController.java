@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.smhrd.web.DTO.JwtResponse;
 import com.smhrd.web.DTO.UserDTO;
+import com.smhrd.web.DTO.NaverDTO;
 import com.smhrd.web.repository.UserMapper;
 import com.smhrd.web.service.JwtService;
 
@@ -104,28 +105,36 @@ public class SocialLoginController{
         }
 
         // 사용자의 정보 가져오기
-        UserDTO user = getNaverUserInfo(accessToken);
+        NaverDTO user = getNaverUserInfo(accessToken);
         System.out.println("user = " + user);
+        if (user == null) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "사용자 정보 조회 실패");
+            return;
+        }
 
         // DB에 사용자의 존재 여부를 확인
-        boolean exists = userMapper.existsByUserNaver(user.getUser_id()) > 0;
+        boolean exists = userMapper.existsByUserNaver(user.getNaverId()) > 0;
 
-        if (!exists) {
-            // 신규 사용자면 회원가입 (naverlogincheck 컬럼에 네이버 ID 저장)
-            user.setUser_id(accessToken);
-            System.out.println(user.getUser_id());  // 네이버 ID 저장
-            user.setRole("팀원"); // 기본 역할 설정
-            userMapper.insertNaverUser(user);
-        }
-            // JWT 발급
-            String jwt = jwtService.createToken(user.getNaverlogincheck());
-            
-            // 프론트로 리다이렉션
+        if (exists) {
+            // 기존 회원 → JWT 생성 후 메인 페이지 리다이렉트
+            String jwt = jwtService.createToken(user.getUser_id());
             String redirectUrl = "http://localhost:5173/naver/success?token=" + URLEncoder.encode(jwt, StandardCharsets.UTF_8);
             response.sendRedirect(redirectUrl);
+        } else {
+            // 신규 회원 → 회원가입 페이지로 리다이렉트
+            // 이름, 휴대폰 번호, 닉네임 등 기본정보를 쿼리스트링으로 전달해서 폼 자동 입력 가능하게 처리
+            String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/join")
+                .queryParam("user_id", user.getUser_id())
+                .queryParam("username", URLEncoder.encode(user.getUsername(), StandardCharsets.UTF_8))
+                .queryParam("phone_number", URLEncoder.encode(user.getPhone_number(), StandardCharsets.UTF_8))
+                .queryParam("nickname", URLEncoder.encode(user.getNickname(), StandardCharsets.UTF_8))
+                .build()
+                .toUriString();
 
+            response.sendRedirect(redirectUrl);
+        }
     } catch (Exception e) {
-         e.printStackTrace();
+        e.printStackTrace();
         try {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "서버 오류");
         } catch (Exception ignored) {}
@@ -173,7 +182,7 @@ public class SocialLoginController{
     }
 
     // 네이버 사용자 정보를 요청 메서드
-    private UserDTO getNaverUserInfo(String accessToken) {
+    private NaverDTO getNaverUserInfo(String accessToken) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             
@@ -195,8 +204,8 @@ public class SocialLoginController{
             Map<String, Object> body = response.getBody();
             Map<String, Object> userInfo = (Map<String, Object>) body.get("response");
 
-            // Map → UserDTO 수동 매핑
-            UserDTO user = new UserDTO();
+            // Map → NaverDTO 수동 매핑
+            NaverDTO user = new NaverDTO();
             user.setUser_id((String) userInfo.get("id")); // 네이버 고유 ID
             user.setUsername((String) userInfo.get("name")); // 이름
             user.setPhone_number((String) userInfo.get("mobile")); // 전화번호

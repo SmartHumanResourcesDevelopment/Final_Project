@@ -10,14 +10,19 @@ import {jwtDecode} from "jwt-decode";
 export const UserContext = createContext();
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState({
-    id: "", // 아이디
-    nickname: "", // 닉네임
-    email: "", // 이메일
-    profileImage: "", //프로필 사진
-    isLogin: false, // 로그인 여부
-    token: "", // 토큰
-  });
+  const initialUser = {
+    id: "",           // 사용자 ID
+    naverId: "",      // 네이버 고유 ID
+    username: "",     // 이름
+    nickname: "",     // 닉네임
+    phoneNumber: "",  // 전화번호
+    email: "",        // 이메일
+    profileImage: "", // 프로필 경로
+    role: "",         // 역할
+    isLogin: false,
+    token: "",        // 토큰
+  };
+  const [user, setUser] = useState(initialUser);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -28,26 +33,26 @@ export function UserProvider({ children }) {
         const decoded = jwtDecode(token);
 
         // ② sub → userId 로 매핑
-        const userId      = decoded.sub;
-        const username    = decoded.username;    // 커스텀 클레임으로 넣으셨다면
-        const phoneNumber = decoded.phoneNumber; // 마찬가지
-        const nickname    = decoded.nickname;
-        const role        = decoded.role;
-        const userProfile = decoded.userProfile; // "/uploads/..."
+        const userData = {
+          id: decoded.sub || "",
+          naverId: decoded.naverId || "",
+          username: decoded.username || "",
+          nickname: decoded.nickname || "",
+          phoneNumber: decoded.phoneNumber || "",
+          email: decoded.email || "",
+          profileImage: decoded.userProfile || "",
+          role: decoded.role || "",
+          isLogin: true,
+          token: token,
+        };
 
-        setUser({
-          userId,
-          username,
-          phoneNumber,
-          nickname,
-          role,
-          userProfile,
-        });
+        setUser(userData);
+
       } catch (e) {
         console.error("Invalid token:", e);
         localStorage.removeItem("jwtToken");
         delete axios.defaults.headers.common["Authorization"];
-        setUser(null);
+        setUser(initialUser);
       }
     }
     setInitialized(true);
@@ -56,7 +61,7 @@ export function UserProvider({ children }) {
   const logout = () => {
     localStorage.removeItem("jwtToken");
     delete axios.defaults.headers.common["Authorization"];
-    setUser(null);
+    setUser(initialUser);
   };
 
   return (
