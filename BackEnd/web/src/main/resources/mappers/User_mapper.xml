@@ -104,10 +104,10 @@
     <!-- 네이버 사용자 신규 가입 -->
     <insert id="insertNaverUser" parameterType="com.smhrd.web.DTO.NaverDTO">
     INSERT INTO user_tbl
-    (user_id, username, phone_number, nickname, created_at, role, userprofile, naverId)
+    (user_id, username, phone_number, nickname, created_at, naverlogincheck, naverId)
     VALUES
-    (#{user_id}, #{username}, #{phone_number}, #{nickname,jdbcType=VARCHAR}, SYSDATE, '팀원', '/uploads/default/user.png', #{naverId})
+    (#{user_id}, #{username}, #{phone_number}, #{nickname,jdbcType=VARCHAR}, SYSDATE, '네이버유저', #{naverId})
 
-</insert>
+    </insert>
 
 </mapper>

@@ -34,6 +34,14 @@ public class LoginService {
     @Transactional
     public boolean register(SignUpRequest req) { // 회원가입 로직
 
+        //get naver id == null isempty{ 아래 로직 실행}
+
+        // else{/ set>> 네이버 식별자 ? 회원가입 을 하면 사용자가 식별자 입력 안함
+        // register >> 서비스로 객체 요청
+        // signup.set(네이버 식별자)}
+
+
+
         System.out.println("가입 요청 데이터: " + req); // 로그 확인용
 
         int exists = userMapper.existsByUserId(req.getUser_id());
@@ -78,6 +86,9 @@ public class LoginService {
         // 4) LoginResponse에는 token만 담아 반환
         return new LoginResponse(true, "로그인 성공",token);
     }
+
+
+    
 }
         
 

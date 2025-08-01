@@ -1,7 +1,7 @@
 package com.smhrd.web.config;
 
 import io.jsonwebtoken.Claims;
-// JwtUtil.java
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
@@ -19,42 +19,68 @@ public class JwtNaverUtil {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    /**유저 정보 토큰에 클레임으로 추가 */
-    public String generateToken(NaverDTO user) {
-        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
-        Key key = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
-        System.out.println("이미지 경로"+user.getUserProfile());
+    private Key key;  // 공용 Key
 
+    @jakarta.annotation.PostConstruct
+    public void initKey() {
+        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
+        this.key = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
+        System.out.println(" JWT Key 초기화 완료");
+    }
+
+    /** 유저 정보 토큰 생성 */
+    public String generateToken(NaverDTO user) {
+        System.out.println("generateToken() 진입함: "+user);
+        
         long now = System.currentTimeMillis();
-        return Jwts.builder()
-            .setSubject(user.getUser_id())                    // 필수 식별자
-            .claim("username", user.getUsername())           // 커스텀 클레임
+        String token = Jwts.builder()
+            .setSubject(user.getUser_id()) // sub
+            .claim("username", user.getUsername())
+            .claim("naverId", user.getNaverId())
             .claim("phoneNumber", user.getPhone_number())
             .claim("nickname", user.getNickname())
             .claim("role", user.getRole())
-            .claim("userProfile",user.getUserProfile())
+            .claim("userProfile", user.getUserProfile())
             .setIssuedAt(new Date(now))
-            .setExpiration(new Date(now + 1000 * 60 * 60 * 1)) // 1시간
+            .setExpiration(new Date(now + 1000 * 60 * 60)) // 1시간
             .signWith(key, SignatureAlgorithm.HS256)
             .compact();
+
+        System.out.println("=== [JWT 생성] ===");
+        System.out.println("Token: " + token);
+        return token;
     }
-    
+
+    /** 토큰 유효성 검사 */
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                .setSigningKey(secretKey) // Base64 인코딩된 키
+            System.out.println("=== [JWT 검증 시작] ===");
+            System.out.println("Received token: " + token);
+
+            Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
                 .parseClaimsJws(token);
+
+            System.out.println("JWT 유효함 ✅");
             return true;
-        } catch (Exception e) {
+        } catch (JwtException e) {
+            System.out.println("JWT 검증 실패 ❌: " + e.getMessage());
             return false;
         }
     }
 
+    /** 토큰에서 userId(sub) 추출 */
     public String getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-            .setSigningKey(secretKey)
+        Claims claims = Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
             .parseClaimsJws(token)
             .getBody();
-        return claims.getSubject(); // userId가 들어감
-}
+
+        System.out.println("=== [JWT 파싱 완료] ===");
+        System.out.println("Claims: " + claims);
+
+        return claims.getSubject();
+    }
 }

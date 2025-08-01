@@ -15,4 +15,5 @@ public class SignUpRequest {
     private String password;   // 비밀번호
     private String phone_number;  // 전화번호
     private String nickname;     // 닉네임
+    // 네이버 식별자
 }

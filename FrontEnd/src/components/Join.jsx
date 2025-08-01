@@ -8,18 +8,23 @@ import mint_bg_color from "../assets/img/common/mint_bg_color.png"
 export const Join = () => {
   const location = useLocation();
   const state = location.state || {};
-  const naverUser = state.user || {}; // NaverCallback에서 navigate 시 전달한 user
   const searchParams = new URLSearchParams(location.search);
+
+  const initialNaverId = searchParams.get("naverId") || "";
+  const initialUsername = decodeURIComponent(searchParams.get("username") || "");
+  const initialPhone = decodeURIComponent(searchParams.get("phone_number") || "");
+  const initialNickname = decodeURIComponent(searchParams.get("nickname") || "");
+
   /* ---------- 상태 ---------- */
   const [formData, setFormData] = useState({
     user_id: "",
     password: "",
     confirmPassword: "",
-    username: decodeURIComponent(searchParams.get("username") || ""),
-    nickname: naverUser.nickname || "",
-    phone_number: decodeURIComponent(searchParams.get("phone_number") || ""),
-    naverId: naverUser.naverId || "",
-    agreeToTerms: false,
+    username: initialUsername,
+    nickname: initialNickname,
+    phone_number: initialPhone,
+    naverId: initialNaverId,
+    agreeToTerms: false
   });
   
   const [passwordError, setPasswordError] = useState("");
@@ -34,13 +39,6 @@ export const Join = () => {
       const cf = k === "confirmPassword" ? v : formData.confirmPassword;
       setPasswordError(pw && cf && pw !== cf ? "비밀번호가 일치하지 않습니다." : "");
     }
-  };
-
-  const formatPhone = (n) => {
-    const nums = n.replace(/\D/g, "");
-    if (nums.length < 4) return nums;
-    if (nums.length < 8) return `${nums.slice(0, 3)}-${nums.slice(3)}`;
-    return `${nums.slice(0, 3)}-${nums.slice(3, 7)}-${nums.slice(7, 11)}`;
   };
 
   const handlePhoneChange = (e) => {
@@ -230,7 +228,8 @@ export const Join = () => {
             </div>
           </div>
         )}
-        {showSuccessModal && <LoginSuccess onClose={() => setShowSuccessModal(false)} />}
+        {showSuccessModal && <LoginSuccess onClose={() => {setShowSuccessModal(false);
+          window.location.href = "/";}}/>}
       </div>
     </div>
   );

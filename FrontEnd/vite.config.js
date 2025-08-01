@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && screenGraphPlugin()
   ].filter(Boolean),
-  publicDir: "./static",
+  publicDir: "./public",
   base: "./",
   css: {
     postcss: { plugins: [tailwind()] },

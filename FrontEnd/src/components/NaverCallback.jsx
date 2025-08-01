@@ -29,7 +29,7 @@ const NaverCallback = () => {
         setUser({
           id: user.naverId || "", // 네이버 고유 ID, 핵심 식별자
           naverId,
-          nickname: user.nickname || "네이버유저",
+          nickname: user.nickname || "",
           profileImage: user.profileImage || "", // 없으면 기본 이미지
           phoneNumber: user.mobile || "",
           isLogin: true,
