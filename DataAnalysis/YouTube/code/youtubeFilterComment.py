@@ -19,10 +19,10 @@ import requests
 import pandas as pd
 
 # ───────────────────── 0. 설정 ─────────────────────
-API_KEY         = "AIzaSyCd7Kzk9ykPl8PHYzQuXCeudXo6n5RrbLo"
-CHANNEL_HANDLE  = "@오하루o_haru"  # @을 포함한 채널 핸들
+API_KEY         = "AIzaSyD2Wy0KguRBTDUTlDwA5R3pdb4ltY3lmyI"
+CHANNEL_HANDLE  = "@toctocsia"  # @을 포함한 채널 핸들
 # 메타 CSV는 filter 폴더에 있습니다
-INPUT_CSV  = Path(__file__).resolve().parent.parent / "filter" / "오하루o_haru_youtube_videos_Filter_viedos.csv"
+INPUT_CSV  = Path(__file__).resolve().parent.parent / "filter" / "toctocsia_youtube_videos_Filter_viedos.csv"
 
 # 댓글은 filter/comment 폴더 안에 저장
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "filter" / "comment"
