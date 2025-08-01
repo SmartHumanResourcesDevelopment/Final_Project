@@ -23,13 +23,12 @@ import requests
 
 # ───────────────────── 0. 환경 설정 ─────────────────────
 API_KEY: str = "AIzaSyBXd7zqgRUMpnYtM8DjAm2th-G4p8qRTJo"
-CHANNEL_HANDLE: str = "@fromseohee"
+CHANNEL_HANDLE: str = "@toctocsia"    # @를 포함한 handle 문자열
+
+PER_PAGE_RESULTS: int  = 50  # playlistItems.list 한 페이지 최대 50
+DETAILS_BATCH_SIZE: int = 50  # videos.list 한 번에 최대 50
 
 BASE_DIR: Path = Path(__file__).resolve().parent
-FILTER_CSV: Path = BASE_DIR / "DB" / "Filtered" / "fromseohee_filtered_food_posts.csv"
-
-MAX_COMMENT_RESULTS: int = 50   # commentThreads.list 한 페이지
-DETAILS_BATCH_SIZE: int = 50    # videos.list 상한
 
 # ───────────────────── 1. 업로드 영상 ID 수집 ─────────────────────
 def get_all_uploaded_video_ids_by_handle(handle: str) -> List[str]:
@@ -154,30 +153,10 @@ def run() -> None:
             "VIEW_COUNT":    stat.get("viewCount", 0),
             "LIKE_COUNT":    stat.get("likeCount", 0),
             "COMMENT_COUNT": stat.get("commentCount", 0),
-            "PLATFORM": "youtube",
+            "PLATFORM":      "youtube",
         })
 
-        for idx, c in enumerate(get_comments(v["id"]), 1):
-            cs = c["snippet"]["topLevelComment"]["snippet"]
-            comment_rows.append({
-                "COMMENT_ID": f"{pk}_c{idx}",
-                "VIDEO_ID": pk,
-                "AUTHOR_NAME": cs.get("authorDisplayName", ""),
-                "COMMENT_TEXT": cs.get("textDisplay", ""),
-                "PUBLISHED_AT": iso_to_date(cs.get("publishedAt", "")),
-            })
+    safe_to_csv(pd.DataFrame(rows), "toctocsia_youtube_videos")
 
-    if video_rows:
-        safe_to_csv(pd.DataFrame(video_rows), "fromseohee_youtube_videos")
-    else:
-        print("⚠️ 저장할 영상이 없습니다.")
-
-    if comment_rows:
-        safe_to_csv(pd.DataFrame(comment_rows), "fromseohee_youtube_comments")
-    else:
-        print("⚠️ 저장할 댓글이 없습니다.")
-
-
-# ───────────────────── 6. 실행 ─────────────────────
 if __name__ == "__main__":
     run()
