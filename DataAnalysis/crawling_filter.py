@@ -4,7 +4,7 @@ import torch
 import pandas as pd
 from transformers import pipeline
 
-assert torch.cuda.is_available(), "CUDA가 활성화된 PyTorch가 필요합니다!"
+#assert torch.cuda.is_available(), "CUDA가 활성화된 PyTorch가 필요합니다!"
 
 def filter_and_save_food_posts(input_csv: str,
                                output_csv: str,
@@ -51,8 +51,8 @@ def filter_and_save_food_posts(input_csv: str,
 
 if __name__ == "__main__":
     filter_and_save_food_posts(
-        input_csv="DataAnalysis/fromseohee.csv",
-        output_csv="DB/Filtered/fromseohee_filtered_food_posts.csv",
+        input_csv="DataAnalysis/toctocsia.csv",
+        output_csv="DB/Filtered/toctocsia_filtered_food_posts.csv",
         threshold=0.5,
-        device=1   # GPU 사용: 0, CPU-only: -1
+        device=0   # GPU 사용: 0, CPU-only: -1
     )
