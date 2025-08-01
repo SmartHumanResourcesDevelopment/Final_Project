@@ -51,8 +51,8 @@ def filter_and_save_food_posts(input_csv: str,
 
 if __name__ == "__main__":
     filter_and_save_food_posts(
-        input_csv="DataAnalysis/fromseohee.csv",
-        output_csv="DB/Filtered/fromseohee_filtered_food_posts.csv",
+        input_csv="DataAnalysis/chu.berup_jmt.csv",
+        output_csv="DB/Filtered/chu.berup_jmt_filtered_food_posts.csv",
         threshold=0.5,
         device=0   # GPU 사용: 0, CPU-only: -1
     )

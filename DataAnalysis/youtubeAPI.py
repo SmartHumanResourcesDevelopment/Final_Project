@@ -27,58 +27,40 @@ import requests
 
 # ───────────────────── 0. 환경 설정 ─────────────────────
 API_KEY: str = "AIzaSyBXd7zqgRUMpnYtM8DjAm2th-G4p8qRTJo"
-CHANNEL_HANDLE: str = "@fromseohee"
+CHANNEL_HANDLE: str = "@sweetshop_s2"
 
 BASE_DIR: Path = Path(__file__).resolve().parent
-FILTER_CSV: Path = BASE_DIR / "DB" / "Filtered" / "fromseohee_filtered_food_posts.csv"
+FILTER_CSV: Path = BASE_DIR / "DB" / "Filtered" / "sweetshop_s2_filtered_food_posts.csv"
 
 MAX_COMMENT_RESULTS: int = 50   # commentThreads.list 한 페이지
 DETAILS_BATCH_SIZE: int = 50    # videos.list 상한
 
 # ───────────────────── 1. 제목 전처리 ─────────────────────
-_tail_pat = re.compile(r'(~|-|–)?\s*\d+\s*(주|일|시간)\s*$')
+# 1) 기존 꼬리표 + '수정됨'까지 한 번에 잡는 패턴으로 확장
+_tail_pat = re.compile(r'(~|-|–)?\s*\d+\s*(주|일|시간)\s*$|\s*수정됨\s*$')
 
 def clean_title(text: str | None) -> str:
+    """strip → lower → 끝단 꼬리표(주/일/시간)·'수정됨' 제거"""
     if not isinstance(text, str):
         return ""
     return _tail_pat.sub("", text.strip().lower()).strip()
 
-def load_filter_titles() -> Set[str]:
-    """
-    CSV '본문' 열을 읽어 전처리된 제목 집합 반환.
-    ① utf-8-sig → ② utf-8 → ③ cp949 → ④ euc-kr 순서로 시도
-    ⑤ 모두 실패하면 chardet 로 추정 후 재시도
-    """
-    tried_enc = []
 
-    for enc in ("utf-8-sig", "utf-8", "cp949", "euc-kr"):
-        tried_enc.append(enc)
+def load_filter_titles() -> Set[str]:
+    for enc in ("utf-8-sig", "cp949", "euc-kr"):
         try:
             df = pd.read_csv(FILTER_CSV, encoding=enc)
-            if "본문" in df.columns:
-                print(f"✔ CSV 인코딩 감지: {enc}")
-                return {clean_title(t) for t in df["본문"].dropna()}
+            if "본문" not in df.columns:
+                raise KeyError("'본문' 열이 없습니다.")
+            return {clean_title(t) for t in df["본문"].dropna()}
         except UnicodeDecodeError:
             continue
+    raise FileNotFoundError(f"CSV 파일을 읽을 수 없습니다: {FILTER_CSV}")
 
-    # ⑤ chardet fallback
-    try:
-        import chardet
-        with open(FILTER_CSV, "rb") as f:
-            raw = f.read(4096)          # 일부만 읽어도 충분
-        guess = chardet.detect(raw)["encoding"]
-        tried_enc.append(f"chardet→{guess}")
-        df = pd.read_csv(FILTER_CSV, encoding=guess, errors="ignore")
-        if "본문" in df.columns:
-            print(f"✔ CSV 인코딩 감지(chardet): {guess}")
-            return {clean_title(t) for t in df["본문"].dropna()}
-    except Exception as e:
-        print(f"chardet 실패: {e}")
 
-    raise FileNotFoundError(
-        f"CSV 파일을 읽을 수 없습니다: {FILTER_CSV}\n"
-        f"시도한 인코딩: {', '.join(tried_enc)}"
-    )
+def is_title_match(api_title: str, filters: Set[str]) -> bool:
+    return clean_title(api_title) in filters
+
 
 # ───────────────────── 2. 채널 & 업로드 목록 ─────────────────────
 def channel_id_from_handle(handle: str) -> str:
@@ -245,12 +227,12 @@ def run() -> None:
             })
 
     if video_rows:
-        safe_to_csv(pd.DataFrame(video_rows), "fromseohee_youtube_videos")
+        safe_to_csv(pd.DataFrame(video_rows), "sweetshop_s2_youtube_videos")
     else:
         print("⚠️ 저장할 영상이 없습니다.")
 
     if comment_rows:
-        safe_to_csv(pd.DataFrame(comment_rows), "fromseohee_youtube_comments")
+        safe_to_csv(pd.DataFrame(comment_rows), "sweetshop_s2_youtube_comments")
     else:
         print("⚠️ 저장할 댓글이 없습니다.")
 
