@@ -27,10 +27,10 @@ import requests
 
 # ───────────────────── 0. 환경 설정 ─────────────────────
 API_KEY: str = "AIzaSyBXd7zqgRUMpnYtM8DjAm2th-G4p8qRTJo"
-CHANNEL_HANDLE: str = "@fromseohee"
+CHANNEL_HANDLE: str = "@sweetshop_s2"
 
 BASE_DIR: Path = Path(__file__).resolve().parent
-FILTER_CSV: Path = BASE_DIR / "DB" / "Filtered" / "fromseohee_filtered_food_posts.csv"
+FILTER_CSV: Path = BASE_DIR / "DB" / "Filtered" / "sweetshop_s2_filtered_food_posts.csv"
 
 MAX_COMMENT_RESULTS: int = 50   # commentThreads.list 한 페이지
 DETAILS_BATCH_SIZE: int = 50    # videos.list 상한
@@ -245,12 +245,12 @@ def run() -> None:
             })
 
     if video_rows:
-        safe_to_csv(pd.DataFrame(video_rows), "fromseohee_youtube_videos")
+        safe_to_csv(pd.DataFrame(video_rows), "sweetshop_s2_youtube_videos")
     else:
         print("⚠️ 저장할 영상이 없습니다.")
 
     if comment_rows:
-        safe_to_csv(pd.DataFrame(comment_rows), "fromseohee_youtube_comments")
+        safe_to_csv(pd.DataFrame(comment_rows), "sweetshop_s2_youtube_comments")
     else:
         print("⚠️ 저장할 댓글이 없습니다.")
 
