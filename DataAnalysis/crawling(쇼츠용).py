@@ -243,7 +243,7 @@ def crawl_account_with_next(driver, username, start_index=0, limit=5):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         data_analysis_dir = os.path.join(script_dir, 'DataAnalysis')
         os.makedirs(data_analysis_dir, exist_ok=True)
-        file_path = os.path.join(data_analysis_dir, "fromseohee.csv")
+        file_path = os.path.join(data_analysis_dir, "toctocsia.csv")
 
         df = pd.DataFrame(collected_posts)
 
@@ -259,9 +259,9 @@ def crawl_account_with_next(driver, username, start_index=0, limit=5):
 
 # 메인 실행 부분
 if __name__ == "__main__":
-    ig_id = "alfowko3258@gmail.com"  # 사용자 Instagram ID
-    ig_pw = "qudfhr77A!"     # 사용자 Instagram 비밀번호
-    target_account = "fromseohee"  # 크롤링할 대상 계정
+    ig_id = "da.da.k200"  # 사용자 Instagram ID
+    ig_pw = "Dh2000"     # 사용자 Instagram 비밀번호
+    target_account = "toctocsia"  # 크롤링할 대상 계정
 
     options = webdriver.ChromeOptions()
     # options.add_argument("--headless")  # 백그라운드 실행 시 활성화
