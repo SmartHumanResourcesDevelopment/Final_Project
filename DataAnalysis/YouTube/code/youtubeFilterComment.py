@@ -20,9 +20,9 @@ import pandas as pd
 
 # ───────────────────── 0. 설정 ─────────────────────
 API_KEY        = "AIzaSyBhGLBy2TmykFW7nREP4eEauBSKwUmR8fo"
-CHANNEL_HANDLE = "@fromseohee"
+CHANNEL_HANDLE = "@toctocsia"
 BASE_DIR       = Path(__file__).resolve().parent.parent
-INPUT_CSV      = BASE_DIR / "filter" / "fromseohee_youtube_videos_Filter_viedos.csv"
+INPUT_CSV      = BASE_DIR / "filter" / "toctocsia_youtube_videos_Filter_viedos.csv"
 OUTPUT_DIR     = BASE_DIR / "filter" / "comment"
 PER_PAGE       = 50    # API 한 번에 조회할 최대 개수
 MAX_COMMENT    = 100   # 댓글 스레드 한 페이지 최대
