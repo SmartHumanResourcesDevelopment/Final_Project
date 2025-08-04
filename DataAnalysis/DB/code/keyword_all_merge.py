@@ -27,7 +27,7 @@ for _, row in df2.iterrows():
     counter[row["KEYWORD_NAME"]] += row["KEYWORDUP"]
 
 # ───────────────────── 2. 유사도 기반 클러스터링 (threshold=0.7) ─────────────────────
-def similarity(a: str, b: str) -> float:
+def similarity(a: str, b: str) -> float:            
     return SequenceMatcher(None, a, b).ratio()
 
 threshold = 0.7
