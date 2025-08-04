@@ -86,7 +86,7 @@ from tqdm import tqdm
 # ───────────── 0. 경로 & 파라미터 ─────────────
 BASE_DIR     = Path(__file__).resolve().parent.parent   # …/DB
 IN_PATTERN   = str(BASE_DIR / "youtube_video_filter" / "*_youtube_videos_Filter_viedos.csv")
-OUT_DIR      = BASE_DIR / "filter"
+OUT_DIR      = BASE_DIR / "youtube_video_filter" /"filter"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 CANDIDATE_LABELS = ["food", "dessert", "snack", "beverage", "meal", "korean food", "non-food"]

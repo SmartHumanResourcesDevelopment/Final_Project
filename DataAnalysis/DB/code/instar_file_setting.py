@@ -32,7 +32,7 @@ def parse_comments(raw_text: str):
 def main():
     base_dir     = Path(__file__).resolve().parent.parent
     instar_dir   = base_dir / 'instar_post_filter'
-    posts_dir    = instar_dir / 'filter'
+    posts_dir    = instar_dir
     comments_dir = instar_dir / 'comment'
 
     # 출력 디렉터리 생성
@@ -56,11 +56,11 @@ def main():
             posts.append({
                 'POST_ID':     post_id,
                 'KEYWORD_ID':  '',  # 나중에 매핑
-                'POST_TEXT':   row['본문'],
-                'HASHTAGS':    row['해시태그'],
+                'POST_TEXT':   row['POST_TEXT'],
+                'HASHTAGS':    row['HASHTAGS'],
                 'AUTHOR_ID':   author_id,
                 'POST_DATE':   post_date,
-                'LIKE_COUNT':  row['좋아요 수'],
+                'LIKE_COUNT':  row['LIKE_COUNT'],
                 'PLATFORM':    'instagram',
             })
 

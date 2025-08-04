@@ -1,115 +1,91 @@
-#!/usr/bin/env python3
-# keyword_id_instar.py  –  Instagram/YouTube KEYWORD_ID 부여 + 노이즈 제거
+# 1) 환경 준비 (터미널에서 한 번만)
+# pip install pandas transformers torch konlpy
 
-import re, pandas as pd
-from pathlib import Path
-from rapidfuzz import process, fuzz
+import os
+import re                                   # ← 추가
+import torch
+import pandas as pd
+from transformers import pipeline
+from konlpy.tag import Okt
 
-# ───────────────────── 0) 헬퍼 ────────────────────────────────
-TIME_PAT  = re.compile(r"\b\d+\s*[초분시간일주월년]+\b")  # 15시간, 3일, 2주 …
-EMOJI_PAT = re.compile(
-    "["
-    "\U0001F600-\U0001F64F"  # emoticons
-    "\U0001F300-\U0001F5FF"  # symbols & pictographs
-    "\U0001F680-\U0001F6FF"  # transport & map
-    "\U0001F1E0-\U0001F1FF"  # flags
-    "]+",
-    flags=re.UNICODE,
-)
+assert torch.cuda.is_available(), "CUDA 활성화된 PyTorch가 필요합니다!"
 
-def clean_text(txt: str) -> str:
-    """이모지·상대날짜 토큰 제거 + 소문자"""
-    if not isinstance(txt, str):
-        return ""
-    txt = EMOJI_PAT.sub(" ", txt)
-    txt = TIME_PAT.sub(" ", txt)
-    txt = re.sub(r"[^\w가-힣 ]+", " ", txt)      # 특수문자 정리
-    return re.sub(r"\s+", " ", txt).strip().lower()
+# Okt 형태소 분석기
+okt = Okt()
 
-def map_keyword_id(text, tags, kw_names, kw_id_map, thr=55):
-    txt = clean_text(text)
-    hts = clean_text(tags)
+def remove_relative_dates(text: str) -> str:
+    """
+    '2주 3일 전', '5주 전', '10일 전', '3시간 전' 등
+    상대 시각 표현을 모두 제거합니다.
+    """
+    # X주 Y일 전
+    text = re.sub(r'\d+\s*주\s*\d+\s*일\s*전', '', text)
+    # X주 전, X일 전, X시간 전, X분 전, X초 전
+    text = re.sub(r'\d+\s*(?:주|일|시간|분|초)\s*전', '', text)
+    return text
 
-    # 1) 정확 포함
-    for name in kw_names:
-        if name in txt or name in hts:
-            return kw_id_map[name]
+def filter_and_add_nouns_as_tags(input_csv: str,
+                                  output_csv: str,
+                                  threshold: float = 0.8,
+                                  device: int = 0):
+    """
+    1) Zero-Shot 분류로 food 포스트만 필터  
+    2) 본문에서 Okt.nouns()로 명사 추출 → 해시태그로 추가  
+    3) 본문에 포함된 상대 시각(몇주 몇일 전 등) 표현 제거
+    """
+    # 1) 데이터 로드
+    df = pd.read_csv(input_csv, encoding='utf-8-sig', parse_dates=['작성일'])
 
-    # 2) 토큰 일치
-    tokens = set(txt.split()) | set(hts.split())
-    for name in kw_names:
-        if name in tokens:
-            return kw_id_map[name]
-
-    # 3) fuzzy
-    best, score, _ = process.extractOne(txt + " " + hts, kw_names, scorer=fuzz.WRatio)
-    return kw_id_map[best] if score >= thr else pd.NA
-
-# ───────────────────── 1) 경로 & 키워드 사전 ───────────────────
-base_dir = Path(__file__).resolve().parent.parent   # …/DB
-all_dir  = base_dir / "all"
-kw_df    = pd.read_csv(all_dir / "combined_keyword_mentions.csv",
-                       usecols=["KEYWORD_ID","KEYWORD_NAME"],
-                       encoding="utf-8-sig")
-kw_map   = dict(zip(kw_df["KEYWORD_NAME"], kw_df["KEYWORD_ID"]))
-kw_names = [k.lower() for k in kw_map]              # 소문자화
-
-# 출력 폴더
-(all_dir / "instar").mkdir(parents=True, exist_ok=True)
-(all_dir / "youtube").mkdir(parents=True, exist_ok=True)
-(all_dir / "logs").mkdir(exist_ok=True)
-# ───────────────────── 2) Instagram posts ─────────────────────
-for fp in (base_dir / "instar_post_filter" / "filter").glob("*_posts.csv"):
-    prefix = fp.stem.replace("_posts", "")
-    df = pd.read_csv(fp, encoding="utf-8-sig")
-
-    df["POST_ID"]   = prefix + "_" + df["POST_DATE"]
-    df["AUTHOR_ID"] = df["POST_ID"]
-    df["POST_TEXT_CLEAN"] = df["POST_TEXT"].apply(clean_text)
-    df["HASHTAGS_CLEAN"]  = df["HASHTAGS"].fillna("").apply(clean_text)
-
-    df["KEYWORD_ID"] = df.apply(
-        lambda r: map_keyword_id(r["POST_TEXT_CLEAN"], r["HASHTAGS_CLEAN"],
-                                 kw_names, kw_map),
-        axis=1
+    # 2) Zero-Shot 분류기 (멀티레이블)
+    classifier = pipeline(
+        "zero-shot-classification",
+        model="joeddav/xlm-roberta-large-xnli",
+        device=device,
+        multi_label=True
     )
+    candidate_labels = ["food","dessert","snack","beverage","meal","korean food","non-food"]
+    food_labels = [l for l in candidate_labels if l!="non-food"]
 
-    miss_cnt = df["KEYWORD_ID"].isna().sum()
-    if miss_cnt:
-        print(f"⚠️  {prefix}: KEYWORD_ID 미매핑 {miss_cnt}행 (파일 미생성)")
+    filtered = []
+    for _, row in df.iterrows():
+        # 원본 본문 읽고, 상대 시각 표현 제거
+        raw_text = str(row['POST_TEXT'])
+        text = remove_relative_dates(raw_text)
 
-    # 매핑된 행만 남김
-    df = df.dropna(subset=["KEYWORD_ID"])
+        tags = str(row.get('HASHTAGS','')) or ""
+        out = classifier(text + " " + tags, candidate_labels)
+        scores = dict(zip(out['labels'], out['scores']))
+        best = max(scores.get(l,0) for l in food_labels)
+        if best < threshold:
+            continue
 
-    out_cols = ["POST_ID","KEYWORD_ID","POST_TEXT","HASHTAGS",
-                "AUTHOR_ID","POST_DATE","LIKE_COUNT","PLATFORM"]
-    df[out_cols].to_csv(all_dir/"instar"/f"{prefix}_posts.csv",
-                        index=False, encoding="utf-8-sig")
-    print(f"✔ Instagram 처리 완료 → {prefix}_posts.csv")
+        # 3) 형태소 분석으로 본문 명사 추출
+        nouns = okt.nouns(text)
+        nouns = [n for n in nouns if len(n)>1 and n.isalpha()]
 
-# ───────────────────── 3) YouTube videos ─────────────────────
-for fp in (base_dir / "youtube_video_filter").glob("*_Filter_viedos.csv"):
-    df = pd.read_csv(fp, encoding="utf-8-sig")
+        # 4) 기존 태그 유지 + 명사 해시태그 추가
+        existing = [t.strip().lstrip('#') for t in tags.split(',') if t.strip()]
+        existing_lower = {t.lower() for t in existing}
 
-    df["DESC_CLEAN"]  = df["DESCRIPTION"].fillna("").apply(clean_text)
-    df["TITLE_CLEAN"] = df["TITLE"].apply(clean_text)
-    df["KEYWORD_ID"]  = df.apply(
-        lambda r: map_keyword_id(f"{r.TITLE_CLEAN} {r.DESC_CLEAN}", "",
-                                 kw_names, kw_map),
-        axis=1
+        for n in nouns:
+            if n.lower() not in existing_lower:
+                existing.append(n)
+
+        new_row = row.copy()
+        new_row['HASHTAGS'] = ", ".join(f"#{t}" for t in existing)
+        filtered.append(new_row)
+
+    # 5) 저장
+    df_out = pd.DataFrame(filtered)
+    cols = ['POST_DATE','LIKE_COUNT','POST_TEXT','HASHTAGS','COMMENTS']
+    os.makedirs(os.path.dirname(output_csv), exist_ok=True)
+    df_out[cols].to_csv(output_csv, index=False, encoding='utf-8-sig')
+    print(f"✅ {len(df_out)}개 포스트에 본문 명사 기반 해시태그를 추가해 '{output_csv}'에 저장했습니다.")
+
+if __name__=="__main__":
+    filter_and_add_nouns_as_tags(
+        input_csv  ="instargram_infu/anunu.kr.csv",
+        output_csv ="hastagging/anunu.kr_noun_tags.csv",
+        threshold  =0.8,
+        device     =0   # GPU:0, CPU-only:-1
     )
-
-    miss_cnt = df["KEYWORD_ID"].isna().sum()
-    if miss_cnt:
-        print(f"⚠️  {fp.name}: KEYWORD_ID 미매핑 {miss_cnt}행 (파일 미생성)")
-
-    df = df.dropna(subset=["KEYWORD_ID"])
-
-    # KEYWORD_ID를 2번째 컬럼으로
-    cols = list(df.columns)
-    cols.insert(1, cols.pop(cols.index("KEYWORD_ID")))
-    df[cols].to_csv(all_dir/"youtube"/fp.name,
-                    index=False, encoding="utf-8-sig")
-    print(f"✔ YouTube 처리 완료 → {fp.name}")
-
-print("✅ 모든 파일 처리 완료 (미매핑 행은 로그만 출력, 파일 저장 안 함)")

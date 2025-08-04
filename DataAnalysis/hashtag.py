@@ -1,5 +1,6 @@
 # 1) 환경 준비 (터미널에서 한 번만)
 # pip install pandas transformers torch konlpy
+# 해시태그 없는 경우 음식과 관련된 본문에서 키워드를 해시태그로 작성
 
 import os
 import torch
@@ -35,8 +36,8 @@ def filter_and_add_nouns_as_tags(input_csv: str,
 
     filtered = []
     for _, row in df.iterrows():
-        text = str(row['본문'])
-        tags = str(row.get('해시태그','')) or ""
+        text = str(row['POST_TEXT'])
+        tags = str(row.get('HASHTAGS','')) or ""
         out = classifier(text + " " + tags, candidate_labels)
         scores = dict(zip(out['labels'], out['scores']))
         # food 계열의 최고 확신도
@@ -59,19 +60,19 @@ def filter_and_add_nouns_as_tags(input_csv: str,
                 existing.append(n)
 
         row = row.copy()
-        row['해시태그'] = ", ".join(f"#{t}" for t in existing)
+        row['HASHTAGS'] = ", ".join(f"#{t}" for t in existing)
         filtered.append(row)
 
     # 5) 저장
     df_out = pd.DataFrame(filtered)
-    cols = ['작성일','좋아요 수','본문','해시태그','댓글 목록']
+    cols = ['POST_DATE','LIKE_COUNT','POST_TEXT','HASHTAGS','COMMENTS']
     os.makedirs(os.path.dirname(output_csv), exist_ok=True)
     df_out[cols].to_csv(output_csv, index=False, encoding='utf-8-sig')
     print(f"✅ {len(df_out)}개 포스트에 본문 명사 기반 해시태그를 추가해 '{output_csv}'에 저장했습니다.")
 
 if __name__=="__main__":
     filter_and_add_nouns_as_tags(
-        input_csv  ="DataAnalysis/anunu.kr.csv",
+        input_csv  ="instargram_infu/anunu.kr.csv",
         output_csv ="hastagging/anunu.kr_noun_tags.csv",
         threshold  =0.8,
         device     =0   # GPU:0, CPU-only:-1

@@ -56,7 +56,7 @@ def main():
     kw_names  = list(kw_id_map.keys())
 
     # ── Instagram posts 처리
-    insta_in   = base_dir / 'instar_post_filter' / 'filter'
+    insta_in   = base_dir / 'instar_post_filter' 
     insta_out  = all_dir / 'instar'
     insta_out.mkdir(parents=True, exist_ok=True)
 
@@ -65,12 +65,12 @@ def main():
         df     = pd.read_csv(fp, encoding='utf-8-sig')
 
         # 새 컬럼 생성
-        df['POST_ID']    = prefix + '_' + df['작성일'].astype(str)
+        df['POST_ID']    = prefix + '_' + df['POST_DATE'].astype(str)
         df['AUTHOR_ID']  = df['POST_ID']
-        df['POST_TEXT']  = df['본문']
-        df['HASHTAGS']   = df['해시태그']
-        df['POST_DATE']  = df['작성일']
-        df['LIKE_COUNT'] = df['좋아요 수']
+        df['POST_TEXT']  = df['POST_TEXT']
+        df['HASHTAGS']   = df['HASHTAGS']
+        df['POST_DATE']  = df['POST_DATE']
+        df['LIKE_COUNT'] = df['LIKE_COUNT']
         df['PLATFORM']   = 'instagram'
         df['KEYWORD_ID'] = df.apply(
             lambda r: map_keyword_id(r['POST_TEXT'], r['HASHTAGS'], kw_names, kw_id_map),
@@ -87,7 +87,7 @@ def main():
         print(f'✔ Instagram → {prefix}_posts.csv')
 
     # ── YouTube videos 처리
-    yt_in   = base_dir / 'youtube_video_filter' / 'filter'
+    yt_in   = base_dir / 'youtube_video_filter'
     yt_out  = all_dir  / 'youtube'
     yt_out.mkdir(parents=True, exist_ok=True)
 

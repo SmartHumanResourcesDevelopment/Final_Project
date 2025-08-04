@@ -1,7 +1,11 @@
-# 이 파일은 누락된 유튜브 계정에 대한 음식관련 키워드만 영상을 전처리 하는 파일
+#!/usr/bin/env python3
+# youtube_hf_filter_all_csv.py
+# 유튜브 키워드 구분 코드
 
 import time
 from pathlib import Path
+from typing import List
+
 import pandas as pd
 import torch
 from transformers import pipeline
@@ -12,15 +16,8 @@ DEVICE = 0 if torch.backends.mps.is_available() else -1
 MODEL_NAME       = "joeddav/xlm-roberta-large-xnli"
 CANDIDATE_LABELS = ["food", "non-food"]
 
-# ▶ BASE_DIR: YouTube 폴더 기준
+# ▶ CSV 파일들이 들어있는 상위 폴더(YouTube) 경로로 변경
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# ▶ 입력 CSV 지정
-INPUT_CSV = BASE_DIR / "Hongji홍지_youtube_videos.csv"
-
-# ▶ 출력 폴더 지정
-OUTPUT_DIR = BASE_DIR / "filter"
-OUTPUT_DIR.mkdir(exist_ok=True)  # 없으면 자동 생성
 
 # ───────────────────── 1. 파이프라인 초기화 ─────────────────────
 classifier = pipeline(
@@ -31,10 +28,6 @@ classifier = pipeline(
 
 # ───────────────────── 2. CSV 필터링 함수 ─────────────────────
 def filter_csv_with_hf(path: Path):
-    if not path.exists():
-        print(f"❌ 입력 CSV 없음: {path}")
-        return
-
     df = pd.read_csv(path, encoding="utf-8-sig")
     if "TITLE" not in df.columns:
         print(f"⚠️ TITLE 컬럼 없음: {path.name}")
@@ -52,14 +45,19 @@ def filter_csv_with_hf(path: Path):
     filtered = df[mask]
 
     out_name = f"{path.stem}_Filter_viedos.csv"
-    out_path = OUTPUT_DIR / out_name
+    out_path = path.with_name(out_name)
     filtered.to_csv(out_path, index=False, encoding="utf-8-sig")
+    print(f"✅ {path.name} → {out_name} ({len(filtered)}/{len(df)})")
 
-    print(f"✅ {path.name} → filter/{out_name} ({len(filtered)}/{len(df)})")
-
-# ───────────────────── 3. 실행 ─────────────────────
+# ───────────────────── 3. 모든 CSV 순회 & 실행 ─────────────────────
 def main():
-    filter_csv_with_hf(INPUT_CSV)
+    csv_files = list(BASE_DIR.rglob("*.csv"))
+    if not csv_files:
+        print(f"❌ 지정된 폴더({BASE_DIR})에 CSV 파일이 없습니다.")
+        return
+
+    for csv_file in tqdm(csv_files, desc="Processing CSV files"):
+        filter_csv_with_hf(csv_file)
 
 if __name__ == "__main__":
     main()

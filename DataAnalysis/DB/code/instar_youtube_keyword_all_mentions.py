@@ -12,8 +12,8 @@ def load_instagram_posts(insta_dir: Path) -> pd.DataFrame:
     for file in files:
         df = pd.read_csv(file, encoding='utf-8-sig')
         # 필요한 컬럼만 뽑아서 통일된 이름으로 변경
-        df = df[['작성일', '본문', '해시태그']].rename(
-            columns={'작성일':'date', '본문':'text', '해시태그':'hashtags'})
+        df = df[['POST_DATE', 'POST_TEXT', 'HASHTAGS']].rename(
+            columns={'POST_DATE':'date', 'POST_TEXT':'text', 'HASHTAGS':'hashtags'})
         # 날짜 파싱
         df['date'] = pd.to_datetime(df['date']).dt.date
         dfs.append(df)

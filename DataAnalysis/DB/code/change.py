@@ -13,7 +13,7 @@ import pandas as pd
 
 # 1) 기준 경로: 이 파일의 상위 두 단계
 BASE_DIR    = Path(__file__).resolve().parent.parent
-FILTER_DIR  = BASE_DIR / "filter"
+FILTER_DIR  = BASE_DIR / "youtube_video_filter"
 CUT_OFF_DATE = pd.to_datetime("2023-08-01")
 
 if not FILTER_DIR.is_dir():
