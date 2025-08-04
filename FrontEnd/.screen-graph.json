@@ -37,7 +37,7 @@
       "id": "src/components/NaverLoginSuccess.jsx",
       "label": "NaverLoginSuccess",
       "routes": [
-        "/naver/success"
+        "/login/success"
       ]
     }
   ],
@@ -171,15 +171,31 @@
       }
     },
     {
-      "id": "src\\components\\NaverLoginSuccess.jsx:40:6-to-src\\contexts\\ProtectedRoute.jsx",
+      "id": "src\\components\\NaverLoginSuccess.jsx:19:6-to-src\\components\\Login.jsx",
+      "source": "src\\components\\NaverLoginSuccess.jsx",
+      "target": "src\\components\\Login.jsx",
+      "data": {
+        "viaRoute": "/",
+        "trigger": {
+          "element": "navigate(\"/\")",
+          "line": 19,
+          "endLine": 19,
+          "column": 6,
+          "endColumn": 19,
+          "sourceFile": "src\\components\\NaverLoginSuccess.jsx"
+        }
+      }
+    },
+    {
+      "id": "src\\components\\NaverLoginSuccess.jsx:46:6-to-src\\contexts\\ProtectedRoute.jsx",
       "source": "src\\components\\NaverLoginSuccess.jsx",
       "target": "src\\contexts\\ProtectedRoute.jsx",
       "data": {
         "viaRoute": "/main",
         "trigger": {
           "element": "navigate(\"/main\")",
-          "line": 40,
-          "endLine": 40,
+          "line": 46,
+          "endLine": 46,
           "column": 6,
           "endColumn": 23,
           "sourceFile": "src\\components\\NaverLoginSuccess.jsx"
@@ -187,15 +203,15 @@
       }
     },
     {
-      "id": "src\\components\\NaverLoginSuccess.jsx:43:6-to-src\\components\\Login.jsx",
+      "id": "src\\components\\NaverLoginSuccess.jsx:50:6-to-src\\components\\Login.jsx",
       "source": "src\\components\\NaverLoginSuccess.jsx",
       "target": "src\\components\\Login.jsx",
       "data": {
         "viaRoute": "/",
         "trigger": {
           "element": "navigate(\"/\")",
-          "line": 43,
-          "endLine": 43,
+          "line": 50,
+          "endLine": 50,
           "column": 6,
           "endColumn": 19,
           "sourceFile": "src\\components\\NaverLoginSuccess.jsx"

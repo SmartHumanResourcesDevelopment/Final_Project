@@ -4,10 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+
 import java.util.Date;
 import java.util.Base64;
 import java.security.Key;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,15 +27,15 @@ public class JwtNaverUtil {
     public void initKey() {
         byte[] keyBytes = Base64.getDecoder().decode(secretKey);
         this.key = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
-        System.out.println(" JWT Key 초기화 완료");
+        System.out.println("JWT Key 초기화 완료 ✅");
     }
 
     /** 유저 정보 토큰 생성 */
     public String generateToken(NaverDTO user) {
-        System.out.println("generateToken() 진입함: "+user);
-        
+        System.out.println("generateToken() 진입함: " + user);
+
         long now = System.currentTimeMillis();
-        String token = Jwts.builder()
+        return Jwts.builder()
             .setSubject(user.getUser_id()) // sub
             .claim("username", user.getUsername())
             .claim("naverId", user.getNaverId())
@@ -45,24 +47,15 @@ public class JwtNaverUtil {
             .setExpiration(new Date(now + 1000 * 60 * 60)) // 1시간
             .signWith(key, SignatureAlgorithm.HS256)
             .compact();
-
-        System.out.println("=== [JWT 생성] ===");
-        System.out.println("Token: " + token);
-        return token;
     }
 
     /** 토큰 유효성 검사 */
     public boolean validateToken(String token) {
         try {
-            System.out.println("=== [JWT 검증 시작] ===");
-            System.out.println("Received token: " + token);
-
             Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
-
-            System.out.println("JWT 유효함 ✅");
             return true;
         } catch (JwtException e) {
             System.out.println("JWT 검증 실패 ❌: " + e.getMessage());
@@ -77,10 +70,6 @@ public class JwtNaverUtil {
             .build()
             .parseClaimsJws(token)
             .getBody();
-
-        System.out.println("=== [JWT 파싱 완료] ===");
-        System.out.println("Claims: " + claims);
-
         return claims.getSubject();
     }
 }

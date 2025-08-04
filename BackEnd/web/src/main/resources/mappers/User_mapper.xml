@@ -96,18 +96,21 @@
         <result property="naverId" column="NAVERID"/>
     </resultMap>
 
-    <!-- 네이버 ID로 회원 정보 조회 -->
-    <select id="findByUserNaver" resultMap="signUpResultMap3">
-    SELECT * FROM user_tbl WHERE NAVERID = #{naverId,jdbcType=VARCHAR}
+    <!-- 네이버 ID로 회원 정보 조회-->
+    <select id="findByNaverId" parameterType="string" resultType="com.smhrd.web.DTO.NaverDTO" resultMap="signUpResultMap3">
+        SELECT *
+        FROM USER_TBL
+        WHERE naverId = #{naverId}
     </select>
 
     <!-- 네이버 사용자 신규 가입 -->
     <insert id="insertNaverUser" parameterType="com.smhrd.web.DTO.NaverDTO">
-    INSERT INTO user_tbl
-    (user_id, username, phone_number, nickname, created_at, naverlogincheck, naverId)
-    VALUES
-    (#{user_id}, #{username}, #{phone_number}, #{nickname,jdbcType=VARCHAR}, SYSDATE, '네이버유저', #{naverId})
-
+    INSERT INTO USER_TBL (
+        user_id, username, phone_number, nickname, created_at, naverlogincheck, userProfile, role, naverId
+    ) VALUES (
+        #{user_id}, #{username}, #{phone_number}, #{nickname}, SYSDATE, '네이버유저',
+        '/uploads/default/user.png', '팀원', #{naverId}
+    )
     </insert>
 
 </mapper>

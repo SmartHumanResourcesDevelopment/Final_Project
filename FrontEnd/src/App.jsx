@@ -70,7 +70,7 @@ function App() {
             }
           />
           <Route
-            path="/naver/success"
+            path="/login/success"
             element={
             <NaverLoginSuccess />
             } 
