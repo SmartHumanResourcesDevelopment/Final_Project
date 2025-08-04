@@ -41,6 +41,6 @@ public interface UserMapper {
     NaverDTO findByNaverId(@Param("naverId") String naverId);
 
     // 네이버 유저 등록
-    int insertNaverUser(NaverDTO user);
+    int insertNaverUser(NaverDTO naverUser);
 
 }

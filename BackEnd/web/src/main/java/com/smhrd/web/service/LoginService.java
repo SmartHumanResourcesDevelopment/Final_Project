@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.smhrd.web.DTO.LoginRequest;
 import com.smhrd.web.DTO.LoginResponse;
+import com.smhrd.web.DTO.NaverDTO;
 import com.smhrd.web.DTO.SignUpRequest;
 import com.smhrd.web.DTO.UserDTO;
 import com.smhrd.web.config.JwtUtil;
@@ -26,38 +27,45 @@ public class LoginService {
     @Autowired
     private JwtUtil jwtUtil;
 
-
-
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
-    public boolean register(SignUpRequest req) { // 회원가입 로직
+    public boolean register(SignUpRequest req, NaverDTO naverUser) {
+        if (naverUser != null && naverUser.getNaverId() != null && !naverUser.getNaverId().isEmpty()) {
+        System.out.println("네이버 회원가입 요청: " + naverUser);
 
-        //get naver id == null isempty{ 아래 로직 실행}
-
-        // else{/ set>> 네이버 식별자 ? 회원가입 을 하면 사용자가 식별자 입력 안함
-        // register >> 서비스로 객체 요청
-        // signup.set(네이버 식별자)}
-
-
-
-        System.out.println("가입 요청 데이터: " + req); // 로그 확인용
-
-        int exists = userMapper.existsByUserId(req.getUser_id());
-
-        System.out.println(" 아이디 중복 결과: " + exists); // 로그 확인용
-
-        if (exists > 0) {
-            return false;
-        }
         // 비밀번호 암호화
         String encPw = passwordEncoder.encode(req.getPassword());
-        req.setPassword(encPw);
+        naverUser.setPassword(encPw);
 
-        int result = userMapper.insertUser(req);
+        // 네이버 유저 기본값
+        if (naverUser.getNaverlogincheck() == null) {
+            naverUser.setNaverlogincheck("네이버유저");
+        }
+        if (naverUser.getUserProfile() == null) {
+            naverUser.setUserProfile("/uploads/default/user.png");
+        }
+        if (naverUser.getRole() == null) {
+            naverUser.setRole("팀원");
+        }
+        naverUser.setUser_id(req.getUser_id()); // 일반 입력값과 연결
+
+        int result = userMapper.insertNaverUser(naverUser);
         return result > 0;
+        } else {
+            // 일반 회원가입
+            System.out.println("일반 회원가입 요청: " + req);
 
+            int exists = userMapper.existsByUserId(req.getUser_id());
+            if (exists > 0) return false;
+
+            String encPw = passwordEncoder.encode(req.getPassword());
+            req.setPassword(encPw);
+
+            int result = userMapper.insertUser(req);
+            return result > 0;
+        }
     }
 
     public LoginResponse login(LoginRequest req) {

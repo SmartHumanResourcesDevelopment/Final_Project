@@ -41,6 +41,7 @@ public class JwtNaverUtil {
             .claim("naverId", user.getNaverId())
             .claim("phoneNumber", user.getPhone_number())
             .claim("nickname", user.getNickname())
+            .claim("naverlogincheck", user.getNaverlogincheck())
             .claim("role", user.getRole())
             .claim("userProfile", user.getUserProfile())
             .setIssuedAt(new Date(now))

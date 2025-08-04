@@ -41,7 +41,7 @@ const NaverCallback = () => {
           localStorage.setItem("jwtToken", token);
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         }
-        // 3. 기존 회원 여부 확인 (전화번호 기준)
+        // 3. 기존 회원 여부 확인 (네이버 고유번호 기준)
         const loginRes = await axios.post("/api/naver-login", {
           naverId
         });
