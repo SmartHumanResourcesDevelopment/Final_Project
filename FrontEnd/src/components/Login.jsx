@@ -43,6 +43,7 @@ const Login = () => {
         phoneNumber: decoded.phoneNumber,
         nickname: decoded.nickname,
         role: decoded.role,
+        isLogin: true,
         userProfile: decoded.userProfile
       });
 

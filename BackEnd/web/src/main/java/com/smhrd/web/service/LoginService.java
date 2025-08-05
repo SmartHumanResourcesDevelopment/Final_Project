@@ -57,6 +57,9 @@ public class LoginService {
             // 일반 회원가입
             System.out.println("일반 회원가입 요청: " + req);
 
+            if (req.getNaverlogincheck() == null) {
+            req.setNaverlogincheck("잇픽유저");
+        }
             int exists = userMapper.existsByUserId(req.getUser_id());
             if (exists > 0) return false;
 
