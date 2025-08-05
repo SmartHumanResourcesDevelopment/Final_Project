@@ -35,10 +35,10 @@ public interface UserMapper {
     UserDTO loginUserInfo(String user_id);
 
     // 네이버 ID 기준으로 가입 여부 확인
-    int existsByUserNaver(@Param("naverId") String naverId);
+    int existsByUserNaver(@Param("naverlogincheck") String naverlogincheck);
 
     // 네이버 ID 기준으로 유저 정보 조회
-    NaverDTO findByNaverId(@Param("naverId") String naverId);
+    NaverDTO findByNaverId(@Param("naverlogincheck") String naverlogincheck);
 
     // 네이버 유저 등록
     int insertNaverUser(NaverDTO naverUser);

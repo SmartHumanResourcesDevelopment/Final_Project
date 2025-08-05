@@ -32,7 +32,7 @@ public class LoginService {
 
     @Transactional
     public boolean register(SignUpRequest req, NaverDTO naverUser) {
-        if (naverUser != null && naverUser.getNaverId() != null && !naverUser.getNaverId().isEmpty()) {
+        if (naverUser != null && naverUser.getNaverlogincheck() != null && !naverUser.getNaverlogincheck().isEmpty()) {
         System.out.println("네이버 회원가입 요청: " + naverUser);
 
         // 비밀번호 암호화
@@ -43,12 +43,7 @@ public class LoginService {
         if (naverUser.getNaverlogincheck() == null) {
             naverUser.setNaverlogincheck("네이버유저");
         }
-        if (naverUser.getUserProfile() == null) {
-            naverUser.setUserProfile("/uploads/default/user.png");
-        }
-        if (naverUser.getRole() == null) {
-            naverUser.setRole("팀원");
-        }
+
         naverUser.setUser_id(req.getUser_id()); // 일반 입력값과 연결
 
         int result = userMapper.insertNaverUser(naverUser);

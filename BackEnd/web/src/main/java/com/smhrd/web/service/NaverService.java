@@ -110,7 +110,7 @@ public class NaverService {
                 String profileImage = responseNode.has("profile_image") ? responseNode.get("profile_image").asText() : null;
 
                 // DTO에 세팅
-                naverUser.setNaverId(id);
+                naverUser.setNaverlogincheck(id);
                 naverUser.setUsername(name);
                 naverUser.setNickname(nickname);
                 naverUser.setPhone_number(mobile);

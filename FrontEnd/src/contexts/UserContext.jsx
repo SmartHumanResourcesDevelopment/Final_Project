@@ -12,7 +12,7 @@ export const UserContext = createContext();
 export function UserProvider({ children }) {
   const initialUser = {
     id: "",           // 사용자 ID
-    naverId: "",      // 네이버 고유 ID
+    naverlogincheck: "",      // 네이버 고유 ID
     username: "",     // 이름
     nickname: "",     // 닉네임
     phoneNumber: "",  // 전화번호
@@ -35,7 +35,7 @@ export function UserProvider({ children }) {
         // ② sub → userId 로 매핑
         const userData = {
           id: decoded.sub || "",
-          naverId: decoded.naverId || "",
+          naverlogincheck: decoded.naverlogincheck || "",
           username: decoded.username || "",
           nickname: decoded.nickname || "",
           phoneNumber: decoded.phoneNumber || "",

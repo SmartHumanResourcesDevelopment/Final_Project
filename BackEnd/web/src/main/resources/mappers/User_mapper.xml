@@ -7,16 +7,16 @@
 
     <!-- 아이디 중복 -->
     <select id="existsByUserId" resultType="int">
-        SELECT COUNT(*) FROM user_tbl WHERE user_id = #{id}
+        SELECT COUNT(*) FROM USER_TBL WHERE user_id = #{id}
     </select>
 
     <!-- 회원가입 -->
     <insert id="insertUser">
-        INSERT INTO user_tbl
-        (user_id, username, password, phone_number, naverlogincheck, nickname,  created_at, naverId)
+        INSERT INTO USER_TBL
+        (user_id, username, password, phone_number, nickname,  created_at)
         VALUES
-        (#{user_id}, #{username}, #{password}, #{phone_number}, #{naverlogincheck,jdbcType=VARCHAR},
-         #{nickname} ,SYSDATE, #{naverId,jdbcType=VARCHAR})
+        (#{user_id}, #{username}, #{password}, #{phone_number},
+         #{nickname} ,SYSDATE)
     </insert>
 
     <resultMap id="signUpResultMap" type="com.smhrd.web.DTO.SignUpRequest">
@@ -31,7 +31,7 @@
 
     <!-- 로그인 -->
     <select id="findByUserId" resultMap="signUpResultMap">
-        SELECT * FROM user_tbl WHERE user_id = #{user_input_id}
+        SELECT * FROM USER_TBL WHERE user_id = #{user_input_id}
     </select>
 
 
@@ -46,14 +46,14 @@
 
     <!-- 로그인 정보 가져오기 -->
     <select id="loginUserInfo" resultMap="signUpResultMap2">
-        SELECT * FROM user_tbl WHERE user_id = #{user_id}
+        SELECT * FROM USER_TBL WHERE user_id = #{user_id}
     </select>
 
 
 
     <!-- 유저 정보  수정 -->
     <update id="UserInfoUpdate" parameterType="com.smhrd.web.DTO.UserInfoUpdate_DTO">
-    UPDATE user_tbl
+    UPDATE USER_TBL
     SET
         password = #{password},
         username = #{username},
@@ -84,7 +84,7 @@
 
     <!-- 네이버 ID로 회원 여부 확인 -->
     <select id="existsByUserNaver" resultType="int">
-    SELECT COUNT(*) FROM user_tbl WHERE NAVERID = #{naverId,jdbcType=VARCHAR}
+    SELECT COUNT(*) FROM USER_TBL WHERE naverlogincheck = #{naverlogincheck,jdbcType=VARCHAR}
     </select>
 
     <resultMap id="signUpResultMap3" type="com.smhrd.web.DTO.NaverDTO">
@@ -94,23 +94,22 @@
         <result property="nickname" column="NICKNAME"/>
         <result property="userProfile" column="USERPROFILE"/>
         <result property="role" column="ROLE"/>
-        <result property="naverId" column="NAVERID"/>
+        <result property="naverlogincheck" column="NAVERLOGINCHECK"/>
     </resultMap>
 
     <!-- 네이버 ID로 회원 정보 조회-->
     <select id="findByNaverId" parameterType="string" resultType="com.smhrd.web.DTO.NaverDTO" resultMap="signUpResultMap3">
         SELECT *
         FROM USER_TBL
-        WHERE naverId = #{naverId}
+        WHERE naverlogincheck = #{naverlogincheck}
     </select>
 
     <!-- 네이버 사용자 신규 가입 -->
     <insert id="insertNaverUser" parameterType="com.smhrd.web.DTO.NaverDTO">
     INSERT INTO USER_TBL (
-        user_id, username, password, phone_number, nickname, created_at, naverlogincheck, userProfile, role, naverId
+        user_id, username, password, phone_number, nickname, naverlogincheck
     ) VALUES (
-        #{user_id}, #{username}, #{password}, #{phone_number}, #{nickname}, SYSDATE, #{naverlogincheck},
-        '/uploads/default/user.png', '팀원', #{naverId}
+        #{user_id}, #{username}, #{password}, #{phone_number}, #{nickname}, #{naverlogincheck}
     )
     </insert>
 </mapper>

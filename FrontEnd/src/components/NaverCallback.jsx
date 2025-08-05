@@ -23,12 +23,12 @@ const NaverCallback = () => {
         const { token, user } = data;
 
         // 네이버 고유 ID 우선
-        const naverId = user.naverId || user.id || "";
+        const naverlogincheck = user.naverlogincheck || user.id || "";
 
         // 1. 사용자 정보 + 토큰 저장 (Context)
         setUser({
-          id: user.naverId || "", // 네이버 고유 ID, 핵심 식별자
-          naverId,
+          id: user.naverlogincheck || "", // 네이버 고유 ID, 핵심 식별자
+          naverlogincheck,
           nickname: user.nickname || "",
           profileImage: user.profileImage || "", // 없으면 기본 이미지
           phoneNumber: user.mobile || "",
@@ -43,14 +43,14 @@ const NaverCallback = () => {
         }
         // 3. 기존 회원 여부 확인 (네이버 고유번호 기준)
         const loginRes = await axios.post("/api/naver-login", {
-          naverId
+          naverlogincheck
         });
 
         if (loginRes.data.registered) {
           navigate("/main"); // 기존 회원
         } else {
           navigate("/join", { state: { user:
-            { ...user, naverId}} }); // 신규 회원
+            { ...user, naverlogincheck}} }); // 신규 회원
         }
       } catch (error) {
         console.error("네이버 로그인 처리 중 오류:", error);

@@ -23,9 +23,9 @@ public class JoinController {
 
         // 네이버 가입 여부 판단
         NaverDTO naverUser = null;
-        if (req.getNaverId() != null && !req.getNaverId().isEmpty()) {
+        if (req.getNaverlogincheck() != null && !req.getNaverlogincheck().isEmpty()) {
             naverUser = new NaverDTO();
-            naverUser.setNaverId(req.getNaverId());
+            naverUser.setNaverlogincheck(req.getNaverlogincheck());
             naverUser.setUser_id(req.getUser_id());
             naverUser.setPassword(req.getPassword());
             naverUser.setUsername(req.getUsername());

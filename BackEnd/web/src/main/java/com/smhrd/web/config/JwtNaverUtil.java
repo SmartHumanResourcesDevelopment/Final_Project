@@ -38,7 +38,6 @@ public class JwtNaverUtil {
         return Jwts.builder()
             .setSubject(user.getUser_id()) // sub
             .claim("username", user.getUsername())
-            .claim("naverId", user.getNaverId())
             .claim("phoneNumber", user.getPhone_number())
             .claim("nickname", user.getNickname())
             .claim("naverlogincheck", user.getNaverlogincheck())

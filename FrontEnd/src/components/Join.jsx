@@ -10,7 +10,7 @@ export const Join = () => {
   const state = location.state || {};
   const searchParams = new URLSearchParams(location.search);
 
-  const initialNaverId = searchParams.get("naverId") || "";
+  const initialnaverlogincheck = searchParams.get("naverlogincheck") || "";
   const initialUsername = decodeURIComponent(searchParams.get("username") || "");
   const initialPhone = decodeURIComponent(searchParams.get("phone_number") || "");
   const initialNickname = decodeURIComponent(searchParams.get("nickname") || "");
@@ -23,7 +23,7 @@ export const Join = () => {
     username: initialUsername,
     nickname: initialNickname,
     phone_number: initialPhone,
-    naverId: initialNaverId,
+    naverlogincheck: initialnaverlogincheck,
     agreeToTerms: false
   });
   
@@ -80,7 +80,7 @@ export const Join = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.naverId) {
+    if (!formData.naverlogincheck) {
       console.warn("⚠️ 네이버 ID 없음, DB에 null로 들어갈 수 있음");
     }
 

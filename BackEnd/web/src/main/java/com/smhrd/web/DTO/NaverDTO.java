@@ -18,7 +18,7 @@ public class NaverDTO {
     private String phone_number;  // 전화번호
     private String nickname;     // 닉네임
     private String userProfile;     //프사 경로
-    private String naverlogincheck; // 네이버 가입 유저 판별
+    private String naverlogincheck; // 네이버 유저 판별 키
     private String role;       // 관리자 or 사용자
-    private String naverId; // 네이버 발급 고유 아이디
+
 }

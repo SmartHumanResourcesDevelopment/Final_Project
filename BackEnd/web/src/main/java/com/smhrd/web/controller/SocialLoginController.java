@@ -91,18 +91,18 @@ public class SocialLoginController {
             NaverDTO naverUser = naverService.getUserInfo(accessToken);
             log.info("네이버 유저 정보 = {}", naverUser);
 
-            if (naverUser == null || naverUser.getNaverId() == null) {
+            if (naverUser == null || naverUser.getNaverlogincheck() == null) {
                 redirectView.setUrl("/error");
                 return redirectView;
             }
 
             // ✅ 4. DB 조회
-            NaverDTO existUser = userMapper.findByNaverId(naverUser.getNaverId());
+            NaverDTO existUser = userMapper.findByNaverId(naverUser.getNaverlogincheck());
 
             if (existUser == null) {
                 // 신규 회원 → 프론트 회원가입 페이지로 이동
                 String joinUrl = "http://localhost:5173/join"
-                        + "?naverId=" + URLEncoder.encode(naverUser.getNaverId(), StandardCharsets.UTF_8)
+                        + "?naverlogincheck=" + URLEncoder.encode(naverUser.getNaverlogincheck(), StandardCharsets.UTF_8)
                         + "&name=" + URLEncoder.encode(naverUser.getUsername(), StandardCharsets.UTF_8)
                         + "&phone=" + URLEncoder.encode(naverUser.getPhone_number(), StandardCharsets.UTF_8);
 

@@ -12,7 +12,7 @@ export const signUp = async (formData) => {
     username: formData.username,
     nickname: formData.nickname,
     phone_number: formData.phone_number,
-    naverId: formData.naverId || null, // 네이버 신규 가입 시 필수
+    naverlogincheck: formData.naverlogincheck || null, // 네이버 신규 가입 시 필수
   };
   const res = await axios.post("http://localhost:8095/zal/api/join", payload);
   return res.data;           // { success, message }
