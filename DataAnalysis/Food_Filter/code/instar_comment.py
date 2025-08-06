@@ -52,11 +52,10 @@ for path in glob.glob(input_pattern):
     # 4) DataFrame 만들고 COMMENT_ID, AUTHOR_ID 삽입
     df_c = pd.DataFrame(records)
     df_c.insert(0, "COMMENT_ID", range(1, len(df_c) + 1))
-    df_c["AUTHOR_ID"] = author
     
     # 5) 컬럼 순서 재정렬
     df_c = df_c[
-        ["COMMENT_ID", "POST_ID", "COMMENTER_ID", "COMMENT_TEXT", "COMMENT_DATE", "AUTHOR_ID"]
+        ["COMMENT_ID", "POST_ID", "COMMENTER_ID", "COMMENT_TEXT", "COMMENT_DATE"]
     ]
     
     # 6) 파일 저장

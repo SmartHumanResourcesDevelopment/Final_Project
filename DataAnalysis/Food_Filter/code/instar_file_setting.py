@@ -64,7 +64,7 @@ for path in glob.glob(os.path.join(insta_infu_dir, "*.csv")):
     for out in outs:
         scores = dict(zip(out["labels"], out["scores"]))
         mask.append(any(scores[l] >= threshold for l in food_labels))
-    df_f = df[mask]
+    df_f = df[mask].copy()  # 명시적으로 복사본 생성
     if df_f.empty:
         continue
 
@@ -72,7 +72,23 @@ for path in glob.glob(os.path.join(insta_infu_dir, "*.csv")):
     base   = os.path.splitext(os.path.basename(path))[0]
     author = base.split("_")[0]
 
-    # 1-5) 저장
+    # .csv 확장자가 작성자명에 포함된 경우 제거
+    if author.endswith('.csv'):
+        author = author[:-4]  # '.csv' 제거
+
+    # 1-5) AUTHOR_ID에서 .csv 제거
+    if 'AUTHOR_ID' in df_f.columns:
+        df_f['AUTHOR_ID'] = df_f['AUTHOR_ID'].astype(str).apply(
+            lambda x: x[:-4] if x.endswith('.csv') else x
+        )
+
+    # POST_ID에서도 .csv 제거
+    if 'POST_ID' in df_f.columns:
+        df_f['POST_ID'] = df_f['POST_ID'].astype(str).apply(
+            lambda x: x.replace('.csv_', '_') if '.csv_' in x else x
+        )
+
+    # 1-6) 저장
     out_name = f"{author}_food_filter.csv"
     df_f.to_csv(os.path.join(post_output_dir, out_name), index=False, encoding="utf-8-sig")
     print(f"✅ Post 필터 저장: {out_name} ({len(df_f)} rows)")

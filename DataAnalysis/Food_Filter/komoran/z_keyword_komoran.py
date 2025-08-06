@@ -23,7 +23,7 @@ def get_predefined_food_keywords():
         "바스크치즈케이크", "크루아상", "마카롱", "에클레어", "슈크림",
         "머랭쿠키", "대왕쿠키", "풋롱쿠키", "메론빵", "타코야끼", "츄러스",
         "오므라이스", "크레페", "야끼소바", "포켓몬빵", "킨조젤리", "훠궈", "샤인머스캣",
-        "망고", "딸기", "바나나", "사과", "멜론", "수박", "파삭",
+        "망고", "딸기", "바나나", "사과", "멜론", "수박", "파삭", "안성재하이볼", "말차",
 
         # 브랜드/매장명 (음식 관련)
         "성심당케익부띠끄", "성심당케익부티크", "성심당", "성심당무화과", "성심당시루케이크",
@@ -188,6 +188,10 @@ def check_predefined_keywords(text):
             found_keywords.add(keyword)
 
         # 김치 브랜드 관련
+        elif "말차" in keyword and "말차" in text:
+            found_keywords.add(keyword)
+
+        # 김치 브랜드 관련
         elif "김치" in keyword and "김치" in text:
             found_keywords.add(keyword)
         # 치킨 브랜드 관련
@@ -236,77 +240,96 @@ def check_predefined_keywords(text):
         elif any(cake_type in keyword for cake_type in ["수건케이크", "수건케익", "마오쥔젤", "마오진젤"]) and \
              any(cake_type in text for cake_type in ["수건케이크", "수건케익", "마오쥔젤", "마오진젤"]):
             found_keywords.add(keyword)
-        # 과일 관련
+
         # 과일 관련
         elif any(fruit in keyword for fruit in ["망고", "딸기", "바나나", "사과", "멜론", "수박"]) and \
             any(fruit in text for fruit in ["망고", "딸기", "바나나", "사과", "멜론", "수박"]):
             found_keywords.add(keyword)
+
         # 민트초코 관련 (모든 표기 변형을 "민트초코"로 통합)
         elif "민트초코" in keyword and \
              any(mint_variant in text for mint_variant in ["민트초코", "민트쵸코", "민트초콜릿", "민초", "민초단"]):
             found_keywords.add(keyword)
+
         # 빙산롱옌 관련
         elif "빙산롱옌" in keyword and "빙산롱옌" in text:
             found_keywords.add(keyword)
+
         # 쫀득쿠키 관련 (모든 변형을 "쫀득쿠키"로 통합)
         elif "쫀득쿠키" in keyword and \
              any(chewy_variant in text for chewy_variant in ["쫀득쿠키", "쫀득쿠", "쫀득쿠키로", "쫜득쿠키"]):
             found_keywords.add(keyword)
+
         # 초콜릿 관련 (초코 변형 포함)
         elif "초콜릿" in keyword and \
              any(choco_variant in text for choco_variant in ["초콜릿", "초코"]):
             found_keywords.add(keyword)
+
         # 카다이프 관련
         elif "카다이프" in keyword and "카다이프" in text:
             found_keywords.add(keyword)
+
         # 브륄레 관련
         elif "브륄레" in keyword and "브륄레" in text:
             found_keywords.add(keyword)
+
         # 티라미수케이크 관련
         elif "티라미수케이크" in keyword and "티라미수" in text:
             found_keywords.add(keyword)
+
         # 파삭 관련
         elif "파삭" in keyword and \
              any(crispy_variant in text for crispy_variant in ["파삭", "파사삭", "파삭쿠키"]):
             found_keywords.add(keyword)
+
         # 컵빙 관련 (팥빙 복합 디저트들만)
         elif "컵빙" in keyword and \
              any(cupbing_variant in text for cupbing_variant in ["컵빙", "팥빙젤라또", "팥빙프라페"]):
             found_keywords.add(keyword)
+
         # 피스타치오 관련
         elif "피스타치오" in keyword and "피스타치오" in text:
             found_keywords.add(keyword)
+
         # 하리보 관련
         elif "하리보" in keyword and "하리보" in text:
             found_keywords.add(keyword)
+
         # 핫치즈빅싸이 관련
         elif "핫치즈빅싸이" in keyword and \
              any(hotcheese_variant in text for hotcheese_variant in ["핫치즈빅싸이", "핫치즈싸이", "핫치즈싸"]):
             found_keywords.add(keyword)
+
         # 고추바사삭 관련
         elif "고추바사삭" in keyword and \
              any(pepper_variant in text for pepper_variant in ["고추바사삭", "고추바바삭"]):
             found_keywords.add(keyword)
+
         # 까르보불닭 관련
         elif "까르보불닭" in keyword and \
              any(carbo_variant in text for carbo_variant in ["까르보불닭", "까르보불"]):
             found_keywords.add(keyword)
+
         # 꼬치 관련
         elif "꼬치" in keyword and \
              any(skewer_variant in text for skewer_variant in ["꼬치", "꼬치구이"]):
             found_keywords.add(keyword)
+
         # 두바이초콜릿 관련 (초코 변형 포함)
         elif "두바이초콜릿" in keyword and \
              any(dubai_variant in text for dubai_variant in ["두바이초콜릿", "두바이초코"]):
             found_keywords.add(keyword)
+
         # 하이디라오 관련
         elif "하이디라오" in keyword and \
              any(haidilao_variant in text for haidilao_variant in ["하이디라오", "하이디"]):
             found_keywords.add(keyword)
+
         # 핫뿌링클 관련
         elif "핫뿌링클" in keyword and \
              any(hotsprinkle_variant in text for hotsprinkle_variant in ["핫뿌링클", "핫뿌링클에"]):
             found_keywords.add(keyword)
+            
         # 달고나크로플 관련 (예시)
         elif "달고나크로플" in keyword and \
              any(dalgona_variant in text for dalgona_variant in ["달고나크로플", "달고나크로플레", "달크로플"]):
@@ -418,7 +441,27 @@ with open(userdic_path, 'w', encoding='utf-8') as wf:
         if word and len(word) >= 2 and all(ord('가') <= ord(c) <= ord('힣') for c in word):
             wf.write(f"{word}\tNNG\t5000\n")
 
+# CSV 파일 생성 (키워드 ID 포함)
+csv_path = os.path.join(result_dir, 'keyword_dictionary.csv')
+with open(csv_path, 'w', encoding='utf-8-sig', newline='') as csvf:
+    csvf.write("keywordid,keywordname,type,priority\n")  # 헤더
+
+    keyword_id = 1
+
+    # 사용자 정의 키워드 (우선순위 9999)
+    for word in sorted(user_defined):
+        if word and len(word) >= 2 and all(ord('가') <= ord(c) <= ord('힣') for c in word):
+            csvf.write(f"{keyword_id},{word},NNG,9999\n")
+            keyword_id += 1
+
+    # AI 추출 키워드 (우선순위 5000)
+    for word in sorted(ai_extracted):
+        if word and len(word) >= 2 and all(ord('가') <= ord(c) <= ord('힣') for c in word):
+            csvf.write(f"{keyword_id},{word},NNG,5000\n")
+            keyword_id += 1
+
 print(f"✅ 최종 사용자 사전 업데이트 완료: {userdic_path}")
+print(f"✅ CSV 키워드 사전 생성 완료: {csv_path}")
 print(f"\n📊 최종 통계:")
 print(f"   - 사용자 정의 키워드 (우선순위 9999): {len(user_defined)}개")
 print(f"   - AI 추출 키워드 (우선순위 5000): {len(ai_extracted)}개")

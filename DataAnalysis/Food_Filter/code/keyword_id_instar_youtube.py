@@ -1,33 +1,17 @@
-
-
 #!/usr/bin/env python3
-# keyword_id.py
-# ──────────────────────────────────────────────────────────────────────────────
-# 1) Instagram posts → DB/all/instar
-#    • Read:   DB/instar_post_filter/filter/*_filtered_food_posts.csv
-#    • Write:  DB/all/instar/{prefix}_posts.csv  (adds KEYWORD_ID)
-#
-# 2) YouTube videos → DB/all/youtube
-#    • Read:   DB/youtube_video_filter/*_Filter_viedos.csv
-#    • Write:  DB/all/youtube/{same_filename}.csv (adds KEYWORD_ID)
-#
-# • Instagram comments are untouched.
-# • KEYWORD_ID 매핑 우선순위:
-#     1) 본문(Instagram: “본문”, YouTube: TITLE+DESCRIPTION) 내 키워드명 포함
-#     2) 해시태그(Instagram) 내 키워드명 포함
-#     3) rapidfuzz 유사도 매칭 (threshold=70)
-# • 키워드 사전: DB/all/combined_keyword_mentions.csv
-# ──────────────────────────────────────────────────────────────────────────────
+# -*- coding: utf-8 -*-
 
+import os
+import glob
 import pandas as pd
-from pathlib import Path
 from rapidfuzz import process, fuzz
 
-def map_keyword_id(text: str, tags: str,
+def map_keyword_id(text, tags,
                    kw_names: list, kw_id_map: dict,
                    threshold: int = 70) -> str:
-    txt = (text or "").lower()
-    hts = (tags or "").lower()
+    # NaN 또는 숫자 입력도 안전하게 처리
+    txt = "" if pd.isna(text) else str(text).lower()
+    hts = "" if pd.isna(tags) else str(tags).lower()
     # 1) 본문 매칭
     for name in kw_names:
         if name.lower() in txt:
@@ -43,75 +27,100 @@ def map_keyword_id(text: str, tags: str,
     return ''
 
 def main():
-    # ── 기준 디렉터리: 이 파일이 있는 DB/code → .parent.parent = DB
-    base_dir = Path(__file__).resolve().parent.parent
-    all_dir  = base_dir / 'all'
+    # 1) 스크립트 위치 기준 최상위 Food_Filter 디렉토리
+    script_dir      = os.path.dirname(os.path.abspath(__file__))
+    food_filter_dir = os.path.abspath(os.path.join(script_dir, os.pardir))
 
-    # 1) 키워드 사전 로드
-    kw_file = all_dir / 'combined_keyword_mentions.csv'
-    if not kw_file.exists():
-        raise FileNotFoundError(f'키워드 사전이 없습니다: {kw_file}')
-    kw_df     = pd.read_csv(kw_file, usecols=['KEYWORD_ID','KEYWORD_NAME'], encoding='utf-8-sig')
-    kw_id_map = dict(zip(kw_df['KEYWORD_NAME'], kw_df['KEYWORD_ID']))
+    # 2) 키워드 사전 파일
+    keyword_dict_path = os.path.join(
+        food_filter_dir, "komoran", "resultDic", "keyword_dictionary.csv"
+    )
+
+    # 3) 인스타그램 입력 파일
+    insta_dir   = os.path.join(food_filter_dir, "instar_post_filter", "posts")
+    insta_files = glob.glob(os.path.join(insta_dir, "*_posts.csv"))
+
+    # 4) 유튜브 입력 파일
+    youtube_dir   = os.path.join(food_filter_dir, "youtube_video_filter")
+    youtube_files = glob.glob(os.path.join(youtube_dir, "*.csv"))
+
+    # 5) 출력 디렉토리
+    insta_out_dir   = os.path.join(food_filter_dir, "instar_post_filter", "keyword", "matching")
+    youtube_out_dir = os.path.join(food_filter_dir, "youtube_video_filter", "keyword", "matching")
+    os.makedirs(insta_out_dir, exist_ok=True)
+    os.makedirs(youtube_out_dir, exist_ok=True)
+
+    # 6) 키워드 사전 로드
+    if not os.path.exists(keyword_dict_path):
+        raise FileNotFoundError(f"키워드 사전이 없습니다: {keyword_dict_path}")
+    kw_df     = pd.read_csv(keyword_dict_path, usecols=['keywordid','keywordname'], encoding='utf-8-sig')
+    kw_id_map = dict(zip(kw_df['keywordname'], kw_df['keywordid']))
     kw_names  = list(kw_id_map.keys())
 
-    # ── Instagram posts 처리
-    insta_in   = base_dir / 'instar_post_filter' 
-    insta_out  = all_dir / 'instar'
-    insta_out.mkdir(parents=True, exist_ok=True)
+    print(f"📚 키워드 사전 로드: {len(kw_names)}개")
+    print(f"📂 인스타 파일: {len(insta_files)}개, 유튜브 파일: {len(youtube_files)}개")
+    print("=" * 60)
 
-    for fp in insta_in.glob('*_filtered_food_posts.csv'):
-        prefix = fp.stem.replace('_filtered_food_posts', '')
-        df     = pd.read_csv(fp, encoding='utf-8-sig')
+    # ── Instagram 처리
+    for i, insta_file in enumerate(insta_files, 1):
+        try:
+            print(f"\n🔄 [{i}/{len(insta_files)}] {os.path.basename(insta_file)}")
+            df = pd.read_csv(insta_file, encoding='utf-8-sig')
+            before = len(df)
 
-        # 새 컬럼 생성
-        df['POST_ID']    = prefix + '_' + df['POST_DATE'].astype(str)
-        df['AUTHOR_ID']  = df['POST_ID']
-        df['POST_TEXT']  = df['POST_TEXT']
-        df['HASHTAGS']   = df['HASHTAGS']
-        df['POST_DATE']  = df['POST_DATE']
-        df['LIKE_COUNT'] = df['LIKE_COUNT']
-        df['PLATFORM']   = 'instagram'
-        df['KEYWORD_ID'] = df.apply(
-            lambda r: map_keyword_id(r['POST_TEXT'], r['HASHTAGS'], kw_names, kw_id_map),
-            axis=1
-        )
+            # 키워드 매칭
+            df['KEYWORD_ID'] = df.apply(
+                lambda r: map_keyword_id(r.get('POST_TEXT'), r.get('HASHTAGS'),
+                                         kw_names, kw_id_map),
+                axis=1
+            )
+            # 매핑 실패(빈) 행 제거
+            df = df[df['KEYWORD_ID'] != '']
+            removed = before - len(df)
+            if removed:
+                print(f"   🚫 제거: {removed} / {before}행")
+            print(f"   📈 유효 매칭: {len(df)} / {before}행")
 
-        # 원하는 컬럼 순서로 추출
-        out_cols = ['POST_ID','KEYWORD_ID','POST_TEXT','HASHTAGS',
-                    'AUTHOR_ID','POST_DATE','LIKE_COUNT','PLATFORM']
-        df[out_cols].to_csv(
-            insta_out / f'{prefix}_posts.csv',
-            index=False, encoding='utf-8-sig'
-        )
-        print(f'✔ Instagram → {prefix}_posts.csv')
+            # 저장
+            base = os.path.splitext(os.path.basename(insta_file))[0].replace('_posts','')
+            out_path = os.path.join(insta_out_dir, f"{base}_keywordid.csv")
+            df.to_csv(out_path, index=False, encoding='utf-8-sig')
+            print(f"   💾 저장: {os.path.basename(out_path)}")
 
-    # ── YouTube videos 처리
-    yt_in   = base_dir / 'youtube_video_filter'
-    yt_out  = all_dir  / 'youtube'
-    yt_out.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            print(f"❌ 오류({os.path.basename(insta_file)}): {e}")
 
-    for fp in yt_in.glob('*_videos_food.csv'):
-        df = pd.read_csv(fp, encoding='utf-8-sig')
+    # ── YouTube 처리
+    for i, youtube_file in enumerate(youtube_files, 1):
+        try:
+            print(f"\n🔄 [{i}/{len(youtube_files)}] {os.path.basename(youtube_file)}")
+            df = pd.read_csv(youtube_file, encoding='utf-8-sig')
+            before = len(df)
 
-        # KEYWORD_ID 컬럼 추가
-        df['KEYWORD_ID'] = df.apply(
-            lambda r: map_keyword_id(f"{r.get('TITLE','')} {r.get('DESCRIPTION','')}",
-                                     '',
-                                     kw_names, kw_id_map),
-            axis=1
-        )
+            # 키워드 매칭
+            df['KEYWORD_ID'] = df.apply(
+                lambda r: map_keyword_id(r.get('TITLE'), r.get('DESCRIPTION'),
+                                         kw_names, kw_id_map),
+                axis=1
+            )
+            # 매핑 실패(빈) 행 제거
+            df = df[df['KEYWORD_ID'] != '']
+            removed = before - len(df)
+            if removed:
+                print(f"   🚫 제거: {removed} / {before}행")
+            print(f"   📈 유효 매칭: {len(df)} / {before}행")
 
-        # 저장할 컬럼 순서는 원본 + KEYWORD_ID
-        cols = list(df.columns)
-        # KEYWORD_ID를 두 번째 열로 끼워넣고 싶다면:
-        cols.insert(1, cols.pop(cols.index('KEYWORD_ID')))
+            # 저장
+            base = os.path.splitext(os.path.basename(youtube_file))[0]
+            out_path = os.path.join(youtube_out_dir, f"{base}_keywordid.csv")
+            df.to_csv(out_path, index=False, encoding='utf-8-sig')
+            print(f"   💾 저장: {os.path.basename(out_path)}")
 
-        df[cols].to_csv(
-            yt_out / fp.name,
-            index=False, encoding='utf-8-sig'
-        )
-        print(f'✔ YouTube → {fp.name}')
+        except Exception as e:
+            print(f"❌ 오류({os.path.basename(youtube_file)}): {e}")
+
+    print("\n🎉 매칭 완료!")
+    print(f"   - 인스타: {len(insta_files)}개, 유튜브: {len(youtube_files)}개")
 
 if __name__ == '__main__':
     main()
