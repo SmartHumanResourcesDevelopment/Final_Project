@@ -30,7 +30,9 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
 
     # 6) 키워드 사전 로드
-    kw_df = pd.read_csv(keyword_dict_path, dtype={"KEYWORD_ID": int, "KEYWORD_NAME": str})
+    kw_df = pd.read_csv(keyword_dict_path, dtype={"keywordid": int, "keywordname": str})
+    # 컬럼명을 대문자로 변경
+    kw_df = kw_df.rename(columns={"keywordid": "KEYWORD_ID", "keywordname": "KEYWORD_NAME"})
 
     # 7) 데이터 집계
     insta_counts = aggregate_counts(insta_pattern,  "POST_DATE")
