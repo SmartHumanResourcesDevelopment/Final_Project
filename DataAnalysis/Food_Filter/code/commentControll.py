@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# -*- csv파일 읽기 모드 coding: utf-8 -*-
 
 import os
 import glob
