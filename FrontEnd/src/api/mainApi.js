@@ -8,7 +8,7 @@ const BASE_URL = "http://localhost:8095/zal/api/main";
 const mainApi = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
-  timeout: 10000, // 10초 타임아웃
+  timeout: 60000, // 60초 타임아웃 (OpenAI API 호출 충분히 고려)
 });
 
 // 요청 인터셉터 (로깅용)
@@ -62,13 +62,15 @@ export const mainApiService = {
     }
   },
 
-  // 3. 급상승 키워드 조회
+  // 3. 급상승 키워드 TOP3 조회
   getTrendingKeywords: async () => {
     try {
+      console.log("🚀 API 요청: GET /trending");
       const response = await mainApi.get("/trending");
+      console.log("✅ API 응답: /trending - 200", response.data);
       return response.data;
     } catch (error) {
-      console.error("급상승 키워드 조회 실패:", error);
+      console.error("❌ 급상승 키워드 조회 실패:", error);
       throw error;
     }
   },

@@ -1,15 +1,74 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../assets/css/Main_top3_insight.css";
-import Top3graph from "../UI/Main_top3_insight_gr";   // 리네임했으므로 대소문자 확인!
+import Top3graph from "../UI/Main_top3_insight_gr";
+import { mainApiService } from "../api/mainApi";
 
 /** 기간 탭 */
 const PERIODS = ["일", "주", "월"];
 
 export default function Main_top3_insight() {
   const [active, setActive] = useState("월");   // 기본 기간
+  const [aiSummary, setAiSummary] = useState(""); // AI 요약문
+  const [loading, setLoading] = useState(false); // 로딩 상태
+  const [fullDataCache, setFullDataCache] = useState({}); // 전체 데이터 캐시 (차트 + AI 요약)
+  const isFirstRender = useRef(true); // 첫 렌더링 여부 추적
+
+  // 통합 데이터 가져오기 (차트 + AI 요약 한 번에)
+  const fetchFullData = async (period) => {
+    // 캐시된 데이터가 있으면 사용
+    if (fullDataCache[period]) {
+      const cachedData = fullDataCache[period];
+      setAiSummary(cachedData.aiSummary);
+      console.log("📋 캐시된 전체 데이터 사용:", period);
+      return cachedData;
+    }
+
+    setLoading(true);
+    try {
+      console.log("🤖 통합 데이터 요청 - 기간:", period);
+      const data = await mainApiService.getTop3Insights(period);
+
+      if (data.aiSummary) {
+        setAiSummary(data.aiSummary);
+        // 전체 데이터를 캐시에 저장
+        setFullDataCache(prev => ({ ...prev, [period]: data }));
+        console.log("✅ 통합 데이터 로드 성공");
+        return data;
+      } else {
+        setAiSummary("트렌드 분석 결과를 불러오는 중입니다...");
+        return data;
+      }
+    } catch (error) {
+      console.error("❌ 통합 데이터 로드 실패:", error);
+      setAiSummary("트렌드 분석 결과를 불러올 수 없습니다.");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 기간 변경 핸들러
+  const handlePeriodChange = (newPeriod) => {
+    if (newPeriod === active) {
+      console.log("📋 동일한 기간 선택됨, 요청 생략:", newPeriod);
+      return; // 같은 기간이면 요청하지 않음
+    }
+
+    setActive(newPeriod);
+    fetchFullData(newPeriod);
+  };
+
+  // 컴포넌트 마운트 시 한 번만 실행
+  useEffect(() => {
+    if (isFirstRender.current) {
+      console.log("📋 컴포넌트 첫 렌더링 - 기간:", active);
+      fetchFullData(active);
+      isFirstRender.current = false;
+    }
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
   return (
-    <section className="insight">
+    <section className="insight_cont">
       {/* ── 제목 + 기간 탭 ─────────────────── */}
       <header className="insight__header">
         <h2 className="highlight">
@@ -25,7 +84,7 @@ export default function Main_top3_insight() {
           {PERIODS.map((p) => (
             <button
               key={p}
-              onClick={() => setActive(p)}
+              onClick={() => handlePeriodChange(p)}
               className={active === p ? "is-active" : ""}
               aria-pressed={active === p}
             >
@@ -41,14 +100,21 @@ export default function Main_top3_insight() {
         role="figure"
         aria-label={`${active} 언급량 추이`}
       >
-        {/* 그래프 컴포넌트 (period prop 전달) */}
-        <Top3graph period={active} />
+        {/* 실제 그래프 컴포넌트 - 캐시된 데이터 전달 */}
+        <Top3graph
+          period={active}
+          cachedData={fullDataCache[active]}
+        />
 
-        {/* 설명문 – 동적 업데이트 */}
+        {/* AI 생성 설명문 */}
         <p className="insight__caption">
-          {active === "일" && "일별 데이터를 통해 최근 트렌드의 세밀한 변화와 급상승 구간을 파악할 수 있습니다."}
-          {active === "주" && "주별 데이터로 단기 트렌드 변화와 지속성을 확인하여 향후 전망을 예측할 수 있습니다."}
-          {active === "월" && "월별 데이터를 통해 중장기 트렌드와 계절적 패턴을 분석할 수 있습니다."}
+          {loading ? (
+            <span style={{ color: '#666', fontStyle: 'italic' }}>
+              🤖 AI가 트렌드를 분석하고 있습니다...
+            </span>
+          ) : (
+            aiSummary || "트렌드 분석 결과를 불러오는 중입니다."
+          )}
         </p>
       </div>
     </section>

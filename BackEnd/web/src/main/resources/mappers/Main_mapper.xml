@@ -18,4 +18,80 @@
         <result property="color" column="COLOR" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <!-- 급상승 키워드 TOP3 조회 (2025-07-01 ~ 2025-07-31) -->
+    <select id="getTrendingKeywordsRecent30Days" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_NAME as keyword_name,
+                SUM(kds.DAILY_COUNT) as total_count,
+                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE kds.STATS_DATE >= TO_DATE('2025-07-01', 'YYYY-MM-DD')
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+            GROUP BY kds.KEYWORD_ID, k.KEYWORD_NAME
+            HAVING SUM(kds.DAILY_COUNT) > 0
+            ORDER BY SUM(kds.DAILY_COUNT) DESC, DBMS_RANDOM.VALUE()
+        ) WHERE ROWNUM <= 3
+        ]]>
+    </select>
+
+    <!-- 급상승 키워드 TOP3 조회 (2025-06-01 ~ 2025-07-31, 2개월) -->
+    <select id="getTrendingKeywordsRecent60Days" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_NAME as keyword_name,
+                SUM(kds.DAILY_COUNT) as total_count,
+                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE kds.STATS_DATE >= TO_DATE('2025-06-01', 'YYYY-MM-DD')
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+            GROUP BY kds.KEYWORD_ID, k.KEYWORD_NAME
+            HAVING SUM(kds.DAILY_COUNT) > 0
+            ORDER BY SUM(kds.DAILY_COUNT) DESC, DBMS_RANDOM.VALUE()
+        ) WHERE ROWNUM <= 3
+        ]]>
+    </select>
+
+    <!-- 급상승 키워드 TOP3 조회 (2025-05-01 ~ 2025-07-31, 3개월) -->
+    <select id="getTrendingKeywordsRecent90Days" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_NAME as keyword_name,
+                SUM(kds.DAILY_COUNT) as total_count,
+                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE kds.STATS_DATE >= TO_DATE('2025-05-01', 'YYYY-MM-DD')
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+            GROUP BY kds.KEYWORD_ID, k.KEYWORD_NAME
+            HAVING SUM(kds.DAILY_COUNT) > 0
+            ORDER BY SUM(kds.DAILY_COUNT) DESC, DBMS_RANDOM.VALUE()
+        ) WHERE ROWNUM <= 3
+        ]]>
+    </select>
+
+    <!-- 급상승 키워드 TOP3 조회 (2025-07-25 ~ 2025-07-31, 최근 일주일) -->
+    <select id="getTrendingKeywordsLatest" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_NAME as keyword_name,
+                SUM(kds.DAILY_COUNT) as total_count,
+                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE kds.STATS_DATE >= TO_DATE('2025-07-25', 'YYYY-MM-DD')
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+            GROUP BY kds.KEYWORD_ID, k.KEYWORD_NAME
+            HAVING SUM(kds.DAILY_COUNT) > 0
+            ORDER BY DBMS_RANDOM.VALUE()
+        ) WHERE ROWNUM <= 3
+        ]]>
+    </select>
+
 </mapper>

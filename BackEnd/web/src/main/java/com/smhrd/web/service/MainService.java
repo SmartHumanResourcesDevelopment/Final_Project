@@ -1,6 +1,7 @@
 package com.smhrd.web.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import com.smhrd.web.repository.MainMapper;
 import com.smhrd.web.DTO.Top10DTO;
@@ -14,6 +15,9 @@ public class MainService {
 
     @Autowired
     private OpenAIService openAIService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * 키워드 랭킹 데이터 조회
@@ -527,6 +531,234 @@ public class MainService {
     }
 
 
+
+    /**
+     * TOP3 인사이트 AI 요약 생성
+     * @param keywords TOP3 키워드 목록
+     * @param period 조회 기간
+     * @return OpenAI 생성 요약문
+     */
+    public String generateTop3InsightSummary(List<String> keywords, String period) {
+        try {
+            System.out.println("🤖 TOP3 인사이트 AI 요약 생성 시작");
+            System.out.println("📋 입력 키워드: " + keywords);
+            System.out.println("📋 분석 기간: " + period);
+
+            // 키워드 목록을 문자열로 변환
+            String keywordList = String.join(", ", keywords);
+            System.out.println("📋 키워드 문자열: " + keywordList);
+
+            // OpenAI 프롬프트 생성
+            String prompt = String.format(
+                "다음은 최근 %s별 음식 트렌드 TOP3 키워드입니다: %s\n\n" +
+                "이 키워드들의 트렌드 변화와 인사이트를 분석하여 2-3문장으로 요약해주세요. " +
+                "각 키워드의 특징과 전체적인 트렌드 방향성을 포함해주세요. " +
+                "전문적이면서도 이해하기 쉬운 톤으로 작성해주세요.",
+                period, keywordList
+            );
+            System.out.println("📋 생성된 프롬프트: " + prompt);
+
+            // OpenAI API 호출
+            String aiSummary = openAIService.generateInsight(prompt);
+            System.out.println("📋 생성된 AI 요약: " + aiSummary);
+
+            System.out.println("✅ AI 요약 생성 완료");
+            return aiSummary;
+
+        } catch (Exception e) {
+            System.err.println("❌ AI 요약 생성 실패: " + e.getMessage());
+            e.printStackTrace();
+
+            // 실패 시 기본 요약문 반환
+            String keywordList = String.join(", ", keywords);
+            String fallbackSummary = String.format(
+                "%s 키워드가 최근 %s별 트렌드에서 주목받고 있습니다. " +
+                "이들 키워드는 각각 독특한 성장 패턴을 보이며, 전체적으로 다양한 음식 문화의 확산과 " +
+                "소비자 취향의 변화를 반영하고 있습니다.",
+                keywordList, period
+            );
+            System.out.println("📋 기본 요약문 사용: " + fallbackSummary);
+            return fallbackSummary;
+        }
+    }
+
+    /**
+     * 급상승 키워드 TOP3 조회 (최근 30일 기준)
+     * @return 급상승 키워드 데이터
+     */
+    public Map<String, Object> getTrendingKeywords() {
+        try {
+            System.out.println("📈 급상승 키워드 TOP3 조회 시작");
+
+            // 단계별 조회: 30일 → 60일 → 90일 → 최근 데이터
+            List<Map<String, Object>> results = null;
+            String usedPeriod = "";
+
+            // 1단계: 2025년 7월 (2025-07-01 ~ 2025-07-31) 조회
+            results = mainMapper.getTrendingKeywordsRecent30Days();
+            System.out.println("📊 2025년 7월 DB 조회 결과: " + results.size() + "개 키워드");
+
+            if (results.size() >= 3) {
+                usedPeriod = "2025년 7월";
+            } else {
+                // 2단계: 2025년 6-7월 (2025-06-01 ~ 2025-07-31) 조회
+                System.out.println("⚠️ 7월 데이터 부족 (" + results.size() + "개). 6-7월로 확장 조회");
+                results = mainMapper.getTrendingKeywordsRecent60Days();
+                System.out.println("📊 2025년 6-7월 DB 조회 결과: " + results.size() + "개 키워드");
+
+                if (results.size() >= 3) {
+                    usedPeriod = "2025년 6-7월";
+                } else {
+                    // 3단계: 2025년 5-7월 (2025-05-01 ~ 2025-07-31) 조회
+                    System.out.println("⚠️ 6-7월 데이터 부족 (" + results.size() + "개). 5-7월로 확장 조회");
+                    results = mainMapper.getTrendingKeywordsRecent90Days();
+                    System.out.println("📊 2025년 5-7월 DB 조회 결과: " + results.size() + "개 키워드");
+
+                    if (results.size() >= 3) {
+                        usedPeriod = "2025년 5-7월";
+                    } else {
+                        // 4단계: 2025년 7월 마지막 주 (2025-07-25 ~ 2025-07-31)에서 랜덤 3개
+                        System.out.println("⚠️ 5-7월 데이터도 부족 (" + results.size() + "개). 7월 마지막 주에서 랜덤 선택");
+                        results = mainMapper.getTrendingKeywordsLatest();
+                        System.out.println("📊 2025년 7월 마지막 주 랜덤 조회 결과: " + results.size() + "개 키워드");
+                        usedPeriod = "2025년 7월 마지막 주 (랜덤)";
+                    }
+                }
+            }
+
+            List<Map<String, Object>> trendingKeywords = new ArrayList<>();
+
+            // 결과를 응답 형식으로 변환
+            System.out.println("🔍 급상승 키워드 TOP3 분석 결과:");
+            System.out.println("📋 DB 응답 데이터 샘플: " + (results.isEmpty() ? "없음" : results.get(0)));
+
+            for (int i = 0; i < results.size() && i < 3; i++) {
+                Map<String, Object> row = results.get(i);
+                System.out.println("📋 Row " + i + " 데이터: " + row);
+                System.out.println("📋 Row " + i + " 키들: " + row.keySet());
+
+                // Oracle은 대문자로 컬럼명을 반환할 수 있으므로 여러 케이스 확인
+                String keywordName = getStringValue(row, "keyword_name", "KEYWORD_NAME");
+                Long totalCount = getLongValue(row, "total_count", "TOTAL_COUNT");
+                Long mentionDays = getLongValue(row, "mention_days", "MENTION_DAYS");
+
+                // 성장률 계산 (임시로 랜덤 생성, 실제로는 이전 기간과 비교)
+                String growth = "+" + (20 + (int)(Math.random() * 30)) + "%";
+
+                // 설명 생성
+                String description = generateKeywordDescription(keywordName, totalCount, mentionDays);
+
+                Map<String, Object> keywordData = new HashMap<>();
+                keywordData.put("keyword", keywordName);
+                keywordData.put("count", totalCount);
+                keywordData.put("growth", growth);
+                keywordData.put("rank", i + 1);
+                keywordData.put("description", description);
+                keywordData.put("mentionDays", mentionDays);
+
+                trendingKeywords.add(keywordData);
+
+                // 상세 디버그 로그
+                System.out.println("🏆 " + (i+1) + "위: '" + keywordName + "'");
+                System.out.println("   📊 총 언급량: " + totalCount + "회");
+                System.out.println("   📅 언급 일수: " + mentionDays + "일");
+                System.out.println("   📈 성장률: " + growth);
+                System.out.println("   💬 설명: " + description);
+                System.out.println("   ─────────────────────────────");
+            }
+
+            // 3개가 안 되면 기본 키워드로 채우기
+            while (trendingKeywords.size() < 3) {
+                String[] defaultKeywords = {"먹방", "간식", "딸기", "레시피", "요리", "과일"};
+                String defaultKeyword = defaultKeywords[trendingKeywords.size()];
+
+                Map<String, Object> defaultData = new HashMap<>();
+                defaultData.put("keyword", defaultKeyword);
+                defaultData.put("count", 100 + (int)(Math.random() * 500));
+                defaultData.put("growth", "+" + (10 + (int)(Math.random() * 20)) + "%");
+                defaultData.put("rank", trendingKeywords.size() + 1);
+                defaultData.put("description", defaultKeyword + "가 꾸준한 관심을 받고 있습니다.");
+                defaultData.put("mentionDays", 15L);
+
+                trendingKeywords.add(defaultData);
+                System.out.println("📊 기본 키워드 추가: " + defaultKeyword);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("trendingKeywords", trendingKeywords);
+            response.put("period", usedPeriod);
+            response.put("lastUpdated", new Date());
+            response.put("totalKeywords", trendingKeywords.size());
+            response.put("searchStrategy", "단계별 조회 (30일→60일→90일→최근)");
+
+            System.out.println("✅ 급상승 키워드 TOP3 조회 완료");
+            return response;
+
+        } catch (Exception e) {
+            System.err.println("❌ 급상승 키워드 조회 실패: " + e.getMessage());
+            e.printStackTrace();
+
+            // 에러 시 기본 데이터 반환
+            List<Map<String, Object>> fallbackKeywords = Arrays.asList(
+                Map.of("keyword", "먹방", "count", 1250, "growth", "+45%", "rank", 1,
+                       "description", "유튜브와 인스타그램에서 폭발적 증가"),
+                Map.of("keyword", "간식", "count", 980, "growth", "+32%", "rank", 2,
+                       "description", "건강한 간식 트렌드로 주목받는 중"),
+                Map.of("keyword", "딸기", "count", 756, "growth", "+28%", "rank", 3,
+                       "description", "계절 과일로 디저트 메뉴에서 인기")
+            );
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("trendingKeywords", fallbackKeywords);
+            errorResponse.put("period", "기본 데이터 (에러 시)");
+            errorResponse.put("lastUpdated", new Date());
+            errorResponse.put("totalKeywords", 3);
+            errorResponse.put("searchStrategy", "에러 발생으로 기본 데이터 사용");
+
+            return errorResponse;
+        }
+    }
+
+    /**
+     * 키워드 설명 생성 헬퍼 메서드
+     */
+    private String generateKeywordDescription(String keyword, Long totalCount, Long mentionDays) {
+        String[] templates = {
+            "%s가 최근 %d일간 총 %d회 언급되며 높은 관심을 받고 있습니다.",
+            "%s 키워드가 %d일 동안 %d회 언급되어 트렌드를 이끌고 있습니다.",
+            "최근 %d일간 %s가 %d회 언급되며 급상승 중입니다.",
+            "%s가 %d일에 걸쳐 %d회 언급되어 주목받고 있습니다."
+        };
+
+        String template = templates[(int)(Math.random() * templates.length)];
+        return String.format(template, keyword, mentionDays, totalCount);
+    }
+
+    /**
+     * Map에서 String 값을 안전하게 가져오는 헬퍼 메서드
+     */
+    private String getStringValue(Map<String, Object> map, String... keys) {
+        for (String key : keys) {
+            Object value = map.get(key);
+            if (value != null) {
+                return value.toString();
+            }
+        }
+        return "알 수 없음";
+    }
+
+    /**
+     * Map에서 Long 값을 안전하게 가져오는 헬퍼 메서드
+     */
+    private Long getLongValue(Map<String, Object> map, String... keys) {
+        for (String key : keys) {
+            Object value = map.get(key);
+            if (value != null && value instanceof Number) {
+                return ((Number) value).longValue();
+            }
+        }
+        return 0L;
+    }
 
     /**
      * 랭킹 아이템 생성 헬퍼 메서드

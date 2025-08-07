@@ -88,27 +88,7 @@ public class MainController {
         }
     }
 
-    // 3. 급상승 키워드 (Main_Trending 컴포넌트용)
-    @GetMapping("/trending")
-    public ResponseEntity<Map<String, Object>> getTrendingKeywords() {
-
-        // TODO: 실제 DB에서 데이터 조회
-        List<Map<String, Object>> trendingData = Arrays.asList(
-            Map.of("keyword", "트러플 감자튀김", "growthRate", 45.2, "currentCount", 759, "previousCount", 523),
-            Map.of("keyword", "아이스크림+식빵조합", "growthRate", 38.7, "currentCount", 689, "previousCount", 497),
-            Map.of("keyword", "샌이머스켓 디저트", "growthRate", 67.8, "currentCount", 201, "previousCount", 120),
-            Map.of("keyword", "비건 디저트", "growthRate", 29.3, "currentCount", 156, "previousCount", 121),
-            Map.of("keyword", "홈카페 원두", "growthRate", 22.1, "currentCount", 134, "previousCount", 110)
-        );
-
-        Map<String, Object> response = Map.of(
-            "data", trendingData,
-            "averageGrowth", 40.6,
-            "lastUpdated", new Date()
-        );
-
-        return ResponseEntity.ok(response);
-    }
+    
 
     // 4. TOP3 인사이트 차트 데이터 (Main_top3_insight 컴포넌트용)
     @GetMapping("/top3/insights")
@@ -117,8 +97,23 @@ public class MainController {
         System.out.println("📊 TOP3 인사이트 API 호출됨 - 기간: " + period);
 
         try {
+            System.out.println("📊 TOP3 인사이트 데이터 조회 중...");
             Map<String, Object> response = mainService.getTop3Insights(period);
-            System.out.println("✅ TOP3 인사이트 응답 성공");
+            System.out.println("📊 기본 인사이트 데이터 조회 완료: " + response.keySet());
+
+            // OpenAI 요약 추가
+            @SuppressWarnings("unchecked")
+            List<String> keywords = (List<String>) response.get("keywords");
+            System.out.println("📊 추출된 키워드 목록: " + keywords);
+
+            String aiSummary = mainService.generateTop3InsightSummary(keywords, period);
+            response.put("aiSummary", aiSummary);
+            System.out.println("📊 최종 응답에 AI 요약 추가 완료");
+            System.out.println("📊 추가된 AI 요약 내용: " + aiSummary);
+
+            System.out.println("✅ TOP3 인사이트 응답 성공 (AI 요약 포함)");
+            System.out.println("📊 최종 응답 키: " + response.keySet());
+            System.out.println("📊 최종 응답 전체: " + response);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.err.println("❌ TOP3 인사이트 조회 실패: " + e.getMessage());
@@ -138,6 +133,35 @@ public class MainController {
                 "chartData", dummyChartData,
                 "keywords", Arrays.asList("먹방", "간식", "딸기"),
                 "period", period,
+                "aiSummary", "먹방, 간식, 딸기 키워드가 최근 " + period + "별 트렌드에서 주목받고 있습니다. 특히 먹방 콘텐츠의 지속적인 성장과 간식 트렌드의 다양화, 계절성 과일인 딸기의 변화하는 인기도를 확인할 수 있습니다.",
+                "lastUpdated", new Date()
+            );
+
+            return ResponseEntity.ok(errorResponse);
+        }
+    }
+
+    // 3. 급상승 키워드 TOP3 (Main_Trending 컴포넌트용)
+    @GetMapping("/trending")
+    public ResponseEntity<Map<String, Object>> getTrendingKeywords() {
+        System.out.println("📈 급상승 키워드 TOP3 API 호출됨");
+
+        try {
+            Map<String, Object> response = mainService.getTrendingKeywords();
+            System.out.println("✅ 급상승 키워드 응답 성공");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("❌ 급상승 키워드 조회 실패: " + e.getMessage());
+            e.printStackTrace();
+
+            // 에러 시 더미 데이터 반환
+            Map<String, Object> errorResponse = Map.of(
+                "trendingKeywords", Arrays.asList(
+                    Map.of("keyword", "먹방", "count", 1250, "growth", "+45%", "rank", 1),
+                    Map.of("keyword", "간식", "count", 980, "growth", "+32%", "rank", 2),
+                    Map.of("keyword", "딸기", "count", 756, "growth", "+28%", "rank", 3)
+                ),
+                "period", "최근 30일",
                 "lastUpdated", new Date()
             );
 
