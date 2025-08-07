@@ -6,8 +6,8 @@ import org.apache.ibatis.annotations.Param;
 import com.smhrd.web.DTO.NaverDTO;
 import com.smhrd.web.DTO.SignUpRequest;
 import com.smhrd.web.DTO.UserDTO;
-import com.smhrd.web.DTO.UserInfoUpdate_DTO;
 
+import com.smhrd.web.DTO.UserInfoUpdate_DTO;
 
 @Mapper
 public interface UserMapper {
@@ -42,5 +42,5 @@ public interface UserMapper {
 
     // 네이버 유저 등록
     int insertNaverUser(NaverDTO naverUser);
-
+    
 }

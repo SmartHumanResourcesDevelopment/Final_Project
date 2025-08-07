@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import close from "../../assets/img/Chart_Bot/close.png";
 import lightOn from "../../assets/img/Chart_Bot/idea_icon.png";
 import "../../assets/css/chartbot/idea.css";
@@ -8,7 +9,7 @@ export const Chart_Bot_idea = ({ onClose }) => {
     {
       id: 1,
       title: "말차츄 츄잇바 (MALCHU CHEW)",
-      features: [
+      content: [
         "씹고 풀면 집중력 + 힐링",
         '공부방에서 꺼내면 "오~ 그거 뭐야?" 소리 들을템',
         '포장에 "차분한데 중독됨" 문구 붙이면 완벽',
@@ -17,7 +18,7 @@ export const Chart_Bot_idea = ({ onClose }) => {
     {
       id: 2,
       title: "말차×떡볶이 디핑소스",
-      features: [
+      content: [
         '"맵찔이 전용 구원템"',
         "크림 떡볶이+말차 조합 = 뉴트로 폭발",
         "편의점 밀키트 한정판용으로 딱",
@@ -26,13 +27,42 @@ export const Chart_Bot_idea = ({ onClose }) => {
     {
       id: 3,
       title: "말차폼 탑재 보틀라떼",
-      features: [
+      content: [
         "쉐이크하면 쫀쫀폼이 올라오는 텀블러형 말차",
         "SNS에 영상 올리기 좋은 ASMR 푸드",
         '"폼 미쳤다" 해시태그로 바이럴 유도',
       ],
     },
   ]);
+
+  const handleScrap = async (idea) => {
+    
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      alert("로그인 후 사용 가능합니다.");
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:8095/zal/api/chatbot/product", {
+        userId,
+        contentTitle: idea.title,
+        contentDesc1: idea.content[0],
+        contentDesc2: idea.content[1],
+        contentDesc3: idea.content[2],
+      });
+
+      if (response.data === "success") {
+        alert("저장 완료!");
+      } else {
+        alert("저장 실패!");
+      }
+    } catch (error) {
+      console.error("에러 발생:", error);
+      alert("서버 오류 발생");
+    }
+  };
 
   return (
     <div className="idea-container">
@@ -49,8 +79,8 @@ export const Chart_Bot_idea = ({ onClose }) => {
         {productIdeas.map((idea, i) => (
           <section key={idea.id} className="idea-section">
             <h2 className="idea-section-title">{i + 1}. {idea.title}</h2>
-            <ul className="idea-features">
-              {idea.features.map((f, j) => (
+            <ul className="idea-content">
+              {idea.content.map((f, j) => (
                 <li key={j} className="idea-feature">✦ {f}</li>
               ))}
             </ul>
@@ -59,9 +89,19 @@ export const Chart_Bot_idea = ({ onClose }) => {
       </main>
 
       <footer className="idea-footer">
-        <button className="idea-scrap-btn" onClick={() => console.log("스크랩!")}>
-          스크랩하기
-        </button>
+        {productIdeas.map((idea, i) => (
+          <section key={idea.id} className="idea-section">
+            <h2 className="idea-section-title">{i + 1}. {idea.title}</h2>
+            <ul className="idea-content">
+              {idea.content.map((f, j) => (
+                <li key={j} className="idea-feature">✦ {f}</li>
+              ))}
+            </ul>
+            <button className="idea-scrap-btn" onClick={() => handleScrap(idea)}>
+              스크랩하기
+            </button>
+          </section>
+        ))}
       </footer>
     </div>
   );

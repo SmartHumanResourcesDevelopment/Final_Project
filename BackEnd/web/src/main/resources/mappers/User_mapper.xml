@@ -112,4 +112,6 @@
         #{user_id}, #{username}, #{password}, #{phone_number}, #{nickname}, #{naverlogincheck}
     )
     </insert>
+
+    
 </mapper>

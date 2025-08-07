@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.smhrd.web.repository.ChatbotMapper">
+
+    <!-- 제품 아이디어 스크랩 저장 기능 -->
+    <insert id="insertProduct" parameterType="com.smhrd.web.DTO.ProductDTO">
+        INSERT INTO USER_PRODUCT_IDEA (
+            IDEA_ID, USER_ID, KEYWORD_ID, TITLE,
+            CONTENT_TITLE, CONTENT_DESC1, CONTENT_DESC2, CONTENT_DESC3
+        )VALUES(
+            #{ideaId}, #{userId}, #{keywordId}, #{title},
+            #{contentTitle}, #{contentDesc1}, #{contentDesc2}, #{contentDesc3}
+        )
+    </insert>
+
+    <!-- 콜라보 아이디어 스크랩 저장 기능-->
+    <insert id="insertCollab" parameterType="com.smhrd.web.DTO.CollabDTO">
+        INSERT INTO USER_COLLAB_IDEA (
+            IDEA_ID, USER_ID, KEYWORD_ID, TITLE,
+            CONTENT_TITLE, CONTENT_DESC1, CONTENT_DESC2, CONTENT_DESC3
+        )VALUES(
+            #{ideaId}, #{userId}, #{keywordId}, #{title},
+            #{contentTitle}, #{contentDesc1}, #{contentDesc2}, #{contentDesc3}
+        )
+    </insert>
+
+    <!-- 슬로건, 마케팅 문구 스크랩 저장 기능 -->
+   <insert id="insertSlogan" parameterType="com.smhrd.web.DTO.SloganDTO">
+        INSERT INTO USER_MARKETING_SLOGAN (
+            SLOGAN_ID, USER_ID, KEYWORD_ID, TITLE,
+            CONTENT_TITLE, CONTENT_DESC1, CONTENT_DESC2, CONTENT_DESC3
+        )VALUES(
+            #{sloganId}, #{userId}, #{keywordId}, #{title},
+            #{contentTitle}, #{contentDesc1}, #{contentDesc2}, #{contentDesc3}
+        )
+    </insert>
+
+</mapper>

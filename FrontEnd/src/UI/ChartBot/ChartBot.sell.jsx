@@ -62,7 +62,7 @@ export const Chart_Bot_Sell = ({ onClose }) => {
       <footer className="sell-footer">
         <button className="sell-scrap-btn" onClick={handleScrap}>
           스크랩하기
-        </button>
+        </button>                                          
       </footer>
     </div>
   );
