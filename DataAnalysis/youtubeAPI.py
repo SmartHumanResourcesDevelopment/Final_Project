@@ -22,8 +22,8 @@ import pandas as pd
 import requests
 
 # ───────────────────── 0. 환경 설정 ─────────────────────
-API_KEY: str = "AIzaSyBXd7zqgRUMpnYtM8DjAm2th-G4p8qRTJo"
-CHANNEL_HANDLE: str = "@toctocsia"    # @를 포함한 handle 문자열
+API_KEY: str = "AIzaSyBrB_bf2ZgNYIUv0V0KlwSwe5y2sM6jzwY"
+CHANNEL_HANDLE: str = "@Hongji홍지"    # @를 포함한 handle 문자열
 
 PER_PAGE_RESULTS: int  = 50  # playlistItems.list 한 페이지 최대 50
 DETAILS_BATCH_SIZE: int = 50  # videos.list 한 번에 최대 50
@@ -145,6 +145,7 @@ def run() -> None:
         vid = make_video_id(s["channelTitle"], s["publishedAt"])
         rows.append({
             "VIDEO_ID":      vid,
+            "KEYWORD_ID": "",# 추후에 파싱예정
             "TITLE":         s.get("title", ""),
             "DESCRIPTION":   s.get("description", "").replace("\n", " "),
             "CHANNEL_TITLE": s["channelTitle"],
@@ -156,7 +157,7 @@ def run() -> None:
             "PLATFORM":      "youtube",
         })
 
-    safe_to_csv(pd.DataFrame(rows), "toctocsia_youtube_videos")
+    safe_to_csv(pd.DataFrame(rows), "Hongji홍지_youtube_videos")
 
 if __name__ == "__main__":
     run()

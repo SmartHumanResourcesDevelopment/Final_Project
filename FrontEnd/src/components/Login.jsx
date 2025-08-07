@@ -5,11 +5,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi"; 
 import google_login from "../assets/img/login_join/google_login.png";
-import kakao_login_medium_narrow from "../assets/img/login_join/kakao_login_medium_narrow.png";
 import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
 import mint_bg_color from "../assets/img/common/mint_bg_color.png";
 import "../assets/css/Login.css"; // 경로 주의
 import { useUser } from "../contexts/UserContext";
+import NaverLoginButton from "./NaverLoginButton";
 
 const Login = () => {
   const [id, setId] = useState("");
@@ -43,6 +43,7 @@ const Login = () => {
         phoneNumber: decoded.phoneNumber,
         nickname: decoded.nickname,
         role: decoded.role,
+        isLogin: true,
         userProfile: decoded.userProfile
       });
 
@@ -165,12 +166,12 @@ const Login = () => {
             {/* SNS 로그인 */}
               <div className="flex justify-center gap-6 w-full mt-10">
                 <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Google login")}>
-                  <img src={google_login} alt="Sign in with Google" />
+                <img src={google_login} alt="Sign in with Google" />
                 </button>
-                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("kakoa login")}>
-                  <img src={kakao_login_medium_narrow} alt="Sign in with kakao" />
-                </button>
+                {/* 네이버 로그인 버튼 컴포넌트 */}
+                <NaverLoginButton />
               </div>
+
 
             {/* 하단 문구 */}
             <p className="w-full text-[13px] font-medium mt-4 text-center">

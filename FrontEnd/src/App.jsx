@@ -9,7 +9,12 @@ import MyPage from "./components/MyPage";
 import Admin from "./components/Admin_page";
 import ServicePage from "./components/ServicePage";
 import ProtectedRoute from "./contexts/ProtectedRoute";
+import NaverCallback from "./components/NaverCallback";
+import NaverLoginSuccess from "./components/NaverLoginSuccess";
+import axios from 'axios';
 
+axios.defaults.baseURL = "http://localhost:8095";
+axios.defaults.withCredentials = true;
 
 function App() {
   return (
@@ -58,6 +63,19 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/naver/callback"
+            element={
+                <NaverCallback />
+            }
+          />
+          <Route
+            path="/login/success"
+            element={
+            <NaverLoginSuccess />
+            } 
+          /> 
+          
         </Routes>
       </UserProvider>
     </BrowserRouter>

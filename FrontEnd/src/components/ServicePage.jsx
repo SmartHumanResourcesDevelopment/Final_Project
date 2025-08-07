@@ -1,7 +1,7 @@
 import React from "react";
 import { NavigationSection } from "../common/menu_bar";
 import FooterSection from "../common/footer";
-import ServiceIntroSection from "../UI/ServiceIntroSection"; // ← 새로 만든 콘텐츠 컴포넌트
+import ServiceIntroSection from "../UI/ServiceIntroSection"; 
 
 export const ServicePage = () => {
   return (

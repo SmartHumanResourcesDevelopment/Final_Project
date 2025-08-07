@@ -210,11 +210,11 @@ def crawl_account_with_next(driver, username, start_index=0, limit=5):
                 print(f"💬 댓글: {c['id']} | {c['date']} | {c['text']}")
 
             collected_posts.append({
-                "작성일": post_date,
-                "좋아요 수": like_count,
-                "본문": pure_caption,
-                "해시태그": ', '.join(hashtags),
-                "댓글 목록": '\n'.join([f"{c['id']} | {c['date']} | {c['text']}" for c in comments])
+                "POST_DATE": post_date,
+                "LIKE_COUNT": like_count,
+                "POST_TEXT": pure_caption,
+                "HASHTAGS": ', '.join(hashtags),
+                "COMMENTS": '\n'.join([f"{c['id']} | {c['date']} | {c['text']}" for c in comments])
             })
 
             if i < limit - 1:
@@ -241,7 +241,7 @@ def crawl_account_with_next(driver, username, start_index=0, limit=5):
     # CSV 저장
     if collected_posts:
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        data_analysis_dir = os.path.join(script_dir, 'DataAnalysis')
+        data_analysis_dir = os.path.join(script_dir, 'instargram_infu')
         os.makedirs(data_analysis_dir, exist_ok=True)
         file_path = os.path.join(data_analysis_dir, "fromseohee.csv")
 

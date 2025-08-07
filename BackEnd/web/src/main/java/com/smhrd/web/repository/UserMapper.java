@@ -3,6 +3,7 @@ package com.smhrd.web.repository;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.smhrd.web.DTO.NaverDTO;
 import com.smhrd.web.DTO.SignUpRequest;
 import com.smhrd.web.DTO.UserDTO;
 import com.smhrd.web.DTO.UserInfoUpdate_DTO;
@@ -33,5 +34,13 @@ public interface UserMapper {
     // 로그인 후 유저 정보 가져오기
     UserDTO loginUserInfo(String user_id);
 
+    // 네이버 ID 기준으로 가입 여부 확인
+    int existsByUserNaver(@Param("naverlogincheck") String naverlogincheck);
+
+    // 네이버 ID 기준으로 유저 정보 조회
+    NaverDTO findByNaverId(@Param("naverlogincheck") String naverlogincheck);
+
+    // 네이버 유저 등록
+    int insertNaverUser(NaverDTO naverUser);
 
 }

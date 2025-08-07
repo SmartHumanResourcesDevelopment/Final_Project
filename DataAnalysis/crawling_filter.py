@@ -1,3 +1,4 @@
+# 인스타 키워드 음식과 관련 키워드로 추출
 # 1) 환경 준비
 # pip install pandas transformers
 import torch
@@ -32,7 +33,7 @@ def filter_and_save_food_posts(input_csv: str,
     food_labels = set(candidate_labels) - {"non-food"}
 
     is_food = []
-    for text, tags in zip(df['본문'].astype(str), df['해시태그'].fillna('')):
+    for text, tags in zip(df['POST_TEXT'].astype(str), df['HASHTAGS'].fillna('')):
         combined = text + " " + tags
         out = classifier(combined, candidate_labels)
         # out["labels"] 순서대로 out["scores"]
@@ -51,7 +52,7 @@ def filter_and_save_food_posts(input_csv: str,
 
 if __name__ == "__main__":
     filter_and_save_food_posts(
-        input_csv="DataAnalysis/toctocsia.csv",
+        input_csv="instargram_infu/toctocsia.csv",
         output_csv="DB/Filtered/toctocsia_filtered_food_posts.csv",
         threshold=0.5,
         device=0   # GPU 사용: 0, CPU-only: -1
