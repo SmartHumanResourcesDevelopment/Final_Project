@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.smhrd.web.repository.MainMapper">
+
+    <!-- 메인 랭킹 전용 프로시저 호출 (6개월, 1년) -->
+    <select id="selectRankingByPeriod" statementType="CALLABLE" parameterType="map">
+        { call GET_MAIN_RANKING(#{period, jdbcType=VARCHAR, mode=IN}, #{result, jdbcType=CURSOR, mode=OUT, resultMap=top10ResultMap}) }
+    </select>
+
+    <!-- TOP10 DTO 결과 매핑 -->
+    <resultMap id="top10ResultMap" type="com.smhrd.web.DTO.Top10DTO">
+        <result property="rank" column="RANK" jdbcType="NUMERIC"/>
+        <result property="name" column="NAME" jdbcType="VARCHAR"/>
+        <result property="count" column="COUNT" jdbcType="NUMERIC"/>
+        <result property="trend" column="TREND" jdbcType="VARCHAR"/>
+        <result property="color" column="COLOR" jdbcType="VARCHAR"/>
+    </resultMap>
+
+</mapper>

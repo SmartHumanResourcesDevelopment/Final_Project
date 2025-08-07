@@ -2,7 +2,7 @@
 .insight {
   max-width: 1260px;
   margin: 5rem auto 10rem;
-  padding: 0 1rem;
+  padding-inline: 1rem;   
   font-family: "Noto Sans KR", sans-serif;
   display: flex;
   flex-direction: column;
@@ -47,7 +47,7 @@
 
 /* ── 2) 잠재 키워드 TOP3 영역 ─────────────────────────── */
 .hot-top3-container{
-  max-width:1200px;
+  max-width:1260px;
   margin:4rem auto 0;
   padding:0 1rem;
   display:flex;
@@ -151,11 +151,10 @@
 /* ── 그래프 캔버스 ─────────────────────────────── */
 .insight__canvas {
   position: relative;
-  border-radius: 18px;  /* ti-card 와 동일 패딩 */  
-  background:#fff;border-radius:30px;
-  box-shadow:0 4px 10px 2px rgba(0,0,0,.25);
-  padding:3rem 3.5rem 4rem;
-
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px 2px rgba(0, 0, 0, 0.25);
+  padding: 3rem 3.5rem 4rem;
 }
 .insight__canvas img {
   width: 100%;
@@ -198,9 +197,9 @@
 
 /* ── 설명문 ───────────────────────────────────── */
 .insight__caption {
-    margin-top:2rem;
-  font-size:1.375rem;
-  line-height:1.6;
+  margin-top: 2rem;
+  font-size: 1.375rem;
+  line-height: 1.6;
 }
 
 /* ── 반응형 ──────────────────────────────────── */
