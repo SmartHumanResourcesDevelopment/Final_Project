@@ -26,13 +26,18 @@ def main():
     )
 
     # 5) 결과 저장 디렉토리
-    output_dir = os.path.join(food_filter_dir, "keywordDaiyCount")
+    output_dir = os.path.join(food_filter_dir, "keywordDailyCount")
     os.makedirs(output_dir, exist_ok=True)
 
     # 6) 키워드 사전 로드
     kw_df = pd.read_csv(keyword_dict_path, dtype={"keywordid": int, "keywordname": str})
-    # 컬럼명을 대문자로 변경
-    kw_df = kw_df.rename(columns={"keywordid": "KEYWORD_ID", "keywordname": "KEYWORD_NAME"})
+    # 컬럼명을 데이터베이스 스키마에 맞게 변경
+    kw_df = kw_df.rename(columns={
+        "keywordid": "KEYWORD_ID",
+        "keywordname": "KEYWORD_NAME",
+        "type": "TYPE",
+        "priority": "PRIORITY"
+    })
 
     # 7) 데이터 집계
     insta_counts = aggregate_counts(insta_pattern,  "POST_DATE")
@@ -43,15 +48,24 @@ def main():
     all_counts = (
         all_counts
         .groupby(["KEYWORD_ID", "STATS_DATE"], as_index=False)
-        .sum()
+        .agg({"DAILY_COUNT": "sum"})  # DAILY_COUNT 컬럼 합계
+        .reset_index()
     )
+
+    # 키워드 사전과 병합
     result = (
         all_counts
         .merge(kw_df, on="KEYWORD_ID", how="left")
         .sort_values(["STATS_DATE", "KEYWORD_ID"])
         .reset_index(drop=True)
     )
+
+    # STATS_ID 추가
     result.insert(0, "STATS_ID", result.index + 1)
+
+    # 데이터베이스 스키마에 맞는 컬럼 순서로 정렬 (KEYWORDUP 제거)
+    final_columns = ["STATS_ID", "KEYWORD_ID", "STATS_DATE", "KEYWORD_NAME", "DAILY_COUNT", "TYPE", "PRIORITY"]
+    result = result[final_columns]
 
     # 9) 최종 CSV 저장
     output_path = os.path.join(output_dir, "keyword_daily_count.csv")
@@ -85,7 +99,7 @@ def aggregate_counts(pattern: str, date_col: str) -> pd.DataFrame:
         all_df
         .groupby(["KEYWORD_ID", date_col], as_index=False)
         .size()
-        .rename(columns={date_col: "STATS_DATE", 0: "DAILY_COUNT"})
+        .rename(columns={date_col: "STATS_DATE", "size": "DAILY_COUNT"})
     )
 
 
