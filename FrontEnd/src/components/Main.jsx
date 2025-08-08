@@ -3,6 +3,10 @@ import React from "react";
 import "../assets/css/Main.css"; // 메인 페이지 스타일
 
 import { NavigationSection } from "../common/menu_bar";
+import { AdminNavigationBarSection } from "../common/Admin_menu_bar";
+
+import {useUser} from "../contexts/UserContext";
+
 import { Main_search } from "../common/Main_search";
 import { Main_servise_banner } from "../UI/Main_servise_banner";
 import { Main_rank } from "../UI/Main_rank";
@@ -16,13 +20,15 @@ import FooterSection from "../common/footer";
 
 const Main = () => {
 
+  const { user } = useUser();
+  const isAdmin = user.role === "관리자";
   
 
   /* ---------- 렌더 ---------- */
   return (
     <div className="main-root">
        {/* 상단 바 */}
-      <NavigationSection />
+      {isAdmin ? <AdminNavigationBarSection /> : <NavigationSection />}
 
      {/* 상단 배너 */}
       <Main_servise_banner />

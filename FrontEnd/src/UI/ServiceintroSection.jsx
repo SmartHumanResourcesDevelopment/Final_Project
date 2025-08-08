@@ -2,9 +2,14 @@ import React from "react";
 import heroImage1 from "../assets/img/common/hero1.png";
 import heroImage2 from "../assets/img/common/hero2.png";
 import ideaImage from "../assets/img/common/idea.png";
+import { useNavigate } from "react-router-dom"; 
 
 
 export const ServiceIntroSection = () => {
+
+   const navigate = useNavigate();
+
+
   return (
     <main className="flex flex-col items-center bg-white">
       {/* 섹션 1: 텍스트 왼쪽, 이미지 오른쪽 */}
@@ -55,7 +60,8 @@ export const ServiceIntroSection = () => {
           잘파세대 식문화 트렌드를 빠르게 파악해보세요!
         </span>  
         </h3>
-        <button className="bg-black text-white text-lg px-8 py-4 rounded-full hover:bg-gray-800 transition">
+        <button className="bg-black text-white text-lg px-8 py-4 rounded-full hover:bg-gray-800 transition"
+        onClick={() => navigate("/main")}>
           트렌드 찾으러 가기
         </button>
       </section>

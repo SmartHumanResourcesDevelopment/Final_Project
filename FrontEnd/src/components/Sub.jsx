@@ -1,6 +1,11 @@
 // src/pages/Sub.jsx
 import React, { useState, useEffect } from "react";
 import { NavigationSection }  from "../common/menu_bar";
+
+import { AdminNavigationBarSection } from "../common/Admin_menu_bar";
+
+import { useUser } from "../contexts/UserContext";
+
 import { DetailKeyword }      from "../UI/Detail_keyword";
 import { DetailInsightsSection } from "../UI/Detail_title";
 import { KeywordHighlightSection } from "../UI/Detail_kote";
@@ -13,6 +18,10 @@ import ChartBot                from "../components/ChartBot";
 import "../assets/css/Sub.css";
 
 const Sub = ({ onClose }) => {
+
+  const { user } = useUser();
+  const isAdmin = user.role === "관리자";
+
   const [openChat, setOpenChat]     = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -39,7 +48,7 @@ const Sub = ({ onClose }) => {
   return (
     <div className="detail-root" onClick={handleBackgroundClick}>
       {/* 상단바 */}
-      <NavigationSection />
+      {isAdmin ? <AdminNavigationBarSection /> : <NavigationSection />}
       {/* 키워드 소개 */}
       <DetailKeyword />
       {/* 키워드 그래프소개 */}
