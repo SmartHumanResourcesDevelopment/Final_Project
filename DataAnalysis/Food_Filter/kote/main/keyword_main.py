@@ -19,7 +19,7 @@ import re
 warnings.filterwarnings("ignore", message=".*sequence length.*")
 
 # OpenAI 클라이언트 초기화 (API 키 직접 선언)
-client = OpenAI(api_key="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")  # 실제 키를 입력하세요
+client = OpenAI(api_key="")  # 실제 키를 입력하세요
 
 # Instant Client Thick 모드
 oracledb.init_oracle_client()
