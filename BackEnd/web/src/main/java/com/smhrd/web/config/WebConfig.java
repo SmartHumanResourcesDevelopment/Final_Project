@@ -21,8 +21,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:5173")
                 .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                .allowedHeaders("*")
                 .allowCredentials(true);
-        System.out.println("✔ CORS configured");
+        System.out.println("[CORS 설정 완료] http://localhost:5173 허용");
     }
 
      @Bean

@@ -35,34 +35,49 @@ export const Chart_Bot_idea = ({ onClose }) => {
     },
   ]);
 
-  const handleScrap = async (idea) => {
-    
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      alert("로그인 후 사용 가능합니다.");
-      return;
-    }
+  const handleScrap = async (ideas) => {
 
     try {
-      const response = await axios.post("http://localhost:8095/zal/api/chatbot/product", {
-        userId,
+
+      const token = localStorage.getItem("jwtToken");
+
+      if (!token) {
+        alert("로그인 후 사용 가능합니다.");
+        return;
+      }
+
+      const dtoList = ideas.map(idea => ({
+        ideaId: idea.id,
+        title: idea.title,
         contentTitle: idea.title,
         contentDesc1: idea.content[0],
         contentDesc2: idea.content[1],
         contentDesc3: idea.content[2],
-      });
+      }));
 
-      if (response.data === "success") {
-        alert("저장 완료!");
-      } else {
-        alert("저장 실패!");
-      }
-    } catch (error) {
-      console.error("에러 발생:", error);
-      alert("서버 오류 발생");
-    }
-  };
+        const response = await fetch("http://localhost:8095/zal/api/chatbot/product", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(dtoList) // 전체 배열 전송
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "저장 실패");
+          }
+
+          const result = await response.json();
+            alert(result.message || "저장 완료!");
+            
+          } catch (error) {
+            console.error("스크랩 중 오류:", error);
+            alert(`저장 실패: ${error.message}`);
+          }
+
+        };
 
   return (
     <div className="idea-container">
@@ -89,19 +104,16 @@ export const Chart_Bot_idea = ({ onClose }) => {
       </main>
 
       <footer className="idea-footer">
-        {productIdeas.map((idea, i) => (
-          <section key={idea.id} className="idea-section">
-            <h2 className="idea-section-title">{i + 1}. {idea.title}</h2>
-            <ul className="idea-content">
-              {idea.content.map((f, j) => (
-                <li key={j} className="idea-feature">✦ {f}</li>
-              ))}
-            </ul>
-            <button className="idea-scrap-btn" onClick={() => handleScrap(idea)}>
-              스크랩하기
-            </button>
-          </section>
-        ))}
+
+        {/* 스크랩 버튼 */}
+        <button
+          className="idea-scrap-btn"
+          onClick={() => handleScrap(productIdeas)}
+        >
+          스크랩하기
+        </button>
+
+
       </footer>
     </div>
   );

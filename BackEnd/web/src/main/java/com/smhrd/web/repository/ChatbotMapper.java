@@ -10,12 +10,12 @@ import com.smhrd.web.DTO.SloganDTO;
 public interface ChatbotMapper {
     
     // 제품 아이디어 스크랩 저장 기능
-    int insertProduct(ProductDTO product);
+    int insertProduct(ProductDTO dto);
 
     // 콜라보 아이디어 스크랩 저장 기능
-    int insertCollab(CollabDTO collab);
+    int insertCollab(CollabDTO dto);
 
     // 슬로건, 마케팅 문구 스크랩 저장 기능
-    int insertSlogan(SloganDTO slogan);
+    int insertSlogan(SloganDTO dto);
 
 }
