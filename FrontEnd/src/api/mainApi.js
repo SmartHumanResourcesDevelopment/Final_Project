@@ -8,7 +8,7 @@ const BASE_URL = "http://localhost:8095/zal/api/main";
 const mainApi = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
-  timeout: 60000, // 60초 타임아웃 (OpenAI API 호출 충분히 고려)
+  timeout: 120000, // 120초 타임아웃 (OpenAI API 호출 + DB 조회 충분히 고려)
 });
 
 // 요청 인터셉터 (로깅용)

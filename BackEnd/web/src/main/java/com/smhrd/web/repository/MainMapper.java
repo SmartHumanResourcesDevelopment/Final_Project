@@ -40,4 +40,19 @@ public interface MainMapper {
      */
     List<Map<String, Object>> getTrendingKeywordsLatest();
 
+    /**
+     * 특정 키워드의 일별 언급량 조회 (최근 N일)
+     * @param keyword 키워드명
+     * @param days 조회할 일수
+     * @return 일별 언급량 리스트
+     */
+    List<Integer> getDailyKeywordMentions(String keyword, int days);
+
+    /**
+     * 추가 급상승 키워드 조회 (TOP15 제외, 더 넓은 범위)
+     * @param limit 조회할 개수
+     * @return 추가 키워드 데이터
+     */
+    List<Map<String, Object>> getAdditionalTrendingKeywords(int limit);
+
 }

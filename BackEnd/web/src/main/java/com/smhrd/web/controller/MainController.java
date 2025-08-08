@@ -154,7 +154,8 @@ public class MainController {
             System.err.println("❌ 급상승 키워드 조회 실패: " + e.getMessage());
             e.printStackTrace();
 
-            // 에러 시 더미 데이터 반환
+            // 에러 시 빈 데이터 반환 (더미 데이터 주석 처리)
+            /*
             Map<String, Object> errorResponse = Map.of(
                 "trendingKeywords", Arrays.asList(
                     Map.of("keyword", "먹방", "count", 1250, "growth", "+45%", "rank", 1),
@@ -164,6 +165,14 @@ public class MainController {
                 "period", "최근 30일",
                 "lastUpdated", new Date()
             );
+            */
+
+            Map<String, Object> errorResponse = Map.of(
+                "trendingKeywords", new ArrayList<>(),
+                "period", "에러 발생",
+                "lastUpdated", new Date(),
+                "error", e.getMessage()
+            );
 
             return ResponseEntity.ok(errorResponse);
         }
@@ -172,23 +181,26 @@ public class MainController {
     // 5. 급상승 인사이트 차트 데이터 (Main_Trending_insight 컴포넌트용)
     @GetMapping("/trending/insights")
     public ResponseEntity<Map<String, Object>> getTrendingInsights() {
+        System.out.println("📈 급상승 인사이트 차트 API 호출됨");
 
-        // TODO: 실제 DB에서 급상승 차트 데이터 조회
-        Map<String, Object> chartData = Map.of(
-            "labels", Arrays.asList("1주전", "6일전", "5일전", "4일전", "3일전", "2일전", "1일전", "오늘"),
-            "datasets", Arrays.asList(
-                Map.of("label", "트러플 감자튀김", "data", Arrays.asList(400, 450, 500, 580, 650, 700, 730, 759), "color", "#FF9F43"),
-                Map.of("label", "아이스크림+식빵조합", "data", Arrays.asList(350, 380, 420, 480, 550, 620, 660, 689), "color", "#6C5CE7"),
-                Map.of("label", "샌이머스켓 디저트", "data", Arrays.asList(80, 90, 110, 130, 150, 170, 185, 201), "color", "#A29BFE")
-            ),
-            "growthAnalysis", Map.of(
-                "fastestGrowing", "샌이머스켓 디저트",
-                "steadyGrowing", "트러플 감자튀김",
-                "totalGrowthRate", 45.2
-            )
-        );
+        try {
+            Map<String, Object> response = mainService.getTrendingInsights();
+            System.out.println("✅ 급상승 인사이트 응답 성공");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("❌ 급상승 인사이트 조회 실패: " + e.getMessage());
+            e.printStackTrace();
 
-        return ResponseEntity.ok(chartData);
+            // 에러 시 빈 데이터 반환
+            Map<String, Object> errorResponse = Map.of(
+                "labels", Arrays.asList(),
+                "datasets", Arrays.asList(),
+                "aiAnalysis", "데이터 조회 중 오류가 발생했습니다.",
+                "error", e.getMessage()
+            );
+
+            return ResponseEntity.ok(errorResponse);
+        }
     }
 
     // 6. 검색 자동완성 (Main_search 컴포넌트용)
