@@ -61,7 +61,25 @@ export function UserProvider({ children }) {
   const logout = () => {
     localStorage.removeItem("jwtToken");
     delete axios.defaults.headers.common["Authorization"];
-    setUser(initialUser);
+
+    // 사용자 정보 완전 초기화 (새 객체로 생성)
+    setUser(() => ({
+      id: "",
+      naverlogincheck: "",
+      username: "",
+      nickname: "",
+      phoneNumber: "",
+      email: "",
+      profileImage: "",
+      role: "",
+      isLogin: false,
+      token: "",
+    }));
+
+    // 추가 정리 작업
+    sessionStorage.clear(); // 세션 스토리지도 정리
+
+    console.log("로그아웃 완료 - 사용자 정보 초기화됨");
   };
 
   return (
