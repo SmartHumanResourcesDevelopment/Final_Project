@@ -112,3 +112,58 @@
   .kote__charts       { grid-template-columns: 1fr; }
   .kote__comments     { grid-template-columns: 1fr; }
 }
+
+/* ===== 댓글 스타일 개선 ===== */
+.kote__commentList li {
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+.kote__commentList li:last-child {
+  border-bottom: none;
+}
+.kote__commentList .no-comments {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+/* ===== 감성분석 데이터 없을 때 ===== */
+.no-sentiment-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 40px;
+  text-align: center;
+}
+
+.no-data-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+  animation: pulse 2s infinite;
+}
+
+.no-sentiment-data h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.no-sentiment-data p {
+  font-size: 14px;
+  color: #6c757d;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+}

@@ -1,6 +1,6 @@
 import React from "react";
 import { UserProvider } from "./contexts/UserContext";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Login from "./components/Login";
 import Join from "./components/Join";
 import Main from "./components/Main";
@@ -15,6 +15,14 @@ import axios from 'axios';
 
 axios.defaults.baseURL = "http://localhost:8095";
 axios.defaults.withCredentials = true;
+
+// Sub 페이지 래퍼 컴포넌트 - state 데이터를 받아서 Sub에 전달
+function SubWrapper() {
+  const location = useLocation();
+  const keywordData = location.state?.keywordData;
+
+  return <Sub keywordData={keywordData} />;
+}
 
 function App() {
   return (
@@ -43,7 +51,7 @@ function App() {
             path="/sub"
             element={
               <ProtectedRoute>
-                <Sub />
+                <SubWrapper />
               </ProtectedRoute>
             }
           />

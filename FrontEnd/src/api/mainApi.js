@@ -1,4 +1,3 @@
-// src/api/mainApi.js
 import axios from "axios";
 
 // 기본 API URL 설정

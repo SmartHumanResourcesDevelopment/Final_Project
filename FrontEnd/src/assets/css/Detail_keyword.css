@@ -174,7 +174,7 @@
 
 .detail-root > .detailKeyword {
   flex: 1;                   /* 헤더를 뺀 남은 공간 100 % 차지 */
-  display: flex;             /* 가운데 정렬용 Flex 컨테이너 */
+  /* display: flex;             가운데 정렬용 Flex 컨테이너 */
   align-items: center;       /* 수직(세로) 중앙 */
   justify-content: center;   /* 수평(가로) 중앙 */
 }

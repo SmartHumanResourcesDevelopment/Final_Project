@@ -12,7 +12,7 @@ import ChartBot                from "../components/ChartBot";
 
 import "../assets/css/Sub.css";
 
-const Sub = ({ onClose }) => {
+const Sub = ({ onClose, keywordData }) => {
   const [openChat, setOpenChat]     = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -41,13 +41,25 @@ const Sub = ({ onClose }) => {
       {/* 상단바 */}
       <NavigationSection />
       {/* 키워드 소개 */}
-      <DetailKeyword />
+      <DetailKeyword keywordData={keywordData} />
       {/* 키워드 그래프소개 */}
-      <DetailInsightsSection />
+      <DetailInsightsSection
+        keyword={keywordData?.keyword || "말차"}
+        trendExplanation={keywordData?.trendExplanation}
+      />
       {/* 감성분석 */}
-      <KeywordHighlightSection />
+      <KeywordHighlightSection
+        keyword={keywordData?.keyword || "말차"}
+        sentimentAnalysis={keywordData?.sentimentAnalysis}
+        positiveComments={keywordData?.positiveComments || []}
+        negativeComments={keywordData?.negativeComments || []}
+      />
       {/* 유사도 */}
-      <TrendAnalysisSection />
+      <TrendAnalysisSection
+        keyword={keywordData?.keyword || "말차"}
+        similarityInfo={keywordData?.similarityInfo}
+        similarKeywords={keywordData?.similarKeywords || []}
+      />
       <FooterSection />
 
       {/* 말풍선 */}

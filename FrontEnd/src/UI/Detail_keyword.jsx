@@ -1,34 +1,40 @@
 import React from "react";
 import { useState } from "react";
+import { useUser } from "../contexts/UserContext";
 import matchaImg from "../assets/img/common/녹차.png";
 import search from "../assets/img/common/search.png";
 import "../assets/css/Detail_keyword.css"; // Assuming you have a CSS file for styling
 
-const keywordData = {
-  keyword: "말차",
-  ranking: "20등",
-  emotionLabels: ["즐거움", "건강", "~", "~", "~"],
-  description: "‘맛있는 건강’을 추구하는 잘파세대의 새로운 일상",
-};
+export default function DetailKeyword({ keywordData }) {
+  const { user } = useUser(); // 사용자 정보 가져오기
 
-export default function DetailKeyword() {
+  // 기본값 설정
+  const defaultKeywordData = {
+    keyword: "말차",
+    ranking: "20등",
+    emotionLabels: ["즐거움", "건강", "~", "~", "~"],
+    description: "‘맛있는 건강’을 추구하는 잘파세대의 새로운 일상",
+  };
+
+  // props로 받은 데이터가 있으면 사용, 없으면 기본값 사용
+  const currentKeywordData = keywordData || defaultKeywordData;
   const [query, setQuery] = useState("");
   return (
     <section className="detailKeyword">
       {/* ① 왼쪽 : 텍스트  */}
       <div className="detailKeyword__info">
-        <p className="detailKeyword__intro">찝찝박사님이 주목한 키워드</p>
+        <p className="detailKeyword__intro">{user?.nickname || '찝찝박사'}님이 주목한 키워드</p>
         <p className="detailKeyword__sub">
-          찝찝박사님이 고르신 키워드 EatPICK이 분석해드려요
+          {user?.nickname || '찝찝박사'}님이 고르신 키워드 EatPICK이 분석해드려요
         </p>
 
-        <h2 className="detailKeyword__keyword">{keywordData.keyword}</h2>
-        <p className="detailKeyword__rank">현재 순위 : {keywordData.ranking}</p>
+        <h2 className="detailKeyword__keyword">{currentKeywordData.keyword}</h2>
+        <p className="detailKeyword__rank">현재 순위 : {currentKeywordData.ranking}</p>
 
         <p className="detailKeyword__labels">
-          감정 라벨링 TOP 5 : {keywordData.emotionLabels.join(", ")}
+          감정 라벨링 TOP 5 : {currentKeywordData.emotionLabels.join(", ")}
         </p>
-        <p className="detailKeyword__desc">{keywordData.description}</p>
+        <p className="detailKeyword__desc">{currentKeywordData.description}</p>
       </div>
 
       {/* ② 오른쪽 : 원형 이미지 */}
