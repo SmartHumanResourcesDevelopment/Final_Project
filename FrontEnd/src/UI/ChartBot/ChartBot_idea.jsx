@@ -36,13 +36,17 @@ export const Chart_Bot_idea = ({ onClose }) => {
   ]);
 
   const handleScrap = async (ideas) => {
+    console.log("==== [제품 API 호출됨] ====");
+    console.log("제품 아이템:", ideas);
 
     try {
 
-      const token = localStorage.getItem("jwtToken");
+      console.log(localStorage.getItem("jwtToken"));
 
+      const token = localStorage.getItem("jwtToken");
+      
       if (!token) {
-        alert("로그인 후 사용 가능합니다.");
+        console.warn("⚠ Authentication 객체가 null입니다. 로그인 상태를 확인하세요.");
         return;
       }
 

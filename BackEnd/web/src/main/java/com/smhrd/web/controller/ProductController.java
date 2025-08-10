@@ -30,7 +30,8 @@ public class ProductController {
     @PostMapping("/product")
     public ResponseEntity<?> ProductIdeas(@RequestBody List<ProductDTO> productList, Authentication authentication) {
         System.out.println("==== [제품 API 호출됨] ====");
-        System.out.println("제품 API 호출됨: " + productList.size() + "개 아이템");
+        System.out.println("제품 API 호출됨 : " + productList.size() + "개 아이템");
+        System.out.println("Authentication : " + authentication);
         
         // 인증 객체 null 여부 체크
         if (authentication == null) {
@@ -51,7 +52,7 @@ public class ProductController {
             System.out.println("➡ 저장 준비: " + product.getTitle());
             }
 
-            productService.productIdeas(productList); // List 전체 전달
+            productService.productIdeas(productList, authentication); // List 전체 전달
             System.out.println("✅ 제품 스크랩 성공");
             return ResponseEntity.ok(Map.of(
             "success", true,
