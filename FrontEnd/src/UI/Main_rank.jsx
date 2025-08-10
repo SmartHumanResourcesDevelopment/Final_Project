@@ -46,10 +46,11 @@ export default function Main_rank() {
     }
   };
 
-  // 컴포넌트 마운트 시 데이터 로드
+  // 컴포넌트 마운트 시 데이터 로드 및 기간 변경 시 재로드
   useEffect(() => {
+    console.log("🚀 Main_rank 컴포넌트 - 랭킹 데이터 로딩:", activePeriod);
     fetchRankingData(activePeriod);
-  }, [activePeriod]);
+  }, [activePeriod]); // activePeriod 변경 시에만 재실행
 
   // 기간 변경 핸들러
   const handlePeriodChange = (period) => {

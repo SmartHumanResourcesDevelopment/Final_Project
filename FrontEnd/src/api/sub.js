@@ -6,7 +6,7 @@ const BASE_URL = "http://localhost:8095/zal/api/keyword";
 // axios 인스턴스 생성
 const subApi = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000, // 10초 타임아웃
+  timeout: 240000, // 60초 타임아웃으로 증가
   headers: {
     'Content-Type': 'application/json',
   },
@@ -38,7 +38,23 @@ subApi.interceptors.response.use(
 
 // 키워드 검색 API 서비스
 export const keywordApiService = {
-  
+
+  /**
+   * 서버 상태 확인
+   * @returns {Promise<Object>} 서버 상태
+   */
+  testConnection: async () => {
+    try {
+      console.log("🧪 서버 연결 테스트 중...");
+      const response = await subApi.get("/test");
+      console.log("✅ 서버 연결 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ 서버 연결 실패:", error);
+      throw error;
+    }
+  },
+
   /**
    * 키워드 상세 정보 검색
    * @param {string} keyword - 검색할 키워드명
@@ -47,26 +63,92 @@ export const keywordApiService = {
   searchKeyword: async (keyword) => {
     try {
       console.log("🔍 키워드 검색 요청:", keyword);
-      
+      console.log("🌐 요청 URL:", `${BASE_URL}/search?keyword=${encodeURIComponent(keyword.trim())}`);
+      console.log("⏰ 요청 시작 시간:", new Date().toLocaleTimeString());
+
+      const startTime = Date.now();
+
       const response = await subApi.get("/search", {
         params: { keyword: keyword.trim() }
       });
-      
+
+      const endTime = Date.now();
+      console.log("⏱️ 응답 시간:", `${endTime - startTime}ms`);
       console.log("✅ 키워드 검색 성공:", response.data);
       return response.data;
       
     } catch (error) {
       console.error("❌ 키워드 검색 실패:", error);
-      
+      console.error("❌ 에러 상세:", {
+        message: error.message,
+        code: error.code,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: error.config?.url,
+        timeout: error.config?.timeout
+      });
+
       // 에러 타입별 처리
-      if (error.response?.status === 404) {
+      if (error.code === 'ECONNABORTED') {
+        throw new Error(`요청 시간이 초과되었습니다. (${error.config?.timeout}ms)`);
+      } else if (error.response?.status === 404) {
         throw new Error("검색된 키워드가 없습니다.");
       } else if (error.response?.status === 500) {
-        throw new Error("서버 오류가 발생했습니다.");
-      } else if (error.code === 'ECONNABORTED') {
-        throw new Error("요청 시간이 초과되었습니다.");
+        throw new Error("서버 내부 오류가 발생했습니다.");
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error("서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.");
+      } else if (error.code === 'NETWORK_ERROR') {
+        throw new Error("네트워크 오류가 발생했습니다.");
       } else {
-        throw new Error("검색 중 오류가 발생했습니다.");
+        throw new Error(`검색 중 오류가 발생했습니다: ${error.message}`);
+      }
+    }
+  },
+
+  /**
+   * 키워드 감성분석 조회 (별도 API)
+   * @param {string} keyword - 키워드명
+   * @returns {Promise<Object>} 감성분석 결과
+   */
+  getSentimentAnalysis: async (keyword) => {
+    try {
+      console.log("🎯 감성분석 요청:", keyword);
+      console.log("🌐 요청 URL:", `${BASE_URL}/sentiment?keyword=${encodeURIComponent(keyword.trim())}`);
+      console.log("⏰ 요청 시작 시간:", new Date().toLocaleTimeString());
+
+      const startTime = Date.now();
+
+      const response = await subApi.get("/sentiment", {
+        params: { keyword: keyword.trim() }
+      });
+
+      const endTime = Date.now();
+      console.log("⏱️ 감성분석 응답 시간:", `${endTime - startTime}ms`);
+      console.log("✅ 감성분석 성공:", response.data);
+      return response.data;
+
+    } catch (error) {
+      console.error("❌ 감성분석 실패:", error);
+      console.error("❌ 에러 상세:", {
+        message: error.message,
+        code: error.code,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: error.config?.url,
+        timeout: error.config?.timeout
+      });
+
+      // 에러 타입별 처리
+      if (error.code === 'ECONNABORTED') {
+        throw new Error(`감성분석 요청 시간이 초과되었습니다. (${error.config?.timeout}ms)`);
+      } else if (error.response?.status === 404) {
+        throw new Error("키워드를 찾을 수 없습니다.");
+      } else if (error.response?.status === 500) {
+        throw new Error("감성분석 서버 오류가 발생했습니다.");
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error("서버에 연결할 수 없습니다.");
+      } else {
+        throw new Error(`감성분석 조회 중 오류가 발생했습니다: ${error.message}`);
       }
     }
   },

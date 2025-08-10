@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { mainApiService } from "../api/mainApi";
+import { keywordApiService } from "../api/sub";
+import { useKeywordData } from "../contexts/KeywordDataContext";
 import "../assets/css/Main_keyword_card.css";
 import img1 from "../assets/img/common/rectangle-125-3.png";
 import img2 from "../assets/img/common/rectangle-125-4.png";
@@ -9,6 +12,8 @@ import img3 from "../assets/img/common/rectangle-125-5.png";
 const defaultImages = [img1, img2, img3];
 
 export default function Main_top3() {
+  const navigate = useNavigate();
+  const { setKeywordData } = useKeywordData();
   const [hovered, setHovered] = useState(null);
   const [top3Data, setTop3Data] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,10 +78,33 @@ export default function Main_top3() {
     }
   };
 
-  // 컴포넌트 마운트 시 데이터 로드
+  // 컴포넌트 마운트 시 데이터 로드 (한 번만 실행)
   useEffect(() => {
+    console.log("🚀 Main_top3 컴포넌트 마운트 - TOP3 키워드 로딩 시작");
     fetchTop3Data();
-  }, []);
+  }, []); // 빈 의존성 배열로 한 번만 실행
+
+  // 심층분석 버튼 클릭 핸들러
+  const handleAnalysisClick = async (keyword) => {
+    try {
+      console.log("🔍 심층분석 시작:", keyword);
+
+      // 키워드 검색 API 호출
+      const data = await keywordApiService.searchKeyword(keyword);
+
+      // 검색 결과를 전역 상태에 저장
+      setKeywordData(data);
+
+      // Sub 페이지로 이동
+      navigate("/sub");
+
+      console.log("✅ 심층분석 페이지 이동 완료:", keyword);
+
+    } catch (error) {
+      console.error("❌ 심층분석 이동 실패:", error);
+      alert("심층분석 페이지로 이동하는 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <section className="trending-section top3">
@@ -132,7 +160,10 @@ export default function Main_top3() {
                   </p>
                 ))}
 
-                <button aria-label={`${title} 심층분석 보러가기`}>
+                <button
+                  aria-label={`${title} 심층분석 보러가기`}
+                  onClick={() => handleAnalysisClick(title)}
+                >
                   심층분석 보러가기
                 </button>
               </div>

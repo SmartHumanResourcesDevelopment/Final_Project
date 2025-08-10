@@ -24,54 +24,129 @@ const negativeData = [
 /* 공통 차트 옵션 */
 const AxisStyle = { fontSize: 12 };
 
-export function DetailInsightsKOTE_positivity_Graph({ positiveCount = 0, totalCount = 0 }) {
-  // 실제 데이터가 있으면 사용, 없으면 기본 데이터
-  const chartData = positiveCount > 0 ? [
-    { name: "긍정", value: positiveCount },
-    { name: "전체", value: totalCount },
-    { name: "비율", value: Math.round((positiveCount / totalCount) * 100) }
-  ] : positiveData;
+export function DetailInsightsKOTE_positivity_Graph({
+  positiveCount = 0,
+  totalCount = 0,
+  topEmotions = [],
+  comments = []
+}) {
+  // TOP 3 감정 데이터 활용
+  const chartData = topEmotions.length > 0
+    ? topEmotions.map(emotion => ({
+        name: emotion.emotion,
+        value: emotion.count
+      }))
+    : positiveData; // 기본 데이터
+
+  // 댓글 4개만 표시
+  const displayComments = comments.slice(0, 4);
 
   return (
     <div className="koteChart">
       <h3 className="koteChart__title koteChart__title--positive">
-        긍정 감정 ({positiveCount > 0 ? `${positiveCount}개` : 'TOP3'})
+        긍정 감정 TOP {Math.min(topEmotions.length, 3)} ({positiveCount}개)
       </h3>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eeeeee" />
-          <XAxis dataKey="name" tick={AxisStyle} />
+          <XAxis
+            dataKey="name"
+            tick={AxisStyle}
+            angle={-45}
+            textAnchor="end"
+            height={80}
+          />
           <YAxis tick={AxisStyle} />
-          <Tooltip />
+          <Tooltip
+            formatter={(value) => [value + '개', '감정 수']}
+            labelFormatter={(label) => `감정: ${label}`}
+          />
           <Bar dataKey="value" fill="#00c851" barSize={40} />
         </BarChart>
       </ResponsiveContainer>
+
+      {/* 긍정 댓글 4개 표시 */}
+      <div className="emotion-comments">
+        <h4 className="emotion-comments__title">긍정 댓글 예시</h4>
+        <div className="emotion-comments__list">
+          {displayComments.length > 0 ? (
+            displayComments.map((comment, index) => (
+              <div key={index} className="emotion-comment">
+                <span className="emotion-comment__platform">{comment.platform}</span>
+                <p className="emotion-comment__text">💬 {comment.comment_text}</p>
+                <span className="emotion-comment__emotion">#{comment.emotion}</span>
+              </div>
+            ))
+          ) : (
+            <div className="emotion-comment emotion-comment--placeholder">
+              <p className="emotion-comment__text">댓글 데이터를 불러오는 중...</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
-export function DetailInsightsKOTE_negative_Graph({ negativeCount = 0, totalCount = 0 }) {
-  // 실제 데이터가 있으면 사용, 없으면 기본 데이터
-  const chartData = negativeCount > 0 ? [
-    { name: "부정", value: negativeCount },
-    { name: "전체", value: totalCount },
-    { name: "비율", value: Math.round((negativeCount / totalCount) * 100) }
-  ] : negativeData;
+export function DetailInsightsKOTE_negative_Graph({
+  negativeCount = 0,
+  topEmotions = [],
+  comments = []
+}) {
+  // TOP 3 감정 데이터 활용
+  const chartData = topEmotions.length > 0
+    ? topEmotions.map(emotion => ({
+        name: emotion.emotion,
+        value: emotion.count
+      }))
+    : negativeData; // 기본 데이터
+
+  // 댓글 4개만 표시
+  const displayComments = comments.slice(0, 4);
 
   return (
     <div className="koteChart">
       <h3 className="koteChart__title koteChart__title--negative">
-        부정 감정 ({negativeCount > 0 ? `${negativeCount}개` : 'TOP3'})
+        부정 감정 TOP {Math.min(topEmotions.length, 3)} ({negativeCount}개)
       </h3>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eeeeee" />
-          <XAxis dataKey="name" tick={AxisStyle} />
+          <XAxis
+            dataKey="name"
+            tick={AxisStyle}
+            angle={-45}
+            textAnchor="end"
+            height={80}
+          />
           <YAxis tick={AxisStyle} />
-          <Tooltip />
+          <Tooltip
+            formatter={(value) => [value + '개', '감정 수']}
+            labelFormatter={(label) => `감정: ${label}`}
+          />
           <Bar dataKey="value" fill="#ff4444" barSize={40} />
         </BarChart>
       </ResponsiveContainer>
+
+      {/* 부정 댓글 4개 표시 */}
+      <div className="emotion-comments">
+        <h4 className="emotion-comments__title">부정 댓글 예시</h4>
+        <div className="emotion-comments__list">
+          {displayComments.length > 0 ? (
+            displayComments.map((comment, index) => (
+              <div key={index} className="emotion-comment">
+                <span className="emotion-comment__platform">{comment.platform}</span>
+                <p className="emotion-comment__text">💬 {comment.comment_text}</p>
+                <span className="emotion-comment__emotion">#{comment.emotion}</span>
+              </div>
+            ))
+          ) : (
+            <div className="emotion-comment emotion-comment--placeholder">
+              <p className="emotion-comment__text">댓글 데이터를 불러오는 중...</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

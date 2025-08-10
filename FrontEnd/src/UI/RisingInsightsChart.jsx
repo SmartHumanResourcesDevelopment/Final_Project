@@ -9,12 +9,14 @@ export default function RisingInsightsChart() {
   const [aiAnalysis, setAiAnalysis] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // 급상승 키워드 차트 데이터 로딩
+  // 급상승 키워드 차트 데이터 로딩 (한 번만 실행)
   useEffect(() => {
+    console.log("📊 급상승 인사이트 차트 데이터 로딩 시작");
+
     fetch("/zal/api/main/trending/insights")
       .then(res => res.json())
       .then(data => {
-        console.log("급상승 인사이트 데이터:", data);
+        console.log("✅ 급상승 인사이트 데이터 로딩 성공:", data);
 
         if (data.labels && data.datasets) {
           // 차트 데이터 변환
@@ -35,10 +37,10 @@ export default function RisingInsightsChart() {
         setLoading(false);
       })
       .catch(error => {
-        console.error("급상승 인사이트 데이터 로딩 실패:", error);
+        console.error("❌ 급상승 인사이트 데이터 로딩 실패:", error);
         setLoading(false);
       });
-  }, []);
+  }, []); // 빈 의존성 배열 추가 - 컴포넌트 마운트 시 한 번만 실행
 
   if (loading) {
     return <div>로딩 중...</div>;

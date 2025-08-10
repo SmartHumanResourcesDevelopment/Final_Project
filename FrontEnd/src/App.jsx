@@ -1,5 +1,6 @@
 import React from "react";
 import { UserProvider } from "./contexts/UserContext";
+import { KeywordDataProvider } from "./contexts/KeywordDataContext";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Login from "./components/Login";
 import Join from "./components/Join";
@@ -28,6 +29,7 @@ function App() {
   return (
     <BrowserRouter>
       <UserProvider>
+        <KeywordDataProvider>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/join" element={<Join />} />
@@ -85,6 +87,7 @@ function App() {
           /> 
           
         </Routes>
+        </KeywordDataProvider>
       </UserProvider>
     </BrowserRouter>
   );

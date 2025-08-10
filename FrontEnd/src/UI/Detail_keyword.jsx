@@ -10,7 +10,7 @@ export default function DetailKeyword({ keywordData }) {
 
   // 기본값 설정
   const defaultKeywordData = {
-    keyword: "말차",
+    keyword: "키워드 없음",
     ranking: "20등",
     emotionLabels: ["즐거움", "건강", "~", "~", "~"],
     description: "‘맛있는 건강’을 추구하는 잘파세대의 새로운 일상",

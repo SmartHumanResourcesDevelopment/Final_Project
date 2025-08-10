@@ -71,11 +71,11 @@ public interface DetailKeywordMapper {
     List<Map<String, Object>> getKeywordDailyStatsByPeriod(@Param("keywordId") Long keywordId, @Param("period") String period);
 
     /**
-     * 키워드 감성분석 결과 조회 (긍정/부정 카운트)
+     * 키워드 감성분석 결과 조회 (감정별 상세 카운트)
      * @param params 파라미터 맵 (keywordId, onlyMain)
-     * @return 감성분석 결과 (긍정/부정 카운트)
+     * @return 감정별 상세 카운트 목록
      */
-    Map<String, Object> getKeywordSentimentAnalysis(Map<String, Object> params);
+    List<Map<String, Object>> getKeywordSentimentAnalysis(Map<String, Object> params);
 
     /**
      * 키워드 관련 랜덤 댓글 조회
@@ -90,6 +90,13 @@ public interface DetailKeywordMapper {
      * @return 데이터 카운트 정보
      */
     Map<String, Object> checkKeywordData(@Param("keywordId") Long keywordId);
+
+    /**
+     * 특정 감정에 해당하는 댓글 조회
+     * @param params 파라미터 맵 (keywordId, emotion, limit)
+     * @return 감정별 댓글 목록
+     */
+    List<Map<String, Object>> getCommentsByEmotion(Map<String, Object> params);
 
     /**
      * 키워드 감정별 상세 카운트 조회

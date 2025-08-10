@@ -129,116 +129,34 @@ public class DetailKeywordService {
                 // 유사도 정보가 없어도 계속 진행
             }
 
-            // 4. 감성분석 정보 조회
-            Map<String, Object> sentimentAnalysis = null;
-            List<Map<String, Object>> positiveComments = new ArrayList<>();
-            List<Map<String, Object>> negativeComments = new ArrayList<>();
+            // 4. 감성분석은 별도 API로 분리 (빠른 응답을 위해)
+            System.out.println("⚡ 기본 정보만 조회 (감성분석은 별도 호출)");
+            // 감성분석은 별도 API에서 처리
 
-            System.out.println("🎯 감성분석 조회 시작 - 키워드 ID: " + keywordId);
-            try {
-                // 먼저 데이터 존재 여부 확인
-                System.out.println("🔍 데이터 존재 여부 확인 중...");
-                Map<String, Object> dataCheck = detailKeywordMapper.checkKeywordData(keywordId);
-                System.out.println("📊 데이터 현황: " + dataCheck);
+            // 5. 유사 키워드 목록 추출 (검색 제안용)
+            List<String> suggestedKeywords = new ArrayList<>();
+            if (similarKeywordDetails != null && !similarKeywordDetails.isEmpty()) {
+                String currentKeyword = (String) keywordInfo.get("KEYWORD_NAME");
 
-                // 매퍼에서 Map 파라미터를 받으므로 Map으로 전달
-                Map<String, Object> sentimentParams = new HashMap<>();
-                sentimentParams.put("keywordId", keywordId);
-                sentimentParams.put("onlyMain", false); // 모든 감정 포함
-
-                sentimentAnalysis = detailKeywordMapper.getKeywordSentimentAnalysis(sentimentParams);
-                System.out.println("📊 감성분석 정보 조회 결과: " + sentimentAnalysis);
-
-                if (sentimentAnalysis != null) {
-                    // 감성분석 결과 상세 출력
-                    Object positiveCount = sentimentAnalysis.get("POSITIVE_COUNT");
-                    Object negativeCount = sentimentAnalysis.get("NEGATIVE_COUNT");
-                    Object totalCount = sentimentAnalysis.get("TOTAL_COUNT");
-
-                    System.out.println("🎯 ===== 키워드 '" + keywordInfo.get("KEYWORD_NAME") + "' 총 감정 분석 결과 =====");
-                    System.out.println("👍 긍정 감정: " + positiveCount + "개");
-                    System.out.println("👎 부정 감정: " + negativeCount + "개");
-                    System.out.println("📊 총 감정: " + totalCount + "개");
-
-                    if (totalCount != null && ((Number) totalCount).intValue() > 0) {
-                        double positiveRatio = ((Number) positiveCount).doubleValue() / ((Number) totalCount).doubleValue() * 100;
-                        double negativeRatio = ((Number) negativeCount).doubleValue() / ((Number) totalCount).doubleValue() * 100;
-                        System.out.println("📈 긍정 비율: " + String.format("%.1f", positiveRatio) + "%");
-                        System.out.println("📉 부정 비율: " + String.format("%.1f", negativeRatio) + "%");
-
-                        if (positiveRatio > negativeRatio) {
-                            System.out.println("✨ 전체적으로 긍정적인 키워드입니다!");
-                        } else if (negativeRatio > positiveRatio) {
-                            System.out.println("⚠️ 전체적으로 부정적인 키워드입니다!");
-                        } else {
-                            System.out.println("⚖️ 긍정과 부정이 균형을 이루는 키워드입니다!");
-                        }
+                for (Map<String, Object> similar : similarKeywordDetails) {
+                    String similarKeywordName = (String) similar.get("KEYWORD_NAME");
+                    if (similarKeywordName != null && !similarKeywordName.equals(currentKeyword)) {
+                        suggestedKeywords.add(similarKeywordName);
                     }
-
-                    // 상세 감정별 카운트 조회 및 출력
-                    try {
-                        List<Map<String, Object>> detailedSentiments = detailKeywordMapper.getKeywordDetailedSentiments(sentimentParams);
-                        if (!detailedSentiments.isEmpty()) {
-                            System.out.println("🔍 ===== 상세 감정별 분석 =====");
-
-                            // 긍정 감정들
-                            System.out.println("👍 긍정 감정 상세:");
-                            detailedSentiments.stream()
-                                .filter(s -> "positive".equals(s.get("SENTIMENT_TYPE")))
-                                .forEach(s -> System.out.println("   • " + s.get("EMOTION_LABEL") + ": " + s.get("COUNT") + "개"));
-
-                            // 부정 감정들
-                            System.out.println("👎 부정 감정 상세:");
-                            detailedSentiments.stream()
-                                .filter(s -> "negative".equals(s.get("SENTIMENT_TYPE")))
-                                .forEach(s -> System.out.println("   • " + s.get("EMOTION_LABEL") + ": " + s.get("COUNT") + "개"));
-
-                            // 중립 감정들 (있다면)
-                            long neutralCount = detailedSentiments.stream()
-                                .filter(s -> "neutral".equals(s.get("SENTIMENT_TYPE")))
-                                .count();
-                            if (neutralCount > 0) {
-                                System.out.println("😐 중립 감정 상세:");
-                                detailedSentiments.stream()
-                                    .filter(s -> "neutral".equals(s.get("SENTIMENT_TYPE")))
-                                    .forEach(s -> System.out.println("   • " + s.get("EMOTION_LABEL") + ": " + s.get("COUNT") + "개"));
-                            }
-                        }
-                    } catch (Exception e) {
-                        System.out.println("⚠️ 상세 감정 정보 조회 실패: " + e.getMessage());
-                    }
-
-                    System.out.println("================================================");
-
-                    // 랜덤 댓글 3개 조회 (긍정/부정 구분 없이)
-                    Map<String, Object> commentParams = new HashMap<>();
-                    commentParams.put("keywordId", keywordId);
-                    commentParams.put("limit", 3);
-
-                    List<Map<String, Object>> randomComments = detailKeywordMapper.getRandomCommentsByKeyword(commentParams);
-
-                    // 임시로 모든 댓글을 긍정으로 분류 (나중에 감정별 분류 로직 추가 가능)
-                    positiveComments = randomComments;
-                    negativeComments = new ArrayList<>(); // 빈 리스트
-
-                    System.out.println("📊 긍정 댓글: " + positiveComments.size() + "개");
-                    System.out.println("📊 부정 댓글: " + negativeComments.size() + "개");
                 }
 
-            } catch (Exception e) {
-                System.out.println("⚠️ 감성분석 정보 조회 실패: " + e.getMessage());
-                // 감성분석 정보가 없어도 계속 진행
+                if (!suggestedKeywords.isEmpty()) {
+                    System.out.println("✅ " + currentKeyword + " 관련 DB 키워드 " + suggestedKeywords.size() + "개 발견");
+                }
             }
 
-            // 5. 응답 데이터 구성
+            // 6. 응답 데이터 구성 (감성분석 제외)
             Map<String, Object> response = new HashMap<>();
             response.put("keywordInfo", keywordInfo);
             response.put("mainStats", mainStats);
             response.put("similarityInfo", similarityInfo);
             response.put("similarKeywords", similarKeywordDetails);
-            response.put("sentimentAnalysis", sentimentAnalysis);
-            response.put("positiveComments", positiveComments);
-            response.put("negativeComments", negativeComments);
+            response.put("suggestedKeywords", suggestedKeywords); // 검색 제안용 키워드 목록
             response.put("lastUpdated", new Date());
             
             System.out.println("✅ 키워드 상세 정보 조회 완료: " + keywordName);
@@ -389,5 +307,284 @@ public class DetailKeywordService {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    /**
+     * 키워드 감성분석 정보 조회 (별도 API)
+     * @param keywordName 키워드명
+     * @return 감성분석 결과
+     */
+    public Map<String, Object> getKeywordSentimentAnalysis(String keywordName) {
+        try {
+            System.out.println("🎯 감성분석 조회 시작 - 키워드: " + keywordName);
+
+            // 1. 키워드 기본 정보 조회
+            Map<String, Object> keywordInfo = detailKeywordMapper.getKeywordByName(keywordName);
+            if (keywordInfo == null) {
+                System.out.println("⚠️ 키워드를 찾을 수 없음: " + keywordName);
+                return Map.of("error", "키워드를 찾을 수 없습니다.");
+            }
+
+            Long keywordId = ((Number) keywordInfo.get("KEYWORD_ID")).longValue();
+            System.out.println("📊 키워드 ID: " + keywordId);
+
+            // 2. 데이터 존재 여부 확인
+            System.out.println("🔍 데이터 존재 여부 확인 중...");
+            Map<String, Object> dataCheck = detailKeywordMapper.checkKeywordData(keywordId);
+            System.out.println("📊 데이터 현황: " + dataCheck);
+
+            // 3. 감성분석 데이터 조회
+            Map<String, Object> sentimentParams = new HashMap<>();
+            sentimentParams.put("keywordId", keywordId);
+            sentimentParams.put("onlyMain", false);
+
+            List<Map<String, Object>> sentimentResults = detailKeywordMapper.getKeywordSentimentAnalysis(sentimentParams);
+            System.out.println("📊 감성분석 원본 데이터: " + sentimentResults.size() + "개");
+
+            if (sentimentResults != null && !sentimentResults.isEmpty()) {
+                // JSON 배열 파싱 및 개별 감정 카운트
+                Map<String, Integer> emotionCounts = parseAndCountEmotions(sentimentResults);
+
+                // 긍정/부정별로 분류하고 TOP 3 추출
+                Map<String, Integer> positiveEmotions = new HashMap<>();
+                Map<String, Integer> negativeEmotions = new HashMap<>();
+
+                for (Map.Entry<String, Integer> entry : emotionCounts.entrySet()) {
+                    String emotion = entry.getKey();
+                    int count = entry.getValue();
+                    String sentimentType = classifyEmotion(emotion);
+
+                    if ("positive".equals(sentimentType)) {
+                        positiveEmotions.put(emotion, count);
+                    } else if ("negative".equals(sentimentType)) {
+                        negativeEmotions.put(emotion, count);
+                    }
+                }
+
+                // TOP 3 추출
+                List<Map<String, Object>> topPositive = getTopEmotions(positiveEmotions, 3);
+                List<Map<String, Object>> topNegative = getTopEmotions(negativeEmotions, 3);
+
+                // 카운트 집계
+                int positiveCount = positiveEmotions.values().stream().mapToInt(Integer::intValue).sum();
+                int negativeCount = negativeEmotions.values().stream().mapToInt(Integer::intValue).sum();
+                int totalCount = positiveCount + negativeCount;
+
+                System.out.println("🔍 ===== TOP 3 감정별 분석 =====");
+                if (!topPositive.isEmpty()) {
+                    System.out.println("👍 긍정 감정 TOP 3:");
+                    topPositive.forEach(emotion ->
+                        System.out.println("   • " + emotion.get("emotion") + ": " + emotion.get("count") + "개"));
+                }
+
+                if (!topNegative.isEmpty()) {
+                    System.out.println("👎 부정 감정 TOP 3:");
+                    topNegative.forEach(emotion ->
+                        System.out.println("   • " + emotion.get("emotion") + ": " + emotion.get("count") + "개"));
+                }
+
+                // 응답 데이터 구성
+                Map<String, Object> response = new HashMap<>();
+                response.put("POSITIVE_COUNT", positiveCount);
+                response.put("NEGATIVE_COUNT", negativeCount);
+                response.put("TOTAL_COUNT", totalCount);
+                response.put("TOP_POSITIVE", topPositive);
+                response.put("TOP_NEGATIVE", topNegative);
+                response.put("keywordName", keywordName);
+                response.put("lastUpdated", new Date());
+
+                // TOP 3 감정별 댓글 예시 추가
+                response.put("POSITIVE_COMMENTS", getEmotionComments(keywordId, topPositive));
+                response.put("NEGATIVE_COMMENTS", getEmotionComments(keywordId, topNegative));
+
+                System.out.println("✅ 감성분석 완료: " + keywordName);
+                return response;
+            } else {
+                // 데이터가 없는 경우
+                Map<String, Object> response = new HashMap<>();
+                response.put("POSITIVE_COUNT", 0);
+                response.put("NEGATIVE_COUNT", 0);
+                response.put("TOTAL_COUNT", 0);
+                response.put("TOP_POSITIVE", new ArrayList<>());
+                response.put("TOP_NEGATIVE", new ArrayList<>());
+                response.put("keywordName", keywordName);
+                response.put("message", "감성분석 데이터가 없습니다.");
+                return response;
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ 감성분석 조회 실패: " + e.getMessage());
+            e.printStackTrace();
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "감성분석 조회 중 오류가 발생했습니다.");
+            errorResponse.put("message", e.getMessage());
+            return errorResponse;
+        }
+    }
+
+    /**
+     * JSON 배열 형태의 감정 라벨을 파싱하여 개별 감정별 카운트
+     */
+    private Map<String, Integer> parseAndCountEmotions(List<Map<String, Object>> sentimentResults) {
+        Map<String, Integer> emotionCounts = new HashMap<>();
+
+        for (Map<String, Object> result : sentimentResults) {
+            String label = (String) result.get("LABEL");
+            if (label == null || label.trim().isEmpty()) {
+                continue;
+            }
+
+            // JSON 배열 파싱: ["어이없음", "당황/난처", "놀람"] → 개별 감정들
+            String[] emotions = parseJsonArray(label);
+
+            for (String emotion : emotions) {
+                emotion = emotion.trim();
+                if (!emotion.isEmpty()) {
+                    emotionCounts.put(emotion, emotionCounts.getOrDefault(emotion, 0) + 1);
+                }
+            }
+        }
+
+        return emotionCounts;
+    }
+
+    /**
+     * JSON 배열 문자열을 파싱하여 개별 요소 배열로 변환
+     */
+    private String[] parseJsonArray(String jsonArrayString) {
+        if (jsonArrayString == null || jsonArrayString.trim().isEmpty()) {
+            return new String[0];
+        }
+
+        // 대괄호 제거: ["a", "b", "c"] → "a", "b", "c"
+        String cleaned = jsonArrayString.trim()
+            .replaceAll("^\\[", "")  // 시작 대괄호 제거
+            .replaceAll("\\]$", ""); // 끝 대괄호 제거
+
+        if (cleaned.trim().isEmpty()) {
+            return new String[0];
+        }
+
+        // 쉼표로 분리하고 따옴표 제거
+        return java.util.Arrays.stream(cleaned.split(","))
+            .map(s -> s.trim().replaceAll("^\"|\"$", "")) // 앞뒤 따옴표 제거
+            .filter(s -> !s.isEmpty())
+            .toArray(String[]::new);
+    }
+
+    /**
+     * 개별 감정을 긍정/부정/중립으로 분류
+     */
+    private String classifyEmotion(String emotion) {
+        if (emotion == null || emotion.trim().isEmpty()) {
+            return "neutral";
+        }
+
+        // 긍정 감정
+        String[] positiveEmotions = {
+            "환영/호의", "감동/감탄", "고마움", "존경", "기대감", "뿌듯함",
+            "편안/쾌적", "신기함/관심", "아껴주는", "즐거움/신남", "깨달음",
+            "흐뭇함(귀여움/예쁨)", "놀람", "행복", "기쁨", "안심/신뢰"
+        };
+
+        // 부정 감정
+        String[] negativeEmotions = {
+            "불평/불만", "지긋지긋", "슬픔", "화남/분노", "우쭐댐/무시함",
+            "안타까움/실망", "비장함", "의심/불신", "부끄러움", "공포/무서움",
+            "절망", "한심함", "역겨움/징그러움", "짜증", "어이없음", "패배/자기혐오",
+            "귀찮음", "힘듦/지침", "죄책감", "증오/혐오", "당황/난처", "경악",
+            "부담/안_내킴", "서러움", "재미없음", "불쌍함/연민", "불안/걱정"
+        };
+
+        for (String positive : positiveEmotions) {
+            if (positive.equals(emotion)) {
+                return "positive";
+            }
+        }
+
+        for (String negative : negativeEmotions) {
+            if (negative.equals(emotion)) {
+                return "negative";
+            }
+        }
+
+        return "neutral";
+    }
+
+    /**
+     * 감정별 카운트에서 TOP N 추출
+     */
+    private List<Map<String, Object>> getTopEmotions(Map<String, Integer> emotionCounts, int topN) {
+        return emotionCounts.entrySet().stream()
+            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed()) // 카운트 내림차순 정렬
+            .limit(topN) // TOP N 개만 선택
+            .map(entry -> {
+                Map<String, Object> emotion = new HashMap<>();
+                emotion.put("emotion", entry.getKey());
+                emotion.put("count", entry.getValue());
+                return emotion;
+            })
+            .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * TOP 감정별 댓글 예시 조회
+     * @param keywordId 키워드 ID
+     * @param topEmotions TOP 감정 목록
+     * @return 감정별 댓글 목록
+     */
+    private List<Map<String, Object>> getEmotionComments(Long keywordId, List<Map<String, Object>> topEmotions) {
+        List<Map<String, Object>> allComments = new ArrayList<>();
+
+        try {
+            // 각 TOP 감정별로 댓글 조회 (감정당 2개씩, 총 4개 목표)
+            int commentsPerEmotion = Math.max(1, 4 / Math.max(1, topEmotions.size()));
+
+            for (Map<String, Object> emotion : topEmotions) {
+                String emotionName = (String) emotion.get("emotion");
+                if (emotionName == null || emotionName.trim().isEmpty()) {
+                    continue;
+                }
+
+                // 매퍼 파라미터 설정
+                Map<String, Object> params = new HashMap<>();
+                params.put("keywordId", keywordId);
+                params.put("emotion", emotionName);
+                params.put("limit", commentsPerEmotion);
+
+                // 해당 감정의 댓글 조회
+                List<Map<String, Object>> emotionComments = detailKeywordMapper.getCommentsByEmotion(params);
+
+                if (emotionComments != null && !emotionComments.isEmpty()) {
+                    allComments.addAll(emotionComments);
+                    System.out.println("📝 " + emotionName + " 감정 댓글: " + emotionComments.size() + "개");
+
+                    // 실제 댓글 내용 출력
+                    for (int i = 0; i < Math.min(emotionComments.size(), 2); i++) {
+                        Map<String, Object> comment = emotionComments.get(i);
+                        System.out.println("   💬 [" + comment.get("platform") + "] " + comment.get("comment_text"));
+                    }
+                }
+
+                // 총 4개 이상이면 중단
+                if (allComments.size() >= 4) {
+                    break;
+                }
+            }
+
+            // 4개로 제한
+            if (allComments.size() > 4) {
+                allComments = allComments.subList(0, 4);
+            }
+
+            System.out.println("💬 총 댓글 예시: " + allComments.size() + "개");
+
+        } catch (Exception e) {
+            System.err.println("❌ 감정별 댓글 조회 실패: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return allComments;
     }
 }

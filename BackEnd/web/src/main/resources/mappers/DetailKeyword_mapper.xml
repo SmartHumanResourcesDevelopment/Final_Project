@@ -194,39 +194,33 @@
      ========================================= -->
   <select id="getKeywordSentimentAnalysis" parameterType="map" resultType="map">
     <![CDATA[
-    SELECT
-      NVL(SUM(CASE
-        WHEN sr.LABEL IN ('환영/호의','감동/감탄','고마움','존경','기대감','뿌듯함',
-                          '편안/쾌적','신기함/관심','아껴주는','즐거움/신남','깨달음',
-                          '흐뭇함(귀여움/예쁨)','놀람','행복','기쁨','안심/신뢰')
-        THEN 1 ELSE 0 END), 0) AS positive_count,
-      NVL(SUM(CASE
-        WHEN sr.LABEL IN ('불평/불만','지긋지긋','슬픔','화남/분노','우쭐댐/무시함',
-                          '안타까움/실망','비장함','의심/불신','부끄러움','공포/무서움',
-                          '절망','한심함','역겨움/징그러움','짜증','어이없음','패배/자기혐오',
-                          '귀찮음','힘듦/지침','죄책감','증오/혐오','당황/난처','경악',
-                          '부담/안_내킴','서러움','재미없음','불쌍함/연민','불안/걱정')
-        THEN 1 ELSE 0 END), 0) AS negative_count,
-      NVL(COUNT(*), 0) AS total_count
-    FROM SENTIMENT_RESULT sr
-    WHERE sr.SOURCE_ID IN (
-      SELECT CAST(yc.COMMENT_ID AS VARCHAR2(4000)) FROM YOUTUBE_COMMENT yc
+    SELECT EMOTIONS AS LABEL, SOURCE_ID
+    FROM (
+      -- YouTube 댓글의 감정 데이터
+      SELECT yc.EMOTIONS, yc.COMMENT_ID AS SOURCE_ID
+      FROM YOUTUBE_COMMENT yc
       JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
       WHERE yv.KEYWORD_ID = #{keywordId}
-      UNION
-      SELECT CAST(ic.COMMENT_ID AS VARCHAR2(4000)) FROM INSTAGRAM_COMMENT ic
+        AND yc.EMOTIONS IS NOT NULL
+        AND yc.EMOTIONS != '[]'
+        AND yc.EMOTIONS != '["없음"]'
+        AND yc.EMOTIONS != '["분석실패"]'
+        AND yc.EMOTIONS != '["분석불가"]'
+
+      UNION ALL
+
+      -- Instagram 댓글의 감정 데이터 (COMMENT_ID를 문자열로 변환)
+      SELECT ic.EMOTIONS, TO_CHAR(ic.COMMENT_ID) AS SOURCE_ID
+      FROM INSTAGRAM_COMMENT ic
       JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
       WHERE ip.KEYWORD_ID = #{keywordId}
+        AND ic.EMOTIONS IS NOT NULL
+        AND ic.EMOTIONS != '[]'
+        AND ic.EMOTIONS != '["없음"]'
+        AND ic.EMOTIONS != '["분석실패"]'
+        AND ic.EMOTIONS != '["분석불가"]'
     )
-    AND sr.SOURCE_TYPE = 'comments'
-    AND sr.LABEL IN ('환영/호의','감동/감탄','고마움','존경','기대감','뿌듯함',
-                     '편안/쾌적','신기함/관심','아껴주는','즐거움/신남','깨달음',
-                     '흐뭇함(귀여움/예쁨)','놀람','행복','기쁨','안심/신뢰',
-                     '불평/불만','지긋지긋','슬픔','화남/분노','우쭐댐/무시함',
-                     '안타까움/실망','비장함','의심/불신','부끄러움','공포/무서움',
-                     '절망','한심함','역겨움/징그러움','짜증','어이없음','패배/자기혐오',
-                     '귀찮음','힘듦/지침','죄책감','증오/혐오','당황/난처','경악',
-                     '부담/안_내킴','서러움','재미없음','불쌍함/연민','불안/걱정')
+    WHERE EMOTIONS IS NOT NULL
     ]]>
   </select>
 
@@ -252,14 +246,22 @@
       END AS sentiment_type,
       COUNT(*) AS count
     FROM SENTIMENT_RESULT sr
-    WHERE sr.SOURCE_ID IN (
-      SELECT CAST(yc.COMMENT_ID AS VARCHAR2(4000)) FROM YOUTUBE_COMMENT yc
-      JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
-      WHERE yv.KEYWORD_ID = #{keywordId}
-      UNION
-      SELECT CAST(ic.COMMENT_ID AS VARCHAR2(4000)) FROM INSTAGRAM_COMMENT ic
-      JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
-      WHERE ip.KEYWORD_ID = #{keywordId}
+    WHERE (
+      -- Instagram 댓글 (COMMENT_ID가 NUMBER이므로 직접 비교)
+      EXISTS (
+        SELECT 1 FROM INSTAGRAM_COMMENT ic
+        JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
+        WHERE ip.KEYWORD_ID = #{keywordId}
+        AND ic.COMMENT_ID = sr.SOURCE_ID
+      )
+      OR
+      -- YouTube 댓글 (COMMENT_ID가 VARCHAR2이므로 NUMBER로 변환해서 비교)
+      EXISTS (
+        SELECT 1 FROM YOUTUBE_COMMENT yc
+        JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
+        WHERE yv.KEYWORD_ID = #{keywordId}
+        AND TO_NUMBER(yc.COMMENT_ID) = sr.SOURCE_ID
+      )
     )
     AND sr.SOURCE_TYPE = 'comments'
     AND sr.LABEL IN ('환영/호의','감동/감탄','고마움','존경','기대감','뿌듯함',
@@ -299,25 +301,25 @@
       FROM (
         -- YouTube
         SELECT
-          SUBSTR(c.COMMENT_TEXT, 1, 4000) AS comment_text,
-          CAST(c.COMMENT_ID AS VARCHAR2(4000)) AS comment_id,
+          DBMS_LOB.SUBSTR(c.COMMENT_TEXT, 4000, 1) AS comment_text,
+          c.COMMENT_ID AS comment_id,
           'youtube' AS source_type
         FROM YOUTUBE_VIDEO v
         JOIN YOUTUBE_COMMENT c ON c.VIDEO_ID = v.VIDEO_ID
         WHERE v.KEYWORD_ID = #{keywordId}
-          AND LENGTH(c.COMMENT_TEXT) >= 15
+          AND DBMS_LOB.GETLENGTH(c.COMMENT_TEXT) >= 15
 
         UNION ALL
 
         -- Instagram
         SELECT
-          SUBSTR(c.COMMENT_TEXT, 1, 4000) AS comment_text,
-          CAST(c.COMMENT_ID AS VARCHAR2(4000)) AS comment_id,
+          DBMS_LOB.SUBSTR(c.COMMENT_TEXT, 4000, 1) AS comment_text,
+          TO_CHAR(c.COMMENT_ID) AS comment_id,
           'instagram' AS source_type
         FROM INSTAGRAM_POST p
         JOIN INSTAGRAM_COMMENT c ON c.POST_ID = p.POST_ID
         WHERE p.KEYWORD_ID = #{keywordId}
-          AND LENGTH(c.COMMENT_TEXT) >= 15
+          AND DBMS_LOB.GETLENGTH(c.COMMENT_TEXT) >= 15
       ) t
       ORDER BY DBMS_RANDOM.VALUE
     )
@@ -337,17 +339,55 @@
       (SELECT COUNT(*) FROM INSTAGRAM_COMMENT ic
        JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
        WHERE ip.KEYWORD_ID = #{keywordId}) AS instagram_comments,
-      (SELECT COUNT(*) FROM SENTIMENT_RESULT sr
-       WHERE sr.SOURCE_ID IN (
-         SELECT CAST(yc.COMMENT_ID AS VARCHAR2(4000)) FROM YOUTUBE_COMMENT yc
-         JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
-         WHERE yv.KEYWORD_ID = #{keywordId}
-         UNION
-         SELECT CAST(ic.COMMENT_ID AS VARCHAR2(4000)) FROM INSTAGRAM_COMMENT ic
-         JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
-         WHERE ip.KEYWORD_ID = #{keywordId}
-       )) AS sentiment_results
+      (SELECT COUNT(*) FROM SENTIMENT_RESULT WHERE SOURCE_TYPE = 'comments') AS total_sentiment_results
     FROM DUAL
+    ]]>
+  </select>
+
+  <!-- 댓글 감정 분석 결과 매핑 -->
+  <resultMap id="commentEmotionResultMap" type="map">
+    <result column="COMMENT_TEXT" property="comment_text"/>
+    <result column="EMOTION" property="emotion"/>
+    <result column="PLATFORM" property="platform"/>
+  </resultMap>
+
+  <!-- 특정 감정에 해당하는 댓글 조회 (플랫폼별 균등 분배) -->
+  <select id="getCommentsByEmotion" parameterType="map" resultMap="commentEmotionResultMap">
+    <![CDATA[
+    SELECT * FROM (
+      -- YouTube 댓글 2개
+      SELECT * FROM (
+        SELECT
+          SUBSTR(DBMS_LOB.SUBSTR(yc.COMMENT_TEXT, 4000, 1), 1, 100) as COMMENT_TEXT,
+          #{emotion} as EMOTION,
+          'YouTube' as PLATFORM
+        FROM YOUTUBE_COMMENT yc
+        JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
+        WHERE yv.KEYWORD_ID = #{keywordId}
+          AND yc.EMOTIONS IS NOT NULL
+          AND yc.EMOTIONS LIKE '%' || #{emotion} || '%'
+          AND DBMS_LOB.GETLENGTH(yc.COMMENT_TEXT) >= 15
+        ORDER BY DBMS_RANDOM.VALUE
+      ) WHERE ROWNUM <= 2
+
+      UNION ALL
+
+      -- Instagram 댓글 2개
+      SELECT * FROM (
+        SELECT
+          SUBSTR(DBMS_LOB.SUBSTR(ic.COMMENT_TEXT, 4000, 1), 1, 100) as COMMENT_TEXT,
+          #{emotion} as EMOTION,
+          'Instagram' as PLATFORM
+        FROM INSTAGRAM_COMMENT ic
+        JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
+        WHERE ip.KEYWORD_ID = #{keywordId}
+          AND ic.EMOTIONS IS NOT NULL
+          AND ic.EMOTIONS LIKE '%' || #{emotion} || '%'
+          AND DBMS_LOB.GETLENGTH(ic.COMMENT_TEXT) >= 15
+        ORDER BY DBMS_RANDOM.VALUE
+      ) WHERE ROWNUM <= 2
+    )
+    ORDER BY DBMS_RANDOM.VALUE
     ]]>
   </select>
 

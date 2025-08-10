@@ -12,6 +12,10 @@ function Main_search() {
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [suggestedKeywords, setSuggestedKeywords] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+
 
   /* 인기 키워드 로드 */
   const loadPopularKeywords = async () => {
@@ -45,6 +49,16 @@ function Main_search() {
     try {
       console.log("🔍 키워드 검색 시작:", searchQuery);
 
+      // 먼저 서버 연결 테스트
+      try {
+        await keywordApiService.testConnection();
+        console.log("✅ 서버 연결 확인됨");
+      } catch (connectionError) {
+        console.error("❌ 서버 연결 실패:", connectionError);
+        setError("서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.");
+        return;
+      }
+
       const data = await keywordApiService.searchKeyword(searchQuery.trim());
 
       console.log("✅ 검색 성공:", data);
@@ -56,11 +70,22 @@ function Main_search() {
       } else {
         setError(''); // 성공한 경우 에러 메시지 초기화
 
-        // 검색 성공 시 Sub 페이지로 이동하면서 키워드 데이터 전달
-        navigate('/sub', {
-          state: {
-            keywordData: {
-              keyword: data.keywordInfo.KEYWORD_NAME,
+        // 유사도 테이블에서 받은 관련 키워드 확인
+        if (data.suggestedKeywords && data.suggestedKeywords.length > 0) {
+          console.log("🔍 " + searchQuery + " 관련 유사도 테이블 키워드들:");
+          data.suggestedKeywords.forEach(keyword => {
+            console.log("🔍 " + searchQuery + " 관련 키워드: " + keyword);
+          });
+          setSuggestedKeywords(data.suggestedKeywords);
+          setShowSuggestions(true);
+          console.log("💡 Enter 키를 누르면 '" + searchQuery + "'로 검색됩니다.");
+        } else {
+          // 유사 키워드가 없으면 바로 Sub 페이지로 이동
+          console.log("🎯 관련 키워드가 없어서 바로 '" + searchQuery + "'로 이동합니다.");
+          navigate('/sub', {
+            state: {
+              keywordData: {
+                keyword: data.keywordInfo.KEYWORD_NAME,
               ranking: data.mainStats && data.mainStats.length > 0 ?
                        `${data.mainStats[0].CURRENT_RANK}등` : "순위 정보 없음",
               emotionLabels: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].MAIN_EMOTIONS ?
@@ -78,12 +103,77 @@ function Main_search() {
           }
         });
         return; // 페이지 이동 후 함수 종료
+        }
       }
 
     } catch (err) {
       console.error("❌ 검색 실패:", err);
       setError(err.message || "검색 중 오류가 발생했습니다.");
       setSearchResults(null); // 에러 시 검색 결과 초기화
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* Enter 키 핸들러 - 유사 키워드 제안 중에도 원래 키워드로 검색 */
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && showSuggestions) {
+      e.preventDefault();
+      handleDirectSearch();
+    }
+  };
+
+  /* 원래 검색어로 직접 검색 (Enter 키 - 관련 키워드 무시하고 원래 키워드로 검색) */
+  const handleDirectSearch = async () => {
+    if (!searchQuery.trim()) {
+      console.log("⚠️ 검색어가 없습니다.");
+      return;
+    }
+
+    try {
+      setShowSuggestions(false);
+      setLoading(true);
+      setError(null);
+
+      console.log("🎯 관련 키워드 무시하고 원래 키워드로 직접 검색:", searchQuery);
+
+      // 원래 입력한 키워드로 새로운 API 호출
+      const data = await keywordApiService.searchKeyword(searchQuery.trim());
+
+      console.log("✅ 원래 키워드 직접 검색 성공:", data);
+
+      if (!data.keywordInfo) {
+        setError(data.message || '검색 결과를 찾을 수 없습니다.');
+        return;
+      }
+
+      // Sub 페이지로 이동
+      navigate('/sub', {
+        state: {
+          keywordData: {
+            keyword: data.keywordInfo.KEYWORD_NAME,
+            ranking: data.mainStats && data.mainStats.length > 0 ?
+                     `${data.mainStats[0].CURRENT_RANK}등` : "순위 정보 없음",
+            emotionLabels: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].MAIN_EMOTIONS ?
+                          data.mainStats[0].MAIN_EMOTIONS.split(',').slice(0, 5) : ["감정", "분석", "정보", "없음", "~"],
+            description: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].SHORT_DESCRIPTION ?
+                        data.mainStats[0].SHORT_DESCRIPTION : "키워드 설명이 없습니다.",
+            trendExplanation: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].TREND_EXPLANATION ?
+                             data.mainStats[0].TREND_EXPLANATION : "트렌드 설명이 없습니다.",
+            similarityInfo: data.similarityInfo,
+            similarKeywords: data.similarKeywords || [],
+            sentimentAnalysis: data.sentimentAnalysis,
+            positiveComments: data.positiveComments || [],
+            negativeComments: data.negativeComments || []
+          }
+        }
+      });
+
+      console.log("✅ 원래 키워드로 Sub 페이지 이동 완료:", searchQuery);
+
+    } catch (error) {
+      console.error("❌ 원래 키워드 직접 검색 실패:", error);
+      setError(error.message || "검색 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -101,15 +191,66 @@ function Main_search() {
     }, 100);
   };
 
+  /* 유사 키워드 클릭 핸들러 */
+  const handleSuggestedKeywordClick = async (keyword) => {
+    try {
+      setSearchQuery(keyword);
+      setShowSuggestions(false); // 제안 목록 숨기기
+      setLoading(true);
+
+      console.log("🔍 유사 키워드 검색 시작:", keyword);
+
+      // 해당 키워드로 다시 검색
+      const data = await keywordApiService.searchKeyword(keyword);
+
+      console.log("✅ 유사 키워드 검색 성공:", data);
+
+      if (!data.keywordInfo) {
+        setError(data.message || '검색 결과를 찾을 수 없습니다.');
+      } else {
+        setError('');
+
+        // 바로 Sub 페이지로 이동 (유사 키워드 선택했으므로)
+        navigate('/sub', {
+          state: {
+            keywordData: {
+              keyword: data.keywordInfo.KEYWORD_NAME,
+              ranking: data.mainStats && data.mainStats.length > 0 ?
+                       `${data.mainStats[0].CURRENT_RANK}등` : "순위 정보 없음",
+              emotionLabels: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].MAIN_EMOTIONS ?
+                            data.mainStats[0].MAIN_EMOTIONS.split(',').slice(0, 5) : ["감정", "분석", "정보", "없음", "~"],
+              description: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].SHORT_DESCRIPTION ?
+                          data.mainStats[0].SHORT_DESCRIPTION : "키워드 설명이 없습니다.",
+              trendExplanation: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].TREND_EXPLANATION ?
+                               data.mainStats[0].TREND_EXPLANATION : "트렌드 설명이 없습니다.",
+              similarityInfo: data.similarityInfo,
+              similarKeywords: data.similarKeywords || [],
+              sentimentAnalysis: data.sentimentAnalysis,
+              positiveComments: data.positiveComments || [],
+              negativeComments: data.negativeComments || []
+            }
+          }
+        });
+      }
+
+    } catch (error) {
+      console.error("❌ 유사 키워드 검색 실패:", error);
+      setError(error.message || "검색 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   /* 입력 변경 처리 */
   const handleInputChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  /* 컴포넌트 마운트 시 인기 키워드 로드 */
+  /* 컴포넌트 마운트 시 인기 키워드 로드 (한 번만 실행) */
   useEffect(() => {
+    console.log("🚀 Main_search 컴포넌트 마운트 - 인기 키워드 로딩 시작");
     loadPopularKeywords();
-  }, []);
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
   return (
     <section className="keyword-search" role="search">
@@ -143,13 +284,55 @@ function Main_search() {
           placeholder="예) 민트초코"
           value={searchQuery}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
         />
 
         <button type="submit" aria-label="검색" disabled={loading}>
           {loading ? (
-            <span>검색중...</span>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              color: '#666',
+              fontSize: '14px',
+              whiteSpace: 'nowrap',
+              minWidth: '100px'
+            }}>
+              <span style={{ whiteSpace: 'nowrap' }}>검색중</span>
+              <div style={{
+                display: 'flex',
+                gap: '2px'
+              }}>
+                <span style={{
+                  animation: 'dots 1.4s ease-in-out infinite both',
+                  animationDelay: '-0.32s'
+                }}>.</span>
+                <span style={{
+                  animation: 'dots 1.4s ease-in-out infinite both',
+                  animationDelay: '-0.16s'
+                }}>.</span>
+                <span style={{
+                  animation: 'dots 1.4s ease-in-out infinite both',
+                  animationDelay: '0s'
+                }}>.</span>
+              </div>
+              <div style={{
+                width: '16px',
+                height: '16px',
+                border: '2px solid #f3f3f3',
+                borderTop: '2px solid #007bff',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                marginLeft: '4px',
+                flexShrink: 0
+              }}></div>
+            </div>
           ) : (
-            <img src={searchIcon} alt="" />
+            <img src={searchIcon} alt="검색" style={{
+              width: '20px',
+              height: '20px'
+            }} />
           )}
         </button>
       </form>
@@ -211,21 +394,94 @@ function Main_search() {
         </div>
       )}
 
-      {/* 검색 결과 미리보기 (옵션) */}
-      {searchResults && (
-        <div className="keyword-search__results" style={{
-          marginTop: '20px',
-          padding: '15px',
+      {/* 유사 키워드 제안 */}
+      {showSuggestions && suggestedKeywords.length > 0 && (
+        <div className="keyword-suggestions" style={{
+          marginTop: '15px',
+          padding: '20px',
           backgroundColor: '#f8f9fa',
-          borderRadius: '8px',
-          fontSize: '14px'
+          borderRadius: '12px',
+          border: '2px solid #e3f2fd',
+          textAlign: 'center'
         }}>
-          <strong>검색 결과:</strong> "{searchResults.keywordInfo?.KEYWORD_NAME}"
-          {searchResults.keywordInfo?.total_mentions &&
-            ` (총 ${searchResults.keywordInfo.total_mentions}회 언급)`
-          }
+          <div style={{
+            color: '#1976d2',
+            marginBottom: '15px',
+            fontWeight: '600',
+            fontSize: '16px'
+          }}>
+            🔍 이런 유사 키워드가 있어요!! 어떤게 궁금하세요!
+          </div>
+
+          <div style={{
+            display: 'flex',
+            gap: '10px',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            maxWidth: '600px',
+            margin: '0 auto'
+          }}>
+            {suggestedKeywords.map((keyword, index) => (
+              <button
+                key={index}
+                onClick={() => handleSuggestedKeywordClick(keyword)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#2196f3',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '25px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 4px rgba(33, 150, 243, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#1976d2';
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 4px 8px rgba(33, 150, 243, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#2196f3';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 2px 4px rgba(33, 150, 243, 0.3)';
+                }}
+              >
+                {keyword}
+              </button>
+            ))}
+          </div>
+
+          <div style={{
+            marginTop: '15px',
+            fontSize: '13px',
+            color: '#666',
+            lineHeight: '1.4'
+          }}>
+            <div style={{ marginBottom: '5px' }}>
+              💡 클릭하면 해당 키워드로 검색됩니다
+            </div>
+            <div style={{
+              fontSize: '12px',
+              color: '#888',
+              fontStyle: 'italic'
+            }}>
+              또는 작성하신 키워드 "<strong style={{color: '#007bff'}}>{searchQuery}</strong>"로 검색하시려면 <kbd style={{
+                background: '#f1f3f4',
+                border: '1px solid #dadce0',
+                borderRadius: '3px',
+                padding: '2px 6px',
+                fontSize: '11px',
+                fontFamily: 'monospace'
+              }}>Enter</kbd>키를 눌러주세요
+            </div>
+          </div>
         </div>
       )}
+
+
     </section>
   );
 }

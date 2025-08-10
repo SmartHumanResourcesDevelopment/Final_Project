@@ -75,14 +75,33 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
 }
-.koteChart { width: 100%; }
-.koteChart__title {
-  margin: 0 0 0.5rem;
-  font-size: 1.125rem;
-  text-align: center;
+.koteChart {
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #f0f0f0;
 }
-.koteChart__title--positive { color: #00a347; }
-.koteChart__title--negative { color: #b30000; }
+
+.koteChart__title {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.koteChart__title--positive {
+  color: #00a347;
+  border-bottom-color: #00a347;
+}
+
+.koteChart__title--negative {
+  color: #b30000;
+  border-bottom-color: #b30000;
+}
 
 /* 댓글 리스트 */
 .kote__comments {
@@ -166,4 +185,268 @@
 @keyframes pulse {
   0%, 100% { opacity: 0.6; }
   50% { opacity: 0.3; }
+}
+
+/* ===== 댓글 준비중 메시지 ===== */
+.comments-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  border: 2px dashed #dee2e6;
+}
+
+.placeholder-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.7;
+  animation: pulse 2s infinite;
+}
+
+.comments-placeholder h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.comments-placeholder p {
+  font-size: 14px;
+  color: #6c757d;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.coming-soon {
+  font-size: 12px;
+  color: #007bff;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ===== 감성분석 로딩 상태 ===== */
+.sentiment-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 16px;
+  border: 2px solid #2196f3;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e3f2fd;
+  border-top: 4px solid #2196f3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.sentiment-loading h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1976d2;
+  margin-bottom: 8px;
+}
+
+.sentiment-loading p {
+  font-size: 14px;
+  color: #1565c0;
+  line-height: 1.5;
+}
+
+/* ===== 감성분석 에러 상태 ===== */
+.sentiment-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-radius: 16px;
+  border: 2px solid #f44336;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.8;
+}
+
+.sentiment-error h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #d32f2f;
+  margin-bottom: 8px;
+}
+
+.sentiment-error p {
+  font-size: 14px;
+  color: #c62828;
+  line-height: 1.5;
+}
+
+/* ===== 감정별 댓글 표시 ===== */
+.emotion-comments {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.emotion-comments__title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.emotion-comments__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.emotion-comment {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  border-left: 4px solid #007bff;
+  position: relative;
+}
+
+.emotion-comment--placeholder {
+  border-left-color: #ccc;
+  color: #666;
+  font-style: italic;
+}
+
+/* ===== 실제 댓글 표시 영역 ===== */
+.comments-active {
+  padding: 20px;
+}
+
+.comments-active h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #333;
+  text-align: center;
+}
+
+.comments-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.comments-section h5 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.comments-section:first-child h5 {
+  color: #00c851;
+  border-bottom-color: #00c851;
+}
+
+.comments-section:last-child h5 {
+  color: #ff4444;
+  border-bottom-color: #ff4444;
+}
+
+.comment-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.comment-item.positive {
+  border-left-color: #00c851;
+  background: #f8fff8;
+}
+
+.comment-item.negative {
+  border-left-color: #ff4444;
+  background: #fff8f8;
+}
+
+.comment-platform {
+  font-size: 12px;
+  background: #007bff;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.comment-text {
+  margin: 8px 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+}
+
+.comment-emotion {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .comments-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.emotion-comment__platform {
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.emotion-comment__text {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+}
+
+.emotion-comment__emotion {
+  display: inline-block;
+  background: #e9ecef;
+  color: #495057;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
 }

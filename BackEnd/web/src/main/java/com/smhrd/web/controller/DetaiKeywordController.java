@@ -61,6 +61,44 @@ public class DetaiKeywordController {
     }
 
     /**
+     * 키워드 감성분석 조회 (별도 API)
+     * @param keywordName 키워드명
+     * @return 감성분석 결과
+     */
+    @GetMapping("/sentiment")
+    public ResponseEntity<Map<String, Object>> getKeywordSentiment(
+            @RequestParam("keyword") String keywordName) {
+
+        System.out.println("=================================================");
+        System.out.println("🎯 감성분석 API 호출됨 - 키워드: " + keywordName);
+        System.out.println("📍 API URL: http://localhost:8095/zal/api/keyword/sentiment?keyword=" + keywordName);
+        System.out.println("=================================================");
+
+        try {
+            Map<String, Object> response = detailKeywordService.getKeywordSentimentAnalysis(keywordName);
+
+            if (response.containsKey("error")) {
+                System.out.println("⚠️ 감성분석 오류: " + response.get("error"));
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            System.out.println("✅ 감성분석 성공: " + keywordName);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.err.println("❌ 감성분석 API 오류: " + e.getMessage());
+            e.printStackTrace();
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "감성분석 조회 중 오류가 발생했습니다.");
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("timestamp", new java.util.Date());
+
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    /**
      * 키워드 자동완성 검색
      * @param query 검색 쿼리
      * @return 자동완성 키워드 목록
