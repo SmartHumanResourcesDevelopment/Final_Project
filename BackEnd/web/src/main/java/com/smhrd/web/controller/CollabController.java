@@ -29,22 +29,37 @@ public class CollabController {
     @PostMapping("/collab")
     public ResponseEntity<?> CollabIdeas(@RequestBody List<CollabDTO> collabList, Authentication authentication) {
         System.out.println("==== [콜라보 API 호출됨] ====");
-        System.out.println("콜라보 API 호출됨: " + collabList.size() + "개 아이템");
+        System.out.println("콜라보 API 호출됨 : " + collabList.size() + "개 아이템");
+        System.out.println("Authentication : " + authentication);
+        
+        // 인증 객체 null 여부 체크
+        if (authentication == null) {
+            System.out.println("❌ Authentication 객체가 null입니다. 로그인 상태를 확인하세요.");
+            return ResponseEntity.status(401).body(Map.of(
+                "success", false,
+                "message", "로그인이 필요합니다."
+            ));
+        }
+        
         try { 
             String currentUserId = authentication.getName();
-            
+            System.out.println("👤 현재 로그인 사용자 ID: " + currentUserId);
+
             // 각 DTO에 인증된 사용자 ID 설정
             for (CollabDTO collab : collabList) {
             collab.setUserId(currentUserId);
+            System.out.println("➡ 저장 준비: " + collab.getTitle());
             }
 
-            collabService.collabIdeas(collabList); // List 전체 전달
+            collabService.collabIdeas(collabList, authentication); // List 전체 전달
+            System.out.println("✅ 콜라보 스크랩 성공");
             return ResponseEntity.ok(Map.of(
             "success", true,
             "message", "콜라보 스크랩 성공",
             "count", collabList.size()
             ));
         } catch (ScrapException e) {
+            System.out.println("❌ 스크랩 예외 발생: " + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "message", e.getMessage()

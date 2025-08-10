@@ -2,10 +2,12 @@ package com.smhrd.web.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.smhrd.web.DTO.SloganDTO;
+import com.smhrd.web.DTO.UserDTO;
 import com.smhrd.web.repository.ChatbotMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -23,12 +25,31 @@ public class SloganService {
     }
     // 마케팅, 슬로건 저장
     @Transactional
-    public void slogans(List<SloganDTO> slogans) {
+    public void slogans(List<SloganDTO> slogans, Authentication authentication) {
+        System.out.println("==== [Service: slogans 호출됨] ====");
+
+        // 1. Authentication 객체에서 UserDTO 추출
+        UserDTO user = (UserDTO) authentication.getPrincipal();
+        
+        // 2. UserDTO에서 user_id(String) 값만 가져오기
+        String userId = user.getUser_id();
+
+        System.out.println("📝 저장 시도 아이템 수: " + slogans.size());
+
         for (SloganDTO slogan : slogans) {
+            // 3. SloganDTO의 userId 필드에 추출한 String 값을 할당
+            slogan.setUserId(userId);
+            slogan.setKeywordId(1L); // 테스트 값 입력 (유효한 키워드 ID로 변경하기)
+            
+            System.out.println("➡ DB 저장 시도: " + slogan.getTitle() + " / USER_ID=" + slogan.getUserId());
             int result = mapper.insertSlogan(slogan);
+
             if (result != 1) {
+                System.out.println("❌ 저장 실패: " + slogan.getTitle());
                 throw new RuntimeException("슬로건 삽입 실패");
+            } else {
+                System.out.println("✅ 저장 성공: " + slogan.getTitle());
             }
         }
-    }
+    }   
 }
