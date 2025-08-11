@@ -56,11 +56,8 @@ public class WebConfig implements WebMvcConfigurer {
         System.out.println("✔ Static uploads location: " + location);
 
         // /uploads/** 와 /zal/uploads/** 요청 모두 이 위치에서 서빙
-        registry    
-          .addResourceHandler("/uploads/**")
-          .addResourceLocations(location);
-        registry
-          .addResourceHandler("/zal/uploads/**")
+
+        registry.addResourceHandler("/uploads/**", "/zal/uploads/**")
           .addResourceLocations(location);
     }
 }

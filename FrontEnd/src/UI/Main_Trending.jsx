@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import rectangle1251 from "../assets/img/common/rectangle-125-1.png";
 import rectangle1252 from "../assets/img/common/rectangle-125-2.png";
 import rectangle1253 from "../assets/img/common/rectangle-125-3-3.png";
 import "../assets/css/Main_keyword_card.css";   // 공통 CSS
 import { mainApiService } from "../api/mainApi";
+import { keywordApiService } from "../api/sub";
+import { useKeywordData } from "../contexts/KeywordDataContext";
 
 export default function Main_Trending() {
+  const navigate = useNavigate();
+  const { setKeywordData: setGlobalKeywordData } = useKeywordData();
   const [hovered, setHovered] = useState(null);
   const [keywordData, setKeywordData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,14 +70,38 @@ export default function Main_Trending() {
     }
   };
 
-  // 컴포넌트 마운트 시 데이터 로드
+  // 컴포넌트 마운트 시 데이터 로드 (한 번만 실행)
   useEffect(() => {
+    console.log("🚀 Main_Trending 컴포넌트 마운트 - 급상승 키워드 로딩 시작");
     fetchTrendingKeywords();
-  }, []);
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
-  const handleCardClick = (id) => {
+  // 심층분석 버튼 클릭 핸들러
+  const handleCardClick = async (id) => {
     const keyword = keywordData.find(k => k.id === id);
-    console.log(`심층분석 보러가기 ← ${keyword?.title} (${keyword?.growth})`);
+    if (!keyword) {
+      console.error("❌ 키워드를 찾을 수 없습니다:", id);
+      return;
+    }
+
+    try {
+      console.log("🔍 심층분석 시작:", keyword.title);
+
+      // 키워드 검색 API 호출
+      const data = await keywordApiService.searchKeyword(keyword.title);
+
+      // 검색 결과를 전역 상태에 저장
+      setGlobalKeywordData(data);
+
+      // Sub 페이지로 이동
+      navigate("/sub");
+
+      console.log("✅ 심층분석 페이지 이동 완료:", keyword.title);
+
+    } catch (error) {
+      console.error("❌ 심층분석 이동 실패:", error);
+      alert("심층분석 페이지로 이동하는 중 오류가 발생했습니다.");
+    }
   };
 
   // 로딩 중일 때

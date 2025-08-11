@@ -55,4 +55,12 @@ public interface MainMapper {
      */
     List<Map<String, Object>> getAdditionalTrendingKeywords(int limit);
 
+    /**
+     * 전체 키워드 랭킹 조회 (랜덤 키워드 선택용)
+     * @return 전체 키워드 랭킹 데이터
+     */
+    List<Map<String, Object>> getOverallRankingAll();
+
+
+
 }
