@@ -56,6 +56,12 @@ export const NavigationSection = () => {
       if (randomKeywordData && randomKeywordData.keyword) {
         console.log("✅ 랜덤 키워드 조회 성공:", randomKeywordData.keyword);
 
+        // 랜덤 키워드도 최근 검색 키워드에 추가
+        if (window.addRecentKeyword) {
+          window.addRecentKeyword(randomKeywordData.keyword);
+          console.log("💾 랜덤 키워드를 최근 검색에 추가:", randomKeywordData.keyword);
+        }
+
         // Sub 페이지로 이동하면서 키워드 데이터 전달
         navigate('/sub', {
           state: {
