@@ -16,7 +16,7 @@ import "../assets/css/Sub.css";
 
 const Sub = ({ keywordData: propsKeywordData, onClose }) => {
   const { keywordData: contextKeywordData } = useKeywordData();
-
+  
   // props로 받은 데이터가 있으면 우선 사용, 없으면 context 데이터 사용
   const keywordData = propsKeywordData || contextKeywordData;
   const [openChat, setOpenChat]     = useState(false);
@@ -72,7 +72,7 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
       onClose?.();
     }
   };
-
+// console.log("🔍 keywordData 내용:", keywordData);
   return (
     <div className="detail-root" onClick={handleBackgroundClick}>
       {/* 상단바 */}
