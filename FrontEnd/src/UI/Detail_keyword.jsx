@@ -30,11 +30,52 @@ export default function DetailKeyword({ keywordData }) {
       return;
     }
 
+    const searchKeyword = query.trim();
+
+    // 🔥 검색 API 요청 시작과 동시에 최근 검색 키워드에 추가
+    console.log("💾 Detail 페이지 - 검색 시도 키워드를 최근 검색에 추가:", searchKeyword);
+
+    // Detail 페이지에서 직접 쿠키/localStorage에 저장
     try {
-      console.log("🔍 키워드 검색 시작:", query.trim());
+      let currentKeywords = [];
+
+      // 기존 키워드 가져오기
+      let savedKeywords = localStorage.getItem('recentSearchKeywords');
+      if (savedKeywords) {
+        currentKeywords = JSON.parse(savedKeywords);
+      }
+
+      // 중복 제거
+      currentKeywords = currentKeywords.filter(
+        k => k.toLowerCase() !== searchKeyword.toLowerCase()
+      );
+
+      // 새 키워드를 맨 앞에 추가
+      currentKeywords.unshift(searchKeyword);
+
+      // 최대 7개까지만 유지
+      if (currentKeywords.length > 7) {
+        currentKeywords = currentKeywords.slice(0, 7);
+      }
+
+      // localStorage에 저장
+      localStorage.setItem('recentSearchKeywords', JSON.stringify(currentKeywords));
+      console.log("✅ Detail 페이지 - 검색 키워드 저장 성공:", searchKeyword);
+
+      // 전역 함수가 있다면 그것도 호출
+      if (window.addRecentKeyword) {
+        window.addRecentKeyword(searchKeyword);
+      }
+
+    } catch (error) {
+      console.error("❌ Detail 페이지 - 검색 키워드 저장 실패:", error);
+    }
+
+    try {
+      console.log("🔍 키워드 검색 시작:", searchKeyword);
 
       // 키워드 검색 API 호출
-      const data = await keywordApiService.searchKeyword(query.trim());
+      const data = await keywordApiService.searchKeyword(searchKeyword);
 
       if (data && data.keywordInfo) {
         // 검색 성공 시 전역 상태에 저장하고 현재 페이지 새로고침
@@ -48,12 +89,13 @@ export default function DetailKeyword({ keywordData }) {
         window.location.reload();
 
       } else {
-        // 검색 결과가 없는 경우
+        // 검색 결과가 없는 경우 (이미 최근 검색에는 추가됨)
         alert("해당 키워드로는 검색을 할 수 없습니다. 올바른 키워드 이름을 입력하세요.");
       }
 
     } catch (error) {
       console.error("❌ 키워드 검색 실패:", error);
+      // 검색 실패해도 이미 최근 검색에는 추가됨
       alert("해당 키워드로는 검색을 할 수 없습니다. 올바른 키워드 이름을 입력하세요.");
     }
   };

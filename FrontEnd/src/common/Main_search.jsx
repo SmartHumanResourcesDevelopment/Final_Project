@@ -4,6 +4,41 @@ import "../assets/css/Main_search.css";
 import searchIcon from "../assets/img/common/search.png";
 import { keywordApiService } from "../api/sub";
 
+// 쿠키 관리 유틸리티 함수 (MyFeed.jsx와 동일)
+const CookieUtils = {
+  setCookie: (name, value, hours = 24) => {
+    try {
+      const expires = new Date();
+      expires.setTime(expires.getTime() + (hours * 60 * 60 * 1000));
+      const cookieString = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+      document.cookie = cookieString;
+      console.log("🍪 쿠키 설정:", cookieString);
+      return true;
+    } catch (error) {
+      console.error("❌ 쿠키 설정 실패:", error);
+      return false;
+    }
+  },
+
+  getCookie: (name) => {
+    try {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) {
+          return decodeURIComponent(c.substring(nameEQ.length, c.length));
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error("❌ 쿠키 읽기 실패:", error);
+      return null;
+    }
+  }
+};
+
 // 키워드 오타 교정 데이터베이스
 const KEYWORD_CORRECTIONS = {
   // 일반적인 오타 패턴
@@ -46,6 +81,73 @@ const KEYWORD_CORRECTIONS = {
   "두짐": "두찜"
 };
 
+
+// 최근 키워드 추가 함수 (메인 페이지 전용)
+const addRecentKeywordLocal = (keyword) => {
+  try {
+    console.log("🔍 메인 페이지 - 키워드 추가 시도:", keyword);
+
+    if (!keyword || keyword.trim() === '') {
+      console.log("⚠️ 빈 키워드로 인해 추가 취소");
+      return;
+    }
+
+    const trimmedKeyword = keyword.trim();
+    let currentKeywords = [];
+
+    // 기존 키워드 가져오기 (쿠키 + localStorage 이중화)
+    let savedKeywords = CookieUtils.getCookie('recentSearchKeywords');
+    if (!savedKeywords) {
+      savedKeywords = localStorage.getItem('recentSearchKeywords');
+      console.log("🔍 localStorage에서 기존 키워드:", savedKeywords);
+    } else {
+      console.log("🔍 쿠키에서 기존 키워드:", savedKeywords);
+    }
+
+    if (savedKeywords) {
+      currentKeywords = JSON.parse(savedKeywords);
+      console.log("📋 파싱된 기존 키워드:", currentKeywords);
+    }
+
+    // 중복 제거 (대소문자 구분 없이)
+    const beforeFilter = currentKeywords.length;
+    currentKeywords = currentKeywords.filter(
+      k => k.toLowerCase() !== trimmedKeyword.toLowerCase()
+    );
+    console.log(`🔄 중복 제거: ${beforeFilter}개 → ${currentKeywords.length}개`);
+
+    // 새 키워드를 맨 앞에 추가
+    currentKeywords.unshift(trimmedKeyword);
+    console.log("➕ 새 키워드 추가 후:", currentKeywords);
+
+    // 최대 7개까지만 유지
+    if (currentKeywords.length > 7) {
+      currentKeywords = currentKeywords.slice(0, 7);
+      console.log("✂️ 7개로 제한 후:", currentKeywords);
+    }
+
+    // 쿠키와 localStorage에 이중 저장
+    const keywordsJson = JSON.stringify(currentKeywords);
+
+    // 쿠키에 저장 시도
+    const cookieSuccess = CookieUtils.setCookie('recentSearchKeywords', keywordsJson, 24);
+    console.log("💾 쿠키 저장 결과:", cookieSuccess);
+
+    // localStorage에도 저장 (백업)
+    try {
+      localStorage.setItem('recentSearchKeywords', keywordsJson);
+      console.log("💾 localStorage에 저장 성공:", keywordsJson);
+    } catch (localStorageError) {
+      console.error("❌ localStorage 저장 실패:", localStorageError);
+    }
+
+    console.log("✅ 메인 페이지 - 검색 키워드 저장 성공:", trimmedKeyword);
+    console.log("📋 최종 키워드 목록:", currentKeywords);
+
+  } catch (error) {
+    console.error("❌ 메인 페이지 - 검색 키워드 저장 실패:", error);
+  }
+};
 
 function Main_search() {
   const navigate = useNavigate();
@@ -134,11 +236,23 @@ function Main_search() {
       return;
     }
 
+    const searchKeyword = searchQuery.trim();
+
+    // 🔥 검색 API 요청 시작과 동시에 최근 검색 키워드에 추가
+    console.log("� 메인 페이지 - 검색 시도 키워드를 최근 검색에 추가:", searchKeyword);
+    addRecentKeywordLocal(searchKeyword);
+
+    // 전역 함수가 있다면 그것도 호출 (마이페이지 상태 동기화)
+    if (window.addRecentKeyword) {
+      console.log("🔄 전역 함수도 호출하여 마이페이지와 동기화");
+      window.addRecentKeyword(searchKeyword);
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      console.log("🔍 키워드 검색 시작:", searchQuery);
+      console.log("🔍 키워드 검색 시작:", searchKeyword);
 
       // 먼저 서버 연결 테스트
       try {
@@ -150,17 +264,10 @@ function Main_search() {
         return;
       }
 
-      const data = await keywordApiService.searchKeyword(searchQuery.trim());
+      const data = await keywordApiService.searchKeyword(searchKeyword);
 
       console.log("✅ 검색 성공:", data);
       setSearchResults(data);
-
-      // 검색 성공 시 최근 검색 키워드에 추가
-      if (data.keywordInfo && window.addRecentKeyword) {
-        const keywordName = data.keywordInfo.KEYWORD_NAME || searchQuery.trim();
-        window.addRecentKeyword(keywordName);
-        console.log("💾 최근 검색 키워드에 추가:", keywordName);
-      }
 
       // 키워드 정보가 없는 경우 에러 메시지 설정
       if (!data.keywordInfo) {
@@ -229,15 +336,26 @@ function Main_search() {
       return;
     }
 
+    const searchKeyword = searchQuery.trim();
+
+    // 🔥 직접 검색도 최근 검색 키워드에 추가 (이미 추가되었을 수도 있지만 중복 제거됨)
+    console.log("💾 메인 페이지 - 직접 검색 키워드를 최근 검색에 추가:", searchKeyword);
+    addRecentKeywordLocal(searchKeyword);
+
+    // 전역 함수가 있다면 그것도 호출
+    if (window.addRecentKeyword) {
+      window.addRecentKeyword(searchKeyword);
+    }
+
     try {
       setShowSuggestions(false);
       setLoading(true);
       setError(null);
 
-      console.log("🎯 관련 키워드 무시하고 원래 키워드로 직접 검색:", searchQuery);
+      console.log("🎯 관련 키워드 무시하고 원래 키워드로 직접 검색:", searchKeyword);
 
       // 원래 입력한 키워드로 새로운 API 호출
-      const data = await keywordApiService.searchKeyword(searchQuery.trim());
+      const data = await keywordApiService.searchKeyword(searchKeyword);
 
       console.log("✅ 원래 키워드 직접 검색 성공:", data);
 
@@ -293,6 +411,15 @@ function Main_search() {
 
   /* 유사 키워드 클릭 핸들러 */
   const handleSuggestedKeywordClick = async (keyword) => {
+    // 🔥 유사 키워드 선택도 최근 검색 키워드에 추가
+    console.log("💾 메인 페이지 - 유사 키워드 선택을 최근 검색에 추가:", keyword);
+    addRecentKeywordLocal(keyword);
+
+    // 전역 함수가 있다면 그것도 호출
+    if (window.addRecentKeyword) {
+      window.addRecentKeyword(keyword);
+    }
+
     try {
       setSearchQuery(keyword);
       setShowSuggestions(false); // 제안 목록 숨기기
