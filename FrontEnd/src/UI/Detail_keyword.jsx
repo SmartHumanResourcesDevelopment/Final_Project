@@ -67,6 +67,7 @@ export default function DetailKeyword({ keywordData }) {
       handleSearch();
     }
   };
+
   return (
     <section className="detailKeyword">
       {/* ① 왼쪽 : 텍스트  */}

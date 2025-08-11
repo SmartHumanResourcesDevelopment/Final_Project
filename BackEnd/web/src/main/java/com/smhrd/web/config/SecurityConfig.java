@@ -42,7 +42,7 @@ public class SecurityConfig {
             // === 로그인, 회원가입 API 경로 허용 ===
             .requestMatchers("/api/login", "/api/register").permitAll()
             // === API 경로 허용 ===
-            .requestMatchers("/api/**").authenticated()
+            .requestMatchers("/api/**").permitAll()
             // === 기존 public 경로 ===
             .requestMatchers("/zal/**").permitAll()
             // === 기타 경로 처리 ===

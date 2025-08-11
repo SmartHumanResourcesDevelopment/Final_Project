@@ -72,7 +72,8 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
       onClose?.();
     }
   };
-
+  
+console.log("키워드정보:",keywordData);
   return (
     <div className="detail-root" onClick={handleBackgroundClick}>
       {/* 상단바 */}
@@ -138,10 +139,13 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
             className="chartbot-dialog-wrapper"
             onClick={e => e.stopPropagation()}
           >
+          {/* keywordData를 ChartBot 컴포넌트에 props로 전달 */}
             <ChartBot onClose={() => {
               setOpenChat(false);
               onClose?.();
-            }} />
+            }}
+            keywordData={keywordData}
+            />
           </div>
         </div>
       )}

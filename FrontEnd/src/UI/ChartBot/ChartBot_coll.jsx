@@ -4,36 +4,14 @@ import close from "../../assets/img/Chart_Bot/close.png";
 import handshake from "../../assets/img/Chart_Bot/call.png";
 import "../../assets/css/chartbot/coll.css";
 
-export const Chart_Bot_Collab = ({ onClose, keywordData }) => {
-  const [collabIdeas] = useState([
-    {
-      id: 1,
-      title: "말차 × 독서타임 유튜버",
-      subtitle: "북카페 느낌 말차 패키지",
-      description: "영상 배경템으로 협업 → 노출 자연스럽게",
-      contrnt : "임시 글1 입니다."
-    },
-    {
-      id: 2,
-      title: "말차 × 감성 스터디카페",
-      subtitle: "고요한 초록 한입",
-      description: "포스트잇, 무드등 세트에 말차 구성해 굿즈화",
-      contrnt : "임시 글2 입니다."
-    },
-    {
-      id: 3,
-      title: "말차 × 틱톡 챌린지",
-      subtitle: "말차폼 흔들기 챌린지",
-      description: "음악 + 컷 편집 + 폼 클로즈업 영상 유도",
-      contrnt : "임시 글3 입니다."
-    },
-  ]);
+export const Chart_Bot_Collab = ({ onClose, keywordData, collabIdeas }) => {
+  console.log("콜라보 값 : ",collabIdeas)
+  console.log("온클로즈 값 : ",onClose)
+  console.log("키워드데이터 값 : ",keywordData)
 
   const handleScrap = async (collabs) => {
     console.log("==== [콜라보 API 호출됨] ====");
     console.log("콜라보 아이템:", collabs);
-
-    try {
 
       console.log(localStorage.getItem("jwtToken"));
 
@@ -44,23 +22,14 @@ export const Chart_Bot_Collab = ({ onClose, keywordData }) => {
         return;
       }
 
-      const dtoList = collabs.map(collab => ({
-        ideaId: collab.id,
-        title: collab.title,
-        contentTitle: collab.title,
-        contentDesc1: collab.subtitle,
-        contentDesc2: collab.description,
-        contentDesc3: collab.contrnt,
-        keywordName: keywordData.keyword,
-      }));
-
+      try {
         const response = await fetch("http://localhost:8095/zal/api/chatbot/collab", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(dtoList) // 전체 배열 전송
+          body: JSON.stringify(keywordData) // 전체 배열 전송
           });
 
           if (!response.ok) {
@@ -91,8 +60,8 @@ export const Chart_Bot_Collab = ({ onClose, keywordData }) => {
       </header>
 
       <main className="collab-main">
-        {collabIdeas.map((collab, i) => (
-          <section key={collab.id} className="collab-section">
+        {collabIdeas?.map((collab, i) => (
+          <section key={i} className="collab-section">
             <h2 className="collab-section-title">{i + 1}. {collab.title}</h2>
             <ul className="collab-content">
               <li className="collab-feature">✦ {collab.subtitle}</li>
