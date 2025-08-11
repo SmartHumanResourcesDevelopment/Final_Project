@@ -20,10 +20,12 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:5173")
-                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
-                .allowCredentials(true);
-                
-                // API 전용 CORS 설정 추가
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                .allowedHeaders("*")
+                .allowCredentials(true)
+                .maxAge(3600); // preflight 캐시 시간 (1시간)
+
+        // API 전용 CORS 설정 추가
         registry.addMapping("/api/**")
                 .allowedOrigins("http://localhost:5173")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
@@ -32,8 +34,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(3600);
 
         System.out.println("✔ CORS configured for localhost:5173");
-
-        System.out.println("✔ CORS configured");
     }
 
      @Bean
@@ -56,9 +56,7 @@ public class WebConfig implements WebMvcConfigurer {
         System.out.println("✔ Static uploads location: " + location);
 
         // /uploads/** 와 /zal/uploads/** 요청 모두 이 위치에서 서빙
-        registry
-          .addResourceHandler("/uploads/**")
-          .addResourceLocations(location);
+
         registry
           .addResourceHandler("/zal/uploads/**")
           .addResourceLocations(location);

@@ -48,3 +48,51 @@
   font-size: 1.1rem;
   line-height: 1.8;
 }
+
+/* 준비중 메시지 스타일 */
+.no-data-message {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 40px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 20px;
+  border: 2px dashed #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.no-data-message:hover {
+  border-color: #adb5bd;
+  background: linear-gradient(135deg, #f1f3f4 0%, #e9ecef 100%);
+}
+
+.no-data-message .icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #6c757d;
+  animation: pulse 2s infinite;
+}
+
+.no-data-message h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.no-data-message p {
+  font-size: 14px;
+  color: #6c757d;
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}

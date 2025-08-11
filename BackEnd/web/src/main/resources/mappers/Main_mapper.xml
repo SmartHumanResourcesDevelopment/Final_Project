@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.smhrd.web.repository.MainMapper">
+
+    <!-- 메인 랭킹 전용 프로시저 호출 (6개월, 1년) -->
+    <select id="selectRankingByPeriod" statementType="CALLABLE" parameterType="map">
+        { call GET_MAIN_RANKING(#{period, jdbcType=VARCHAR, mode=IN}, #{result, jdbcType=CURSOR, mode=OUT, resultMap=top10ResultMap}) }
+    </select>
+
+    <!-- TOP10 DTO 결과 매핑 -->
+    <resultMap id="top10ResultMap" type="com.smhrd.web.DTO.Top10DTO">
+        <result property="rank" column="RANK" jdbcType="NUMERIC"/>
+        <result property="name" column="NAME" jdbcType="VARCHAR"/>
+        <result property="count" column="COUNT" jdbcType="NUMERIC"/>
+        <result property="trend" column="TREND" jdbcType="VARCHAR"/>
+        <result property="color" column="COLOR" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 급상승 키워드 TOP3 조회 (2025-07-01 ~ 2025-07-31) - TOP10 랭킹 제외 -->
+    <select id="getTrendingKeywordsRecent30Days" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_NAME as keyword_name,
+                SUM(kds.DAILY_COUNT) as total_count,
+                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE kds.STATS_DATE >= TO_DATE('2025-07-01', 'YYYY-MM-DD')
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+              AND k.KEYWORD_NAME NOT IN ('간장', '게장', '가지', '궁채')
+              AND k.KEYWORD_NAME NOT IN (
+                  SELECT TOP10.KEYWORD_NAME FROM (
+                      SELECT k2.KEYWORD_NAME
+                      FROM KEYWORD_DAILY_STATS kds2
+                      JOIN KEYWORD k2 ON kds2.KEYWORD_ID = k2.KEYWORD_ID
+                      WHERE kds2.STATS_DATE >= TO_DATE('2025-07-01', 'YYYY-MM-DD')
+                        AND kds2.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+                      GROUP BY kds2.KEYWORD_ID, k2.KEYWORD_NAME
+                      HAVING SUM(kds2.DAILY_COUNT) > 0
+                      ORDER BY SUM(kds2.DAILY_COUNT) DESC
+                  ) TOP10 WHERE ROWNUM <= 10
+              )
+            GROUP BY kds.KEYWORD_ID, k.KEYWORD_NAME
+            HAVING SUM(kds.DAILY_COUNT) > 0
+            ORDER BY SUM(kds.DAILY_COUNT) DESC, DBMS_RANDOM.VALUE()
+        ) WHERE ROWNUM <= 3
+        ]]>
+    </select>
+
+    <!-- 급상승 키워드 TOP3 조회 (2025-06-01 ~ 2025-07-31, 2개월) - TOP10 랭킹 제외 -->
+    <select id="getTrendingKeywordsRecent60Days" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_NAME as keyword_name,
+                SUM(kds.DAILY_COUNT) as total_count,
+                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE kds.STATS_DATE >= TO_DATE('2025-06-01', 'YYYY-MM-DD')
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+              AND k.KEYWORD_NAME NOT IN ('간장', '게장', '가지', '궁채')
+              AND k.KEYWORD_NAME NOT IN (
+                  SELECT TOP10.KEYWORD_NAME FROM (
+                      SELECT k2.KEYWORD_NAME
+                      FROM KEYWORD_DAILY_STATS kds2
+                      JOIN KEYWORD k2 ON kds2.KEYWORD_ID = k2.KEYWORD_ID
+                      WHERE kds2.STATS_DATE >= TO_DATE('2025-06-01', 'YYYY-MM-DD')
+                        AND kds2.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+                      GROUP BY kds2.KEYWORD_ID, k2.KEYWORD_NAME
+                      HAVING SUM(kds2.DAILY_COUNT) > 0
+                      ORDER BY SUM(kds2.DAILY_COUNT) DESC
+                  ) TOP10 WHERE ROWNUM <= 10
+              )
+            GROUP BY kds.KEYWORD_ID, k.KEYWORD_NAME
+            HAVING SUM(kds.DAILY_COUNT) > 0
+            ORDER BY SUM(kds.DAILY_COUNT) DESC, DBMS_RANDOM.VALUE()
+        ) WHERE ROWNUM <= 3
+        ]]>
+    </select>
+
+    <!-- 급상승 키워드 TOP3 조회 (2025-05-01 ~ 2025-07-31, 3개월) - TOP10 랭킹 제외 -->
+    <select id="getTrendingKeywordsRecent90Days" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_NAME as keyword_name,
+                SUM(kds.DAILY_COUNT) as total_count,
+                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE kds.STATS_DATE >= TO_DATE('2025-05-01', 'YYYY-MM-DD')
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+              AND k.KEYWORD_NAME NOT IN ('간장', '게장', '가지', '궁채')
+              AND k.KEYWORD_NAME NOT IN (
+                  SELECT TOP10.KEYWORD_NAME FROM (
+                      SELECT k2.KEYWORD_NAME
+                      FROM KEYWORD_DAILY_STATS kds2
+                      JOIN KEYWORD k2 ON kds2.KEYWORD_ID = k2.KEYWORD_ID
+                      WHERE kds2.STATS_DATE >= TO_DATE('2025-05-01', 'YYYY-MM-DD')
+                        AND kds2.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+                      GROUP BY kds2.KEYWORD_ID, k2.KEYWORD_NAME
+                      HAVING SUM(kds2.DAILY_COUNT) > 0
+                      ORDER BY SUM(kds2.DAILY_COUNT) DESC
+                  ) TOP10 WHERE ROWNUM <= 10
+              )
+            GROUP BY kds.KEYWORD_ID, k.KEYWORD_NAME
+            HAVING SUM(kds.DAILY_COUNT) > 0
+            ORDER BY SUM(kds.DAILY_COUNT) DESC, DBMS_RANDOM.VALUE()
+        ) WHERE ROWNUM <= 3
+        ]]>
+    </select>
+
+    <!-- 급상승 키워드 TOP3 조회 (2025-07-25 ~ 2025-07-31, 최근 일주일) - TOP10 랭킹 제외 -->
+    <select id="getTrendingKeywordsLatest" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_NAME as keyword_name,
+                SUM(kds.DAILY_COUNT) as total_count,
+                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE kds.STATS_DATE >= TO_DATE('2025-07-25', 'YYYY-MM-DD')
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+              AND k.KEYWORD_NAME NOT IN ('간장', '게장', '가지', '궁채')
+              AND k.KEYWORD_NAME NOT IN (
+                  SELECT TOP10.KEYWORD_NAME FROM (
+                      SELECT k2.KEYWORD_NAME
+                      FROM KEYWORD_DAILY_STATS kds2
+                      JOIN KEYWORD k2 ON kds2.KEYWORD_ID = k2.KEYWORD_ID
+                      WHERE kds2.STATS_DATE >= TO_DATE('2025-07-25', 'YYYY-MM-DD')
+                        AND kds2.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+                      GROUP BY kds2.KEYWORD_ID, k2.KEYWORD_NAME
+                      HAVING SUM(kds2.DAILY_COUNT) > 0
+                      ORDER BY SUM(kds2.DAILY_COUNT) DESC
+                  ) TOP10 WHERE ROWNUM <= 10
+              )
+            GROUP BY kds.KEYWORD_ID, k.KEYWORD_NAME
+            HAVING SUM(kds.DAILY_COUNT) > 0
+            ORDER BY DBMS_RANDOM.VALUE()
+        ) WHERE ROWNUM <= 3
+        ]]>
+    </select>
+
+    <!-- 특정 키워드의 일별 언급량 조회 (최근 N일) -->
+    <select id="getDailyKeywordMentions" resultType="int">
+        <![CDATA[
+        SELECT NVL(kds.DAILY_COUNT, 0) as daily_count
+        FROM (
+            SELECT TO_DATE('2025-07-31', 'YYYY-MM-DD') - LEVEL + 1 as stats_date
+            FROM DUAL
+            CONNECT BY LEVEL <= #{days}
+        ) dates
+        LEFT JOIN (
+            SELECT kds.STATS_DATE, kds.DAILY_COUNT
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE k.KEYWORD_NAME = #{keyword}
+              AND kds.STATS_DATE >= TO_DATE('2025-07-31', 'YYYY-MM-DD') - #{days} + 1
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+        ) kds ON dates.stats_date = kds.STATS_DATE
+        ORDER BY dates.stats_date ASC
+        ]]>
+    </select>
+
+    <!-- 추가 급상승 키워드 조회 (TOP15 제외, 더 넓은 범위) -->
+    <select id="getAdditionalTrendingKeywords" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_NAME as keyword_name,
+                SUM(kds.DAILY_COUNT) as total_count,
+                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+            FROM KEYWORD_DAILY_STATS kds
+            JOIN KEYWORD k ON kds.KEYWORD_ID = k.KEYWORD_ID
+            WHERE kds.STATS_DATE >= TO_DATE('2025-07-01', 'YYYY-MM-DD')
+              AND kds.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+              AND k.KEYWORD_NAME NOT IN ('간장', '게장', '가지', '궁채')
+              AND k.KEYWORD_NAME NOT IN (
+                  SELECT TOP15.KEYWORD_NAME FROM (
+                      SELECT k2.KEYWORD_NAME
+                      FROM KEYWORD_DAILY_STATS kds2
+                      JOIN KEYWORD k2 ON kds2.KEYWORD_ID = k2.KEYWORD_ID
+                      WHERE kds2.STATS_DATE >= TO_DATE('2025-07-01', 'YYYY-MM-DD')
+                        AND kds2.STATS_DATE <= TO_DATE('2025-07-31', 'YYYY-MM-DD')
+                      GROUP BY kds2.KEYWORD_ID, k2.KEYWORD_NAME
+                      HAVING SUM(kds2.DAILY_COUNT) > 0
+                      ORDER BY SUM(kds2.DAILY_COUNT) DESC
+                  ) TOP15 WHERE ROWNUM <= 15
+              )
+            GROUP BY kds.KEYWORD_ID, k.KEYWORD_NAME
+            HAVING SUM(kds.DAILY_COUNT) > 0
+            ORDER BY SUM(kds.DAILY_COUNT) DESC, DBMS_RANDOM.VALUE()
+        ) WHERE ROWNUM <= #{limit}
+        ]]>
+    </select>
+
+</mapper>
