@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import Chart_Bot_Collab from "../UI/ChartBot/ChartBot_coll"
 import matchaImg from "../assets/img/common/녹차.png";
 import search from "../assets/img/common/search.png";
 import "../assets/css/Detail_keyword.css"; // Assuming you have a CSS file for styling
@@ -13,6 +14,8 @@ const keywordData = {
 
 export default function DetailKeyword() {
   const [query, setQuery] = useState("");
+  const [showCollab, setShowCollab] = useState(false);
+
   return (
     <section className="detailKeyword">
       {/* ① 왼쪽 : 텍스트  */}
@@ -59,6 +62,13 @@ export default function DetailKeyword() {
               onClick={(e) => e.stopPropagation()}      // 아이콘 클릭과 구분
             />
           </div>
+          {/* 콜라보 컴포넌트 (props 전달) */}
+          {showCollab && (
+            <Chart_Bot_Collab
+              onClose={() => setShowCollab(false)}
+              keywordData={keywordData} // *핵심: 여기서 props 전달
+            />
+          )}
     </section>
   );
 }

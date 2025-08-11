@@ -40,7 +40,7 @@ public class SloganService {
             // 3. SloganDTO의 userId 필드에 추출한 String 값을 할당
             slogan.setUserId(userId);
             slogan.setKeywordId(1L); // 테스트 값 입력 (유효한 키워드 ID로 변경하기)
-            
+
             System.out.println("➡ DB 저장 시도: " + slogan.getTitle() + " / USER_ID=" + slogan.getUserId());
             int result = mapper.insertSlogan(slogan);
 

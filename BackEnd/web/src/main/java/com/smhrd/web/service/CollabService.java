@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.smhrd.web.DTO.CollabDTO;
 import com.smhrd.web.DTO.UserDTO;
 import com.smhrd.web.repository.ChatbotMapper;
+import com.smhrd.web.repository.KeywordMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +17,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CollabService {
 
-     private final ChatbotMapper mapper;
+    private final ChatbotMapper mapper;
+    private final KeywordMapper keywordMapper;
     
     public class ScrapException extends RuntimeException {
         public ScrapException(String message) {
@@ -37,10 +39,17 @@ public class CollabService {
         System.out.println("📝 저장 시도 아이템 수: " + collabs.size());
 
         for (CollabDTO collab : collabs) {
+            // 메서드 호출
+            Long keywordId = keywordMapper.getKeywordIdByName(collab.getKeywordName());
+            
+            if (keywordId == null) {
+                throw new RuntimeException("유효하지 않은 키워드입니다.");
+            }
+            collab.setKeywordId(keywordId); // 조회한 ID로 설정
+
             // 3. CollabDTO의 userId 필드에 추출한 String 값을 할당
             collab.setUserId(userId);
-            collab.setKeywordId(1L); // 테스트 값 입력 (유효한 키워드 ID로 변경하기)
-            
+
             System.out.println("➡ DB 저장 시도: " + collab.getTitle() + " / USER_ID=" + collab.getUserId());
             int result = mapper.insertCollab(collab);
 

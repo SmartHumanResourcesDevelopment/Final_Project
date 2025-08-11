@@ -40,7 +40,7 @@ public class SecurityConfig {
             // === Swagger 관련 경로 추가 ===
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
             // === 로그인, 회원가입 API 경로 허용 ===
-            .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+            .requestMatchers("/api/login", "/api/register").permitAll()
             // === API 경로 허용 ===
             .requestMatchers("/api/**").authenticated()
             // === 기존 public 경로 ===

@@ -20,7 +20,7 @@
     <insert id="insertCollab" parameterType="com.smhrd.web.DTO.CollabDTO">
         INSERT INTO USER_COLLAB_IDEA (
             IDEA_ID, USER_ID, KEYWORD_ID, TITLE,
-            CONTENT_TITLE, CONTENT_DESC_1, CONTENT_DESC_2, CONTENT_DESC_3
+            CONTENT_TITLE, CONTENT_DESC_1, CONTENT_DESC_2, "CONTENT_DESC_3"
         )VALUES(
             #{ideaId}, #{userId}, #{keywordId}, #{title},
             #{contentTitle}, #{contentDesc1}, #{contentDesc2}, #{contentDesc3}
@@ -37,5 +37,5 @@
             #{contentTitle}, #{contentDesc1}, #{contentDesc2}, #{contentDesc3}
         )
     </insert>
-
+    
 </mapper>

@@ -52,5 +52,5 @@ public class ProductService {
                 System.out.println("✅ 저장 성공: " + product.getTitle());
             }
         }
-}
+    }
 }
