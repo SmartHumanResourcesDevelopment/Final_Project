@@ -104,4 +104,21 @@ public interface DetailKeywordMapper {
      * @return 감정별 상세 카운트 목록
      */
     List<Map<String, Object>> getKeywordDetailedSentiments(Map<String, Object> params);
+
+    /**
+     * 전체 키워드 랭킹 조회 (프로시저 호출)
+     * @return 전체 키워드 랭킹 데이터
+     */
+    List<Map<String, Object>> getOverallRankingAll();
+
+    // 추가: 특정 키워드의 전체 랭킹(한 건)
+    Map<String, Object> getKeywordOverallRank(String keywordName);
+
+    /**
+     * 키워드의 마지막 언급일 조회
+     * @param keywordId 키워드 ID
+     * @return 마지막 언급일 정보
+     */
+    Map<String, Object> getLastMentionDate(@Param("keywordId") Long keywordId);
+
 }

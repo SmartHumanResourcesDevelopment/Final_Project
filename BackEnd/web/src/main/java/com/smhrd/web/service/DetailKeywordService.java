@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.smhrd.web.repository.DetailKeywordMapper;
 import java.util.*;
-import java.util.LinkedHashSet;
 
 @Service
 public class DetailKeywordService {
@@ -23,6 +22,8 @@ public class DetailKeywordService {
             System.out.println("=================================================");
             System.out.println("🔍 키워드 상세 정보 조회 시작: " + keywordName);
             System.out.println("=================================================");
+
+            
 
             // 디버그: 모든 키워드 조회해서 확인
             List<Map<String, Object>> allKeywords = detailKeywordMapper.getAllKeywords();
@@ -159,15 +160,40 @@ public class DetailKeywordService {
             response.put("suggestedKeywords", suggestedKeywords); // 검색 제안용 키워드 목록
             response.put("lastUpdated", new Date());
             
+            // 🔽🔽🔽 여기서 전체 랭킹 값을 추가로 주입
+            try {
+                Map<String, Object> rankInfo = detailKeywordMapper.getKeywordOverallRank(keywordName);
+                System.out.println("🏆 전체 랭킹 조회 시작: " + keywordName);
+                System.out.println("🔍 rankInfo 결과: " + rankInfo);
+
+                if (rankInfo != null && rankInfo.get("ranking") != null) {
+                    int rankingValue = ((Number) rankInfo.get("ranking")).intValue();
+                    response.put("ranking", rankingValue);
+                    System.out.println("✅ 랭킹 설정 완료: " + rankingValue + "위");
+                } else {
+                    response.put("ranking", 999);
+                    System.out.println("⚠️ 랭킹 정보 없음, 기본값 999 설정");
+                }
+
+            } catch (Exception e) {
+                System.out.println("❌ 전체 랭킹 조회 실패: " + e.getMessage());
+                e.printStackTrace();
+                response.put("ranking", 999);
+            }
+
             System.out.println("✅ 키워드 상세 정보 조회 완료: " + keywordName);
+            System.out.println("📤 프론트엔드로 전달되는 ranking 값: " + response.get("ranking"));
             return response;
-            
+
         } catch (Exception e) {
             System.err.println("❌ 키워드 상세 정보 조회 실패: " + e.getMessage());
             e.printStackTrace();
             throw e;
         }
     }
+
+
+    
 
     /**
      * 키워드 자동완성 검색
@@ -312,11 +338,12 @@ public class DetailKeywordService {
     /**
      * 키워드 감성분석 정보 조회 (별도 API)
      * @param keywordName 키워드명
+     * @param period 기간 (전체, 최신순(3개월))
      * @return 감성분석 결과
      */
-    public Map<String, Object> getKeywordSentimentAnalysis(String keywordName) {
+    public Map<String, Object> getKeywordSentimentAnalysis(String keywordName, String period) {
         try {
-            System.out.println("🎯 감성분석 조회 시작 - 키워드: " + keywordName);
+            System.out.println("🎯 감성분석 조회 시작 - 키워드: " + keywordName + ", 기간: " + period);
 
             // 1. 키워드 기본 정보 조회
             Map<String, Object> keywordInfo = detailKeywordMapper.getKeywordByName(keywordName);
@@ -333,10 +360,29 @@ public class DetailKeywordService {
             Map<String, Object> dataCheck = detailKeywordMapper.checkKeywordData(keywordId);
             System.out.println("📊 데이터 현황: " + dataCheck);
 
-            // 3. 감성분석 데이터 조회
+            // 3. 감성분석 데이터 조회 (기간별 필터링)
             Map<String, Object> sentimentParams = new HashMap<>();
             sentimentParams.put("keywordId", keywordId);
             sentimentParams.put("onlyMain", false);
+            sentimentParams.put("period", period);
+
+            // 최신순(3개월) 기간인 경우 날짜 필터 추가
+            if ("최신순(3개월)".equals(period)) {
+                // 키워드의 마지막 언급일 조회
+                Map<String, Object> lastMentionInfo = detailKeywordMapper.getLastMentionDate(keywordId);
+                if (lastMentionInfo != null && lastMentionInfo.get("LAST_DATE") != null) {
+                    Object lastDate = lastMentionInfo.get("LAST_DATE");
+                    // Oracle DATE 타입을 java.sql.Date로 변환
+                    if (lastDate instanceof java.sql.Date) {
+                        sentimentParams.put("lastMentionDate", lastDate);
+                    } else if (lastDate instanceof java.util.Date) {
+                        sentimentParams.put("lastMentionDate", new java.sql.Date(((java.util.Date) lastDate).getTime()));
+                    } else {
+                        sentimentParams.put("lastMentionDate", lastDate);
+                    }
+                    System.out.println("📅 마지막 언급일 기준 3개월 필터 적용: " + lastDate);
+                }
+            }
 
             List<Map<String, Object>> sentimentResults = detailKeywordMapper.getKeywordSentimentAnalysis(sentimentParams);
             System.out.println("📊 감성분석 원본 데이터: " + sentimentResults.size() + "개");
@@ -547,18 +593,25 @@ public class DetailKeywordService {
                     continue;
                 }
 
+                // 감정 라벨 전처리 (SQL 안전성 확보, 길이 제한 제거)
+                String safeEmotionName = emotionName
+                    .replace("'", "''")  // 작은따옴표 이스케이프
+                    .trim();
+
+                System.out.println("🔍 감정 검색: '" + emotionName + "' (길이: " + emotionName.length() + ")");
+
                 // 매퍼 파라미터 설정
                 Map<String, Object> params = new HashMap<>();
                 params.put("keywordId", keywordId);
-                params.put("emotion", emotionName);
+                params.put("emotion", safeEmotionName);
                 params.put("limit", commentsPerEmotion);
 
-                // 해당 감정의 댓글 조회
+                // 해당 감정의 댓글 조회 (DBMS_LOB.INSTR 사용으로 멀티바이트 안정성 확보)
                 List<Map<String, Object>> emotionComments = detailKeywordMapper.getCommentsByEmotion(params);
 
                 if (emotionComments != null && !emotionComments.isEmpty()) {
                     allComments.addAll(emotionComments);
-                    System.out.println("📝 " + emotionName + " 감정 댓글: " + emotionComments.size() + "개");
+                    System.out.println("📝 " + emotionName + " 감정 댓글: " + emotionComments.size() + "개 (VARCHAR2 최적화)");
 
                     // 실제 댓글 내용 출력
                     for (int i = 0; i < Math.min(emotionComments.size(), 2); i++) {

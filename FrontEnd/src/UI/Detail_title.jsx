@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import  "../assets/css/DetailInsightsSection.css"; // Assuming you have a CSS file for styling
 import DetailInsightsGraph from "../UI/Detail_graph"; // 실제 그래프 컴포넌트
-const PERIODS = ["1일", "1주", "1달", "1년"];
+const PERIODS = ["7일", "1달", "1년"];
 export default function DetailInsightsSection({ keyword = "말차", trendExplanation = "" }) {
-  const [active, setActive] = useState("1주");   // 기본 탭
+  const [active, setActive] = useState("1달");   // 기본 탭을 6일로 변경
 
   return (
     <section className="detailInsights">

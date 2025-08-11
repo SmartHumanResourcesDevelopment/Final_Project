@@ -50,6 +50,66 @@
         ]]>
     </select>
 
+ <!-- 특정 키워드의 전체 랭킹 한 건 조회 -->
+  <select id="getKeywordOverallRank"
+          parameterType="string"
+          resultType="map">
+          <![CDATA[
+      SELECT
+    t.rn            AS "ranking",
+    t.keyword_name  AS "name",
+    t.total_count   AS "count",
+    CASE
+      WHEN t.rn = 1 THEN '#e60000'
+      WHEN t.rn <= 3 THEN '#ff6600'
+      WHEN t.rn <= 7 THEN '#000000'
+      ELSE '#0044ff'
+    END             AS "color"
+  FROM (
+    SELECT
+      keyword_name,
+      SUM(NVL(daily_count, 0)) AS total_count,
+      DENSE_RANK() OVER (ORDER BY SUM(NVL(daily_count, 0)) DESC) AS rn
+    FROM KEYWORD_DAILY_STATS
+    WHERE keyword_name IS NOT NULL
+      AND daily_count > 0
+    GROUP BY keyword_name
+  ) t
+  WHERE t.keyword_name = #{keywordName}
+
+    ]]>
+  </select>
+
+  <!-- 전체 기간 누적 랭킹 전체 리스트 -->
+<select id="getOverallRankingAll" resultType="map">
+<![CDATA[
+  SELECT
+    seq_no      AS rank,
+    keyword_name AS name,
+    total_count  AS count,
+    '↔'          AS trend,
+    CASE
+      WHEN seq_no = 1 THEN '#e60000'
+      WHEN seq_no <= 3 THEN '#ff6600'
+      WHEN seq_no <= 7 THEN '#000000'
+      ELSE '#0044ff'
+    END AS color
+  FROM (
+    SELECT
+      ROW_NUMBER() OVER (ORDER BY SUM(NVL(daily_count, 0)) DESC) AS seq_no,
+      keyword_name,
+      SUM(NVL(daily_count, 0)) AS total_count
+    FROM KEYWORD_DAILY_STATS
+    WHERE keyword_name IS NOT NULL
+      AND daily_count > 0
+    GROUP BY keyword_name
+  )
+  ORDER BY seq_no
+  ]]>
+</select>
+
+    
+
     <!-- 키워드 유사도 정보 조회 -->
     <select id="getKeywordSimilarity" resultType="map">
         <![CDATA[
@@ -153,37 +213,81 @@
         ]]>
     </select>
 
-    <!-- 키워드 일별 통계 조회 (기간별) -->
+    <!-- 키워드 일별 통계 조회 (기간별) - 마지막 언급일 기준 -->
     <select id="getKeywordDailyStatsByPeriod" resultType="map">
-        <![CDATA[
-        SELECT
-            kds.STATS_DATE,
-            kds.DAILY_COUNT,
-            TO_CHAR(kds.STATS_DATE, 'MM/DD') as formatted_date,
-            TO_CHAR(kds.STATS_DATE, 'YYYY-MM-DD') as date_string
-        FROM KEYWORD_DAILY_STATS kds
-        WHERE kds.KEYWORD_ID = #{keywordId}
-        AND kds.STATS_DATE >=
-        ]]>
         <choose>
-            <when test="period == '1일'">
-                <![CDATA[TRUNC(SYSDATE) - 1]]>
-            </when>
-            <when test="period == '1주'">
-                <![CDATA[TRUNC(SYSDATE) - 7]]>
-            </when>
+            <!-- 1달 기간: 6개월간 월별 집계 -->
             <when test="period == '1달'">
-                <![CDATA[TRUNC(SYSDATE) - 30]]>
+                <![CDATA[
+                WITH LAST_MENTION AS (
+                    SELECT MAX(kds.STATS_DATE) as last_date
+                    FROM KEYWORD_DAILY_STATS kds
+                    WHERE kds.KEYWORD_ID = #{keywordId}
+                    AND kds.DAILY_COUNT > 0
+                )
+                SELECT
+                    TRUNC(kds.STATS_DATE, 'MM') as STATS_DATE,
+                    SUM(kds.DAILY_COUNT) as DAILY_COUNT,
+                    TO_CHAR(TRUNC(kds.STATS_DATE, 'MM'), 'MM/DD') as formatted_date,
+                    TO_CHAR(TRUNC(kds.STATS_DATE, 'MM'), 'YYYY-MM-DD') as date_string
+                FROM KEYWORD_DAILY_STATS kds, LAST_MENTION lm
+                WHERE kds.KEYWORD_ID = #{keywordId}
+                AND kds.STATS_DATE >= ADD_MONTHS(lm.last_date, -6)
+                AND kds.STATS_DATE <= lm.last_date
+                GROUP BY TRUNC(kds.STATS_DATE, 'MM'), TO_CHAR(TRUNC(kds.STATS_DATE, 'MM'), 'MM/DD'), TO_CHAR(TRUNC(kds.STATS_DATE, 'MM'), 'YYYY-MM-DD')
+                ORDER BY TRUNC(kds.STATS_DATE, 'MM') ASC
+                ]]>
             </when>
-            <when test="period == '1년'">
-                <![CDATA[TRUNC(SYSDATE) - 365]]>
-            </when>
+            <!-- 기타 기간: 일별 데이터 -->
             <otherwise>
-                <![CDATA[TRUNC(SYSDATE) - 7]]>
+                <![CDATA[
+                WITH LAST_MENTION AS (
+                    SELECT MAX(kds.STATS_DATE) as last_date
+                    FROM KEYWORD_DAILY_STATS kds
+                    WHERE kds.KEYWORD_ID = #{keywordId}
+                    AND kds.DAILY_COUNT > 0
+                )
+                SELECT
+                    kds.STATS_DATE,
+                    kds.DAILY_COUNT,
+                    TO_CHAR(kds.STATS_DATE, 'MM/DD') as formatted_date,
+                    TO_CHAR(kds.STATS_DATE, 'YYYY-MM-DD') as date_string
+                FROM KEYWORD_DAILY_STATS kds, LAST_MENTION lm
+                WHERE kds.KEYWORD_ID = #{keywordId}
+                AND kds.STATS_DATE >=
+                ]]>
+                <choose>
+                    <when test="period == '1일'">
+                        <![CDATA[lm.last_date - 1]]>
+                    </when>
+                    <when test="period == '7일'">
+                        <![CDATA[lm.last_date - 6]]>
+                    </when>
+                    <when test="period == '1주'">
+                        <![CDATA[lm.last_date - 6]]>
+                    </when>
+                    <when test="period == '1년'">
+                        <![CDATA[lm.last_date - 364]]>
+                    </when>
+                    <otherwise>
+                        <![CDATA[lm.last_date - 6]]>
+                    </otherwise>
+                </choose>
+                <![CDATA[
+                AND kds.STATS_DATE <= lm.last_date
+                ORDER BY kds.STATS_DATE ASC
+                ]]>
             </otherwise>
         </choose>
+    </select>
+
+    <!-- 키워드 마지막 언급일 조회 -->
+    <select id="getLastMentionDate" resultType="map">
         <![CDATA[
-        ORDER BY kds.STATS_DATE ASC
+        SELECT MAX(kds.STATS_DATE) as LAST_DATE
+        FROM KEYWORD_DAILY_STATS kds
+        WHERE kds.KEYWORD_ID = #{keywordId}
+        AND kds.DAILY_COUNT > 0
         ]]>
     </select>
 
@@ -193,7 +297,6 @@
        - onlyMain=true 이면 MAIN_EMOTIONS에 있는 라벨만 집계
      ========================================= -->
   <select id="getKeywordSentimentAnalysis" parameterType="map" resultType="map">
-    <![CDATA[
     SELECT EMOTIONS AS LABEL, SOURCE_ID
     FROM (
       -- YouTube 댓글의 감정 데이터
@@ -206,6 +309,10 @@
         AND yc.EMOTIONS != '["없음"]'
         AND yc.EMOTIONS != '["분석실패"]'
         AND yc.EMOTIONS != '["분석불가"]'
+        <if test="period == '최신순(3개월)' and lastMentionDate != null">
+        AND yc.PUBLISHED_AT >= ADD_MONTHS(#{lastMentionDate, jdbcType=DATE}, -3)
+        AND yc.PUBLISHED_AT <![CDATA[<=]]> #{lastMentionDate, jdbcType=DATE}
+        </if>
 
       UNION ALL
 
@@ -219,9 +326,12 @@
         AND ic.EMOTIONS != '["없음"]'
         AND ic.EMOTIONS != '["분석실패"]'
         AND ic.EMOTIONS != '["분석불가"]'
+        <if test="period == '최신순(3개월)' and lastMentionDate != null">
+        AND ic.COMMENT_DATE >= ADD_MONTHS(#{lastMentionDate, jdbcType=DATE}, -3)
+        AND ic.COMMENT_DATE <![CDATA[<=]]> #{lastMentionDate, jdbcType=DATE}
+        </if>
     )
     WHERE EMOTIONS IS NOT NULL
-    ]]>
   </select>
 
 
@@ -351,21 +461,24 @@
     <result column="PLATFORM" property="platform"/>
   </resultMap>
 
-  <!-- 특정 감정에 해당하는 댓글 조회 (플랫폼별 균등 분배) -->
+  <!-- 특정 감정에 해당하는 댓글 조회 (VARCHAR2 컬럼 최적화) -->
   <select id="getCommentsByEmotion" parameterType="map" resultMap="commentEmotionResultMap">
     <![CDATA[
-    SELECT * FROM (
+    SELECT
+      COMMENT_TEXT,
+      '${emotion}' as EMOTION,
+      PLATFORM
+    FROM (
       -- YouTube 댓글 2개
       SELECT * FROM (
         SELECT
           SUBSTR(DBMS_LOB.SUBSTR(yc.COMMENT_TEXT, 4000, 1), 1, 100) as COMMENT_TEXT,
-          #{emotion} as EMOTION,
           'YouTube' as PLATFORM
         FROM YOUTUBE_COMMENT yc
         JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
         WHERE yv.KEYWORD_ID = #{keywordId}
           AND yc.EMOTIONS IS NOT NULL
-          AND yc.EMOTIONS LIKE '%' || #{emotion} || '%'
+          AND INSTR(yc.EMOTIONS, '${emotion}') > 0
           AND DBMS_LOB.GETLENGTH(yc.COMMENT_TEXT) >= 15
         ORDER BY DBMS_RANDOM.VALUE
       ) WHERE ROWNUM <= 2
@@ -376,13 +489,12 @@
       SELECT * FROM (
         SELECT
           SUBSTR(DBMS_LOB.SUBSTR(ic.COMMENT_TEXT, 4000, 1), 1, 100) as COMMENT_TEXT,
-          #{emotion} as EMOTION,
           'Instagram' as PLATFORM
         FROM INSTAGRAM_COMMENT ic
         JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
         WHERE ip.KEYWORD_ID = #{keywordId}
           AND ic.EMOTIONS IS NOT NULL
-          AND ic.EMOTIONS LIKE '%' || #{emotion} || '%'
+          AND INSTR(ic.EMOTIONS, '${emotion}') > 0
           AND DBMS_LOB.GETLENGTH(ic.COMMENT_TEXT) >= 15
         ORDER BY DBMS_RANDOM.VALUE
       ) WHERE ROWNUM <= 2

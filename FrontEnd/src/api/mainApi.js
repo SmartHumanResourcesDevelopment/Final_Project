@@ -7,7 +7,7 @@ const BASE_URL = "http://localhost:8095/zal/api/main";
 const mainApi = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
-  timeout: 120000, // 120초 타임아웃 (OpenAI API 호출 + DB 조회 충분히 고려)
+  timeout: 2400000, // 120초 타임아웃 (OpenAI API 호출 + DB 조회 충분히 고려)
 });
 
 // 요청 인터셉터 (로깅용)
@@ -129,6 +129,19 @@ export const mainApiService = {
       return response.data;
     } catch (error) {
       console.error("테스트 API 호출 실패:", error);
+      throw error;
+    }
+  },
+
+  // 7. 랜덤 키워드 조회 (심층분석 페이지용)
+  getRandomKeyword: async () => {
+    try {
+      console.log("🎲 랜덤 키워드 조회 시작");
+      const response = await mainApi.get("/random-keyword");
+      console.log("✅ 랜덤 키워드 조회 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ 랜덤 키워드 조회 실패:", error);
       throw error;
     }
   }

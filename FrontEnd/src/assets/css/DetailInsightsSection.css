@@ -1,6 +1,6 @@
 /* ===== 공통 레이아웃 ===== */
 .detailInsights {
-  max-width: 1260px;
+  width: 1260px;
   margin: 0 auto;
   padding: 3rem 1rem 4rem;
   font-family: "Noto Sans KR", sans-serif;

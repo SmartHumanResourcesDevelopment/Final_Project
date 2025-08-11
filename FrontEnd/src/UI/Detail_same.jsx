@@ -42,43 +42,93 @@ export default function TrendAnalysisSection({ keyword = "말차", similarityInf
     return basePositions.slice(0, count);
   };
 
-  // 유사 키워드 데이터 확인 및 처리 (중복 제거)
+  // 키워드 정규화 함수 (중복 제거용)
+  const normalizeKeyword = (keyword) => {
+    if (!keyword) return "";
+    return keyword.toString().trim().toLowerCase();
+  };
+
+  // 유사 키워드 데이터 확인 및 처리 (강화된 중복 제거)
   const getSimilarKeywordsFromInfo = () => {
     if (!similarityInfo) return [];
 
     const keywords = [];
-    const seenKeywords = new Set(); // 중복 제거용
+    const seenKeywords = new Set(); // 중복 제거용 (정규화된 키워드 저장)
 
     for (let i = 1; i <= 5; i++) {
       const keywordName = similarityInfo[`SIMILAR_${i}_NAME`];
-      if (keywordName && keywordName !== "null" && keywordName.trim() !== "" && !seenKeywords.has(keywordName)) {
-        seenKeywords.add(keywordName);
-        keywords.push({ KEYWORD_NAME: keywordName });
+      if (keywordName && keywordName !== "null" && keywordName.trim() !== "") {
+        const normalizedKeyword = normalizeKeyword(keywordName);
+
+        // 정규화된 키워드로 중복 체크
+        if (!seenKeywords.has(normalizedKeyword)) {
+          seenKeywords.add(normalizedKeyword);
+          keywords.push({ KEYWORD_NAME: keywordName.trim() }); // 원본 키워드 저장 (공백만 제거)
+        } else {
+          console.log(`🔄 중복 키워드 제거: "${keywordName}" (정규화: "${normalizedKeyword}")`);
+        }
       }
     }
+
+    console.log(`📊 similarityInfo에서 추출된 유니크 키워드: ${keywords.length}개`, keywords.map(k => k.KEYWORD_NAME));
     return keywords;
   };
 
   // similarityInfo에서 키워드 이름들을 가져오거나, 없으면 similarKeywords 사용
   const keywordsToDisplay = getSimilarKeywordsFromInfo();
 
-  // similarKeywords에서도 중복 제거
+  // similarKeywords에서도 강화된 중복 제거
   const uniqueSimilarKeywords = similarKeywords ?
-    similarKeywords.filter((keyword, index, self) =>
-      index === self.findIndex(k => k.KEYWORD_NAME === keyword.KEYWORD_NAME)
-    ) : [];
+    similarKeywords.filter((keyword, index, self) => {
+      if (!keyword || !keyword.KEYWORD_NAME) return false;
 
-  const hasValidSimilarKeywords = keywordsToDisplay.length > 0 || uniqueSimilarKeywords.length > 0;
+      const currentNormalized = normalizeKeyword(keyword.KEYWORD_NAME);
 
-  // 실제 표시할 키워드 목록 결정
-  const finalKeywords = keywordsToDisplay.length > 0 ? keywordsToDisplay : uniqueSimilarKeywords;
+      // 현재 키워드가 배열에서 처음 나타나는 위치인지 확인 (정규화 기준)
+      const firstIndex = self.findIndex(k =>
+        k && k.KEYWORD_NAME && normalizeKeyword(k.KEYWORD_NAME) === currentNormalized
+      );
 
-  console.log("키워드 처리 결과:", {
-    keywordsFromInfo: keywordsToDisplay,
-    keywordsFromProps: similarKeywords,
-    uniqueSimilarKeywords: uniqueSimilarKeywords,
-    finalKeywords: finalKeywords,
-    hasValidSimilarKeywords: hasValidSimilarKeywords
+      const isUnique = index === firstIndex;
+      if (!isUnique) {
+        console.log(`🔄 similarKeywords에서 중복 제거: "${keyword.KEYWORD_NAME}" (정규화: "${currentNormalized}")`);
+      }
+
+      return isUnique;
+    }) : [];
+
+  console.log(`📊 similarKeywords에서 추출된 유니크 키워드: ${uniqueSimilarKeywords.length}개`, uniqueSimilarKeywords.map(k => k.KEYWORD_NAME));
+
+  // 두 소스를 합쳐서 최종 중복 제거
+  const combineAndDeduplicateKeywords = () => {
+    const allKeywords = [...keywordsToDisplay, ...uniqueSimilarKeywords];
+    const seenNormalized = new Set();
+
+    const finalUnique = allKeywords.filter(keyword => {
+      if (!keyword || !keyword.KEYWORD_NAME) return false;
+
+      const normalized = normalizeKeyword(keyword.KEYWORD_NAME);
+      if (seenNormalized.has(normalized)) {
+        console.log(`🔄 최종 단계에서 중복 제거: "${keyword.KEYWORD_NAME}" (정규화: "${normalized}")`);
+        return false;
+      }
+
+      seenNormalized.add(normalized);
+      return true;
+    });
+
+    console.log(`📊 최종 유니크 키워드: ${finalUnique.length}개`, finalUnique.map(k => k.KEYWORD_NAME));
+    return finalUnique;
+  };
+
+  const finalKeywords = combineAndDeduplicateKeywords();
+  const hasValidSimilarKeywords = finalKeywords.length > 0;
+
+  console.log("🎯 키워드 중복 제거 완료:", {
+    원본_similarityInfo: keywordsToDisplay.length,
+    원본_similarKeywords: similarKeywords?.length || 0,
+    중복제거_후_최종: finalKeywords.length,
+    최종_키워드목록: finalKeywords.map(k => k.KEYWORD_NAME)
   });
 
   // 유사 키워드 데이터를 버블 차트 형식으로 변환
@@ -121,9 +171,7 @@ export default function TrendAnalysisSection({ keyword = "말차", similarityInf
 
       {/* ------- 카드 ------- */}
       <section className="trendCard" role="region" aria-labelledby="trend-title">
-        <h3 id="trend-title" className="sr-only">
-          비슷한 키워드 TOP5 버블 차트
-        </h3>
+
 
         {hasValidSimilarKeywords ? (
           <DetailBubbleChart data={trendData} />

@@ -4,6 +4,48 @@ import "../assets/css/Main_search.css";
 import searchIcon from "../assets/img/common/search.png";
 import { keywordApiService } from "../api/sub";
 
+// 키워드 오타 교정 데이터베이스
+const KEYWORD_CORRECTIONS = {
+  // 일반적인 오타 패턴
+  "제리": "젤리",
+  "젤이": "젤리",
+  "겔리": "젤리",
+  "먹빵": "먹방",
+  "먹팡": "먹방",
+  "간시": "간식",
+  "갈식": "간식",
+  "과져": "과자",
+  "괘자": "과자",
+  "음뇨": "음료",
+  "디져트": "디저트",
+  "디절트": "디저트",
+  "케익": "케이크",
+  "케잌": "케이크",
+  "치긴": "치킨",
+  "피짜": "피자",
+  "햄버가": "햄버거",
+  "햄벅거": "햄버거",
+  "라멘": "라면",
+  "라민": "라면",
+  "떡복이": "떡볶이",
+  "떡뽁이": "떡볶이",
+  "깁치": "김치",
+  "불닥": "불닭",
+  "불딱": "불닭",
+  "마라땅": "마라탕",
+  "마라당": "마라탕",
+  "탕후르": "탕후루",
+  "당후루": "탕후루",
+  "버블테": "버블티",
+  "버불티": "버블티",
+  "치즈케익": "치즈케이크",
+  "치즈케잌": "치즈케이크",
+  "망고": "망고",
+  "맹고": "망고",
+  "두찜": "두찜",
+  "두짐": "두찜"
+};
+
 
 function Main_search() {
   const navigate = useNavigate();
@@ -14,6 +56,55 @@ function Main_search() {
   const [error, setError] = useState(null);
   const [suggestedKeywords, setSuggestedKeywords] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [correctionMessage, setCorrectionMessage] = useState("");
+
+  // 오타 교정 함수
+  const correctTypo = (input) => {
+    const trimmedInput = input.trim().toLowerCase();
+
+    // 정확한 매칭 먼저 확인
+    if (KEYWORD_CORRECTIONS[trimmedInput]) {
+      return KEYWORD_CORRECTIONS[trimmedInput];
+    }
+
+    // 부분 매칭 확인 (유사도 기반)
+    for (const [typo, correct] of Object.entries(KEYWORD_CORRECTIONS)) {
+      if (trimmedInput.includes(typo) || typo.includes(trimmedInput)) {
+        // 길이 차이가 1-2자 이내인 경우만 교정
+        if (Math.abs(trimmedInput.length - typo.length) <= 2) {
+          return correct;
+        }
+      }
+    }
+
+    return null; // 교정할 수 없음
+  };
+
+  // 검색어 변경 시 오타 교정 확인
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // 교정 메시지 초기화
+    setCorrectionMessage("");
+
+    if (value.trim().length > 1) {
+      const correctedKeyword = correctTypo(value);
+      if (correctedKeyword && correctedKeyword !== value.trim()) {
+        setCorrectionMessage(`"${correctedKeyword}"(으)로 검색하시겠습니까?`);
+      }
+    }
+  };
+
+  // 교정된 키워드로 검색창 업데이트
+  const applyCorrectedKeyword = () => {
+    const correctedKeyword = correctTypo(searchQuery);
+    if (correctedKeyword) {
+      setSearchQuery(correctedKeyword);
+      setCorrectionMessage("");
+      console.log(`🔧 오타 교정: "${searchQuery}" → "${correctedKeyword}"`);
+    }
+  };
 
 
 
@@ -64,6 +155,13 @@ function Main_search() {
       console.log("✅ 검색 성공:", data);
       setSearchResults(data);
 
+      // 검색 성공 시 최근 검색 키워드에 추가
+      if (data.keywordInfo && window.addRecentKeyword) {
+        const keywordName = data.keywordInfo.KEYWORD_NAME || searchQuery.trim();
+        window.addRecentKeyword(keywordName);
+        console.log("💾 최근 검색 키워드에 추가:", keywordName);
+      }
+
       // 키워드 정보가 없는 경우 에러 메시지 설정
       if (!data.keywordInfo) {
         setError(data.message || '검색 결과를 찾을 수 없습니다.');
@@ -86,8 +184,9 @@ function Main_search() {
             state: {
               keywordData: {
                 keyword: data.keywordInfo.KEYWORD_NAME,
-              ranking: data.mainStats && data.mainStats.length > 0 ?
-                       `${data.mainStats[0].CURRENT_RANK}등` : "순위 정보 없음",
+              ranking: data.ranking ?
+                       (typeof data.ranking === 'number' ? `${data.ranking}위` : data.ranking) :
+                       "순위 정보 없음",
               emotionLabels: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].MAIN_EMOTIONS ?
                            data.mainStats[0].MAIN_EMOTIONS.split(',').slice(0, 5) : ["감정", "분석", "정보", "없음", "~"],
               description: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].SHORT_DESCRIPTION ?
@@ -152,8 +251,9 @@ function Main_search() {
         state: {
           keywordData: {
             keyword: data.keywordInfo.KEYWORD_NAME,
-            ranking: data.mainStats && data.mainStats.length > 0 ?
-                     `${data.mainStats[0].CURRENT_RANK}등` : "순위 정보 없음",
+            ranking: data.ranking ?
+                     (typeof data.ranking === 'number' ? `${data.ranking}위` : data.ranking) :
+                     "순위 정보 없음",
             emotionLabels: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].MAIN_EMOTIONS ?
                           data.mainStats[0].MAIN_EMOTIONS.split(',').slice(0, 5) : ["감정", "분석", "정보", "없음", "~"],
             description: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].SHORT_DESCRIPTION ?
@@ -215,8 +315,9 @@ function Main_search() {
           state: {
             keywordData: {
               keyword: data.keywordInfo.KEYWORD_NAME,
-              ranking: data.mainStats && data.mainStats.length > 0 ?
-                       `${data.mainStats[0].CURRENT_RANK}등` : "순위 정보 없음",
+              ranking: data.ranking ?
+                       (typeof data.ranking === 'number' ? `${data.ranking}위` : data.ranking) :
+                       "순위 정보 없음",
               emotionLabels: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].MAIN_EMOTIONS ?
                             data.mainStats[0].MAIN_EMOTIONS.split(',').slice(0, 5) : ["감정", "분석", "정보", "없음", "~"],
               description: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].SHORT_DESCRIPTION ?
@@ -241,9 +342,9 @@ function Main_search() {
     }
   };
 
-  /* 입력 변경 처리 */
+  /* 입력 변경 처리 (오타 교정 포함) */
   const handleInputChange = (e) => {
-    setSearchQuery(e.target.value);
+    handleSearchChange(e);
   };
 
   /* 컴포넌트 마운트 시 인기 키워드 로드 (한 번만 실행) */
@@ -336,6 +437,43 @@ function Main_search() {
           )}
         </button>
       </form>
+
+      {/* 오타 교정 메시지 */}
+      {correctionMessage && (
+        <div style={{
+          marginTop: '10px',
+          padding: '12px 16px',
+          backgroundColor: '#e3f2fd',
+          border: '1px solid #2196f3',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: '14px',
+          color: '#1976d2'
+        }}>
+          <span>
+            🔧 {correctionMessage}
+          </span>
+          <button
+            onClick={applyCorrectedKeyword}
+            style={{
+              padding: '6px 12px',
+              backgroundColor: '#2196f3',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '12px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#1976d2'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#2196f3'}
+          >
+            교정하기
+          </button>
+        </div>
+      )}
 
       {/* 에러 메시지 및 추천 키워드 */}
       {error && (
