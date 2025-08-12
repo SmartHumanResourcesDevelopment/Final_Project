@@ -18,7 +18,6 @@ export const Chart_Bot_Collab = ({ onClose, keywordData, collabIdeas }) => {
 
     // 1. AI가 생성한 데이터를 DB 저장용 DTO 형태로 변환합니다.
   const dtoList = collabIdeas.map(idea => ({
-    title: idea.title,           // TITLE 필드 추가
     contentTitle: idea.title,
     // contents 배열을 별도의 필드로 변환합니다. (DB 스키마에 맞게)
     // 예시: contentDesc1, contentDesc2, contentDesc3

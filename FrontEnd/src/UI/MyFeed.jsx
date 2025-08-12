@@ -67,6 +67,7 @@ export const ActivityFeedSection = () => {
   // 모달 상태 관리
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState("");
+  const [selectedScrapType, setSelectedScrapType] = useState("콜라보");
 
   // 최근 검색 키워드 불러오기 (쿠키 + localStorage 이중화)
   const loadRecentKeywords = () => {
@@ -217,11 +218,16 @@ export const ActivityFeedSection = () => {
 
   // 스크랩 정보 클릭 핸들러
   const handleScrapClick = (reportText) => {
-    // "[콜라보] 젤리에 관한 보고서" 형태에서 키워드 추출
-    const match = reportText.match(/\[콜라보\]\s*(.+?)에\s*관한\s*보고서/);
-    if (match && match[1]) {
-      const keywordName = match[1].trim();
-      console.log("🔍 스크랩 클릭 - 키워드:", keywordName);
+    const match = reportText.match(/\[(콜라보|제품|슬로건)\]\s*(.+?)에\s*관한\s*보고서/);
+    
+    // match[1]은 타입(콜라보, 제품, 슬로건), match[2]는 키워드 이름이 됩니다.
+    if (match && match[1] && match[2]) {
+      const type = match[1].trim();
+      const keywordName = match[2].trim();
+
+      console.log(`🔍 스크랩 클릭 - 타입: ${type}, 키워드: ${keywordName}`);
+      
+      setSelectedScrapType(type); // 어떤 종류의 스크랩인지 상태에 저장
       setSelectedKeyword(keywordName);
       setIsModalOpen(true);
     } else {
@@ -286,9 +292,8 @@ export const ActivityFeedSection = () => {
       setScrapLoading(true);
       console.log("🔍 스크랩 정보 로드 시작");
 
-      const response = await fetchWithAuth("/zal/api/mypage/scrap-info", {
-        method: "GET"
-      });
+      const response = await fetchWithAuth("/zal/api/mypage/scrap-info", { method: "GET" });
+
 
       if (response.ok) {
         const result = await response.json();
@@ -387,6 +392,7 @@ export const ActivityFeedSection = () => {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         keywordName={selectedKeyword}
+        scrapType={selectedScrapType}
       />
     </section>
   );

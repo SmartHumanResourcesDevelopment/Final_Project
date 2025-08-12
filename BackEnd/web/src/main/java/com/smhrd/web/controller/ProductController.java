@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import com.smhrd.web.DTO.ProductDTO;
+import com.smhrd.web.DTO.ChatBotIdeaDTO;
+import com.smhrd.web.DTO.CollabRequestDTO;
 import com.smhrd.web.service.ProductService;
+import com.smhrd.web.service.ChatbotService;
 import com.smhrd.web.service.ProductService.ScrapException;
 
 
@@ -23,8 +25,13 @@ import com.smhrd.web.service.ProductService.ScrapException;
 @CrossOrigin(origins = "http://localhost:5173")
 public class ProductController {
 
+    // DB저장 서비스
     @Autowired
     private ProductService productService;
+
+    // AI 생성용 서비스
+    @Autowired
+    private ChatbotService chatbotService;
 
     // 제품 아이디어 저장
     @PostMapping("/product")
@@ -67,6 +74,14 @@ public class ProductController {
             ));
         }
     }
-
+    // 신규: AI로 제품 아이디어 생성 API
+    @PostMapping("/product/generate")
+    public ResponseEntity<List<ChatBotIdeaDTO>> generateProductIdeas(@RequestBody CollabRequestDTO request) {
+        System.out.println("==== [AI 제품 생성 API 호출됨] ====");
+        System.out.println("키워드: " + request.getKeyword());
+        
+        List<ChatBotIdeaDTO> ideas = chatbotService.generateProductIdeas(request.getKeyword());
+        return ResponseEntity.ok(ideas);
+    }
 }
 

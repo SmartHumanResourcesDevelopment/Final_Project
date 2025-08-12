@@ -2,6 +2,7 @@ package com.smhrd.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -10,13 +11,15 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.smhrd.web.repository.UserMapper;
+
 import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-     private final JwtFilter jwtFilter;
+    private final JwtFilter jwtFilter;
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
 
@@ -36,8 +39,6 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             // === Swagger 관련 경로 추가 ===
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-            // === 로그인, 회원가입 API 경로 허용 ===
-            .requestMatchers("/api/login", "/api/register").permitAll()
             // === API 경로 허용 ===
             .requestMatchers("/api/**").permitAll()
             // === 기존 public 경로 ===

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.smhrd.web.DTO.ProductDTO;
 import com.smhrd.web.DTO.UserDTO;
 import com.smhrd.web.repository.ChatbotMapper;
+import com.smhrd.web.repository.KeywordMapper; 
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +17,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductService {
 
-     private final ChatbotMapper mapper;
+    private final ChatbotMapper mapper;
+    private final KeywordMapper keywordMapper; 
     
     public class ScrapException extends RuntimeException {
         public ScrapException(String message) {
@@ -29,20 +31,25 @@ public class ProductService {
     public void productIdeas(List<ProductDTO> products, Authentication authentication) {
         System.out.println("==== [Service: productIdeas 호출됨] ====");
 
-        // 1. Authentication 객체에서 UserDTO 추출
         UserDTO user = (UserDTO) authentication.getPrincipal();
-        
-        // 2. UserDTO에서 user_id(String) 값만 가져오기
         String userId = user.getUser_id();
 
         System.out.println("📝 저장 시도 아이템 수: " + products.size());
 
         for (ProductDTO product : products) {
-            // 3. ProductDTO의 userId 필드에 추출한 String 값을 할당
-            product.setUserId(userId);
-            product.setKeywordId(1L); // 테스트 값 입력 (유효한 키워드 ID로 변경하기)
+            // 1.  키워드 이름으로 DB에서 실제 keyword_id를 조회합니다. 
+            Long keywordId = keywordMapper.getKeywordIdByName(product.getKeywordName());
             
-            System.out.println("➡ DB 저장 시도: " + product.getTitle() + " / USER_ID=" + product.getUserId());
+            // 2. 조회된 ID가 없으면 에러를 발생시킵니다. 
+            if (keywordId == null) {
+                throw new RuntimeException("유효하지 않은 키워드입니다: " + product.getKeywordName());
+            }
+            
+            // 3.  조회된 ID를 DTO에 설정합니다. 
+            product.setKeywordId(keywordId);
+            product.setUserId(userId);
+            
+            System.out.println("➡ DB 저장 시도: " + product.getTitle() + " / KEYWORD_ID=" + product.getKeywordId());
             int result = mapper.insertProduct(product);
 
             if (result != 1) {

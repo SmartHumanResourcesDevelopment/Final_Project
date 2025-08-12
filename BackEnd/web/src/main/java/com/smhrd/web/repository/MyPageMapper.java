@@ -33,16 +33,32 @@ public interface MyPageMapper {
     Long selectKeywordIdByName(@Param("keywordName") String keywordName);
 
     /**
-     * 사용자의 스크랩된 제품 아이디어 목록 조회 (향후 확장용)
+     * 사용자의 스크랩된 제품 아이디어 목록 조회
      * @param userId 사용자 ID
-     * @return 제품 아이디어 목록
+     * @return 콜라보 아이디어 목록
      */
-    // List<MyPageProductDTO> selectUserProductIdeas(@Param("userId") String userId);
+    List<MyPageCollabDTO> selectUserProductIdeas(@Param("userId") String userId);
 
     /**
-     * 사용자의 스크랩된 슬로건 목록 조회 (향후 확장용)
+     * 사용자의 스크랩된 슬로건 아이디어 목록 조회
      * @param userId 사용자 ID
-     * @return 슬로건 목록
+     * @return 콜라보 아이디어 목록
      */
-    // List<MyPageSloganDTO> selectUserSlogans(@Param("userId") String userId);
+    List<MyPageCollabDTO> selectUserSloganIdeas(@Param("userId") String userId);
+
+    /**
+     * 특정 키워드의 제품 아이디어 상세 조회 (개인화)
+     * @param userId 사용자 ID
+     * @param keywordId 키워드 ID
+     * @return 콜라보 아이디어 상세 목록
+     */
+    List<MyPageCollabDTO> selectProductDetailsByKeyword(@Param("userId") String userId, @Param("keywordId") Long keywordId);
+
+    /**
+     * 특정 키워드의 슬로건 아이디어 상세 조회 (개인화)
+     * @param userId 사용자 ID
+     * @param keywordId 키워드 ID
+     * @return 콜라보 아이디어 상세 목록
+     */
+    List<MyPageCollabDTO> selectSloganDetailsByKeyword(@Param("userId") String userId, @Param("keywordId") Long keywordId);
 }

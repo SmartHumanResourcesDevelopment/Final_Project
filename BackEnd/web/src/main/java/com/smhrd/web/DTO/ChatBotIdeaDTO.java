@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class CollabIdeaDTO {
-    private String title;       // 콜라보 아이디어 제목
+public class ChatBotIdeaDTO {
+    private String title;       // 아이디어 제목
     private List<String> contents;  // 제목에 해당하는 내용 글 목록 (3개)
 }

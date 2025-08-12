@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smhrd.web.DTO.CollabDTO;
-import com.smhrd.web.DTO.CollabIdeaDTO;
+import com.smhrd.web.DTO.ChatBotIdeaDTO;
 import com.smhrd.web.DTO.CollabRequestDTO;
 import com.smhrd.web.service.ChatbotService;
 import com.smhrd.web.service.CollabService;
@@ -76,11 +76,11 @@ public class CollabController {
     }
     // AI 콜라보 아이디어 생성
     @PostMapping("/collab/generate")
-    public ResponseEntity<List<CollabIdeaDTO>> generateCollabIdeas(@RequestBody CollabRequestDTO request) {
+    public ResponseEntity<List<ChatBotIdeaDTO>> generateCollabIdeas(@RequestBody CollabRequestDTO request) {
         System.out.println("==== [AI 콜라보 생성 API 호출됨] ====");
         System.out.println("키워드: " + request.getKeyword());
 
-        List<CollabIdeaDTO> ideas = chatbotService.generateCollabIdeas(request.getKeyword());
+        List<ChatBotIdeaDTO> ideas = chatbotService.generateCollabIdeas(request.getKeyword());
         return ResponseEntity.ok(ideas);
     }
 }

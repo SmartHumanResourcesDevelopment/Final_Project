@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smhrd.web.DTO.SloganDTO;
+import com.smhrd.web.service.ChatbotService;
+import com.smhrd.web.DTO.ChatBotIdeaDTO;
+import com.smhrd.web.DTO.CollabRequestDTO;
 import com.smhrd.web.service.SloganService;
+import com.smhrd.web.service.ChatbotService; 
 import com.smhrd.web.service.SloganService.ScrapException;
 
 @RestController
@@ -21,8 +25,13 @@ import com.smhrd.web.service.SloganService.ScrapException;
 @CrossOrigin(origins = "http://localhost:5173")
 public class SloganController {
 
+    // DB저장 서비스
     @Autowired
     private SloganService sloganService;
+
+    // AI 생성용 서비스
+    @Autowired
+    private ChatbotService chatbotService;    
 
     // 마케팅, 슬로건 저장
     @PostMapping("/slogan")
@@ -65,6 +74,14 @@ public class SloganController {
             ));
         }
     }
-
+    // AI로 슬로건 생성 API
+    @PostMapping("/slogan/generate")
+    public ResponseEntity<List<ChatBotIdeaDTO>> generateSlogans(@RequestBody CollabRequestDTO request) {
+        System.out.println("==== [AI 슬로건 생성 API 호출됨] ====");
+        System.out.println("키워드: " + request.getKeyword());
+        
+        List<ChatBotIdeaDTO> ideas = chatbotService.generateSlogans(request.getKeyword());
+        return ResponseEntity.ok(ideas);
+    }
 }
 
