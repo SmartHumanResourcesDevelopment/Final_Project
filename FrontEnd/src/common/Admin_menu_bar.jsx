@@ -87,7 +87,7 @@ export const AdminNavigationBarSection = () => {
           {/* 프로필 이미지 (관리자용으로 user.userProfile 또는 기본이미지 넣어주세요) */}
           <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100">
             <img
-              src={user?.profileImage || "/default-admin.png"}
+              src={user?.profileImage || "/img/default/admin.png"}
               alt="Admin profile"
               className="w-full h-full object-cover"
             />

@@ -19,8 +19,14 @@ import { useKeywordData }      from "../contexts/KeywordDataContext";
 
 import "../assets/css/Sub.css";
 
+
+
 const Sub = ({ keywordData: propsKeywordData, onClose }) => {
   const { keywordData: contextKeywordData } = useKeywordData();
+
+
+  const { user } = useUser();
+  const isAdmin = user.role === "관리자";
 
   // props로 받은 데이터가 있으면 우선 사용, 없으면 context 데이터 사용
   const keywordData = propsKeywordData || contextKeywordData;
