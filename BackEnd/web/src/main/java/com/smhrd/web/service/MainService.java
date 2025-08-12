@@ -661,38 +661,47 @@ public class MainService {
         try {
             System.out.println("📈 급상승 키워드 TOP3 조회 시작 (시작 시간: " + new Date() + ")");
 
-            // 단계별 조회: 30일 → 60일 → 90일 → 최근 데이터
+            // 최적화된 단계별 조회: 30일 → 60일 → 90일 (인덱스 활용)
             List<Map<String, Object>> results = null;
             String usedPeriod = "";
 
-            // 1단계: 2025년 7월 (2025-07-01 ~ 2025-07-31) 조회
-            results = mainMapper.getTrendingKeywordsRecent30Days();
-            System.out.println("📊 2025년 7월 DB 조회 결과: " + results.size() + "개 키워드");
+            // 1단계: 최근 30일 조회 (인덱스 최적화)
+            Map<String, Object> params30 = new HashMap<>();
+            params30.put("days", 30);
+            params30.put("limit", 3);
+            results = mainMapper.getTrendingKeywordsByDays(params30);
+            System.out.println("📊 최근 30일 DB 조회 결과 (인덱스 최적화): " + results.size() + "개 키워드");
 
             if (results.size() >= 3) {
-                usedPeriod = "2025년 7월";
+                usedPeriod = "최근 30일";
             } else {
-                // 2단계: 2025년 6-7월 (2025-06-01 ~ 2025-07-31) 조회
-                System.out.println("⚠️ 7월 데이터 부족 (" + results.size() + "개). 6-7월로 확장 조회");
-                results = mainMapper.getTrendingKeywordsRecent60Days();
-                System.out.println("📊 2025년 6-7월 DB 조회 결과: " + results.size() + "개 키워드");
+                // 2단계: 최근 60일 조회
+                System.out.println("⚠️ 30일 데이터 부족 (" + results.size() + "개). 60일로 확장 조회");
+                Map<String, Object> params60 = new HashMap<>();
+                params60.put("days", 60);
+                params60.put("limit", 3);
+                results = mainMapper.getTrendingKeywordsByDays(params60);
+                System.out.println("📊 최근 60일 DB 조회 결과 (인덱스 최적화): " + results.size() + "개 키워드");
 
                 if (results.size() >= 3) {
-                    usedPeriod = "2025년 6-7월";
+                    usedPeriod = "최근 60일";
                 } else {
-                    // 3단계: 2025년 5-7월 (2025-05-01 ~ 2025-07-31) 조회
-                    System.out.println("⚠️ 6-7월 데이터 부족 (" + results.size() + "개). 5-7월로 확장 조회");
-                    results = mainMapper.getTrendingKeywordsRecent90Days();
-                    System.out.println("📊 2025년 5-7월 DB 조회 결과: " + results.size() + "개 키워드");
+                    // 3단계: 최근 90일 조회
+                    System.out.println("⚠️ 60일 데이터 부족 (" + results.size() + "개). 90일로 확장 조회");
+                    Map<String, Object> params90 = new HashMap<>();
+                    params90.put("days", 90);
+                    params90.put("limit", 3);
+                    results = mainMapper.getTrendingKeywordsByDays(params90);
+                    System.out.println("📊 최근 90일 DB 조회 결과 (인덱스 최적화): " + results.size() + "개 키워드");
 
                     if (results.size() >= 3) {
-                        usedPeriod = "2025년 5-7월";
+                        usedPeriod = "최근 90일";
                     } else {
-                        // 4단계: 2025년 7월 마지막 주 (2025-07-25 ~ 2025-07-31)에서 랜덤 3개
-                        System.out.println("⚠️ 5-7월 데이터도 부족 (" + results.size() + "개). 7월 마지막 주에서 랜덤 선택");
+                        // 4단계: 최근 7일에서 랜덤 3개 (폴백)
+                        System.out.println("⚠️ 90일 데이터도 부족 (" + results.size() + "개). 최근 7일에서 랜덤 선택");
                         results = mainMapper.getTrendingKeywordsLatest();
-                        System.out.println("📊 2025년 7월 마지막 주 랜덤 조회 결과: " + results.size() + "개 키워드");
-                        usedPeriod = "2025년 7월 마지막 주 (랜덤)";
+                        System.out.println("📊 최근 7일 랜덤 조회 결과: " + results.size() + "개 키워드");
+                        usedPeriod = "최근 7일 (랜덤)";
                     }
                 }
             }

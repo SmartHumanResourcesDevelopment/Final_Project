@@ -61,6 +61,13 @@ public interface MainMapper {
      */
     List<Map<String, Object>> getOverallRankingAll();
 
+    /**
+     * 통합 급상승 키워드 조회 (30/60/90일 공용) - 최고 성능 버전
+     * @param params days(일수), limit(개수) 파라미터
+     * @return 급상승 키워드 데이터
+     */
+    List<Map<String, Object>> getTrendingKeywordsByDays(Map<String, Object> params);
+
 
 
 }
