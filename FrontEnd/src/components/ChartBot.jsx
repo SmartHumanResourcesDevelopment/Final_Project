@@ -34,48 +34,61 @@ export const ChartBot = ({ onClose, keywordData }) => {
     return;
   }
 
-  // 2. 콜라보 뷰에 진입했으므로, 항상 데이터 로딩을 시작합니다.
-  setIsLoading(true);
   
-  const fetchCollabData = async () => {
+  
+  const fetchCollabIdeasFromAI = async () => {
+
+    // 2. 콜라보 뷰에 진입했으므로, 항상 데이터 로딩을 시작합니다.
+    setIsLoading(true);
+
     console.log(`'${keywordData.keyword}' 키워드로 새 콜라보 아이디어를 요청합니다.`);
     
-    // API 호출 시뮬레이션 (1초 대기)
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // API 호출 시뮬레이션 (2초 대기)
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     // API로부터 받아온 새로운 데이터
-    const generatedIdeas = [
-      { 
-        title: `'${keywordData.keyword}' 컨셉의 팝업 스토어`, 
-        content1: "긍정 반응: " + (keywordData?.positiveComments?.join(', ') || "특별한 긍정 반응이 없습니다."), 
-        content2: "부정 반응: " + (keywordData?.negativeComments?.join(', ') || "특별한 부정 반응이 없습니다."),
-        content3: "트렌드 분석: " + (keywordData?.trendExplanation || "데이터가 없습니다.")
-      },
-      { 
-        title: `'${keywordData?.keyword}' 관련 인플루언서와 공동구매`, 
-        content1: "유명 먹방 유튜버와 협업하여 긍정적 이미지를 극대화합니다.", 
-        content2: "라이브 방송을 통한 실시간 소통으로 부정적 우려를 해소합니다.",
-        content3: `이 트렌드는 ${keywordData?.trendExplanation?.substring(0, 30)}... 와 같이 요약될 수 있습니다.`
-      },
-      { 
-        title: `'${keywordData.keyword}' 임시 글 작성 제목`, 
-        content1: "임시 글 작성 부제목", 
-        content2: "임시 글 작성 서술",
-        content3: "임시 글 작성 내용"
-      },
-    ];
-    
-    // 3. 받아온 새 데이터로 state를 업데이트합니다.
-    setCollabIdeas(generatedIdeas);
-    setIsLoading(false); // 4. 로딩을 종료합니다.
-  };
+    try {
+        // 1. 새로 만든 백엔드 API 주소로 'POST' 요청을 보냅니다.
+        const response = await fetch("http://localhost:8095/zal/api/chatbot/collab/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // 2. 요청 본문(body)에 키워드를 JSON 형태로 담아 보냅니다.
+          body: JSON.stringify({ keyword: keywordData.keyword }),
+        });
 
-  fetchCollabData();
+        // 3. 서버 응답이 성공적이지 않으면 에러를 발생시킵니다.
+        if (!response.ok) {
+          throw new Error(`서버 에러: ${response.status}`);
+        }
+
+        // 4. 성공적으로 받은 JSON 데이터를 파싱합니다.
+        const generatedIdeas = await response.json();
+        console.log("✅ 백엔드로부터 받은 AI 아이디어:", generatedIdeas);
+
+        // 5. 받아온 데이터로 state를 업데이트하여 화면에 표시합니다.
+        setCollabIdeas(generatedIdeas);
+
+      } catch (error) {
+        console.error("❌ AI 아이디어 요청 실패:", error);
+        // 에러가 발생하면 사용자에게 알려줄 수 있도록 상태를 업데이트할 수 있습니다.
+        setCollabIdeas([
+            { title: "오류 발생!", contents: ["아이디어를 불러오는 데 실패했습니다.", "잠시 후 다시 시도해주세요.", error.message] }
+        ]);
+      } finally {
+        // 6. 성공하든 실패하든 로딩 상태를 종료합니다.
+        setIsLoading(false);
+      }
+    };
+
+  fetchCollabIdeasFromAI();
 
 // 5. 이 로직은 'view' 또는 'keywordData'가 변경될 때만 다시 실행됩니다.
 }, [view, keywordData]); 
 
   if (!isVisible) return null;
+
 return(
  <div className="chartbot-overlay" role="dialog" aria-modal="true" onClick={onClose}>
       <div className="chartbot-dialog" onClick={e => e.stopPropagation()}>

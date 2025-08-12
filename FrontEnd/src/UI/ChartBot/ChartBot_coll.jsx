@@ -10,7 +10,26 @@ export const Chart_Bot_Collab = ({ onClose, keywordData, collabIdeas }) => {
   console.log("키워드데이터 값 : ",keywordData)
 
   const handleScrap = async () => {
+    if (!collabIdeas || collabIdeas.length === 0) {
+      alert("스크랩할 아이디어가 없습니다.");
+      return;
+    }
     console.log("==== [콜라보 API 호출됨] ====");
+
+    // 1. AI가 생성한 데이터를 DB 저장용 DTO 형태로 변환합니다.
+  const dtoList = collabIdeas.map(idea => ({
+    title: idea.title,           // TITLE 필드 추가
+    contentTitle: idea.title,
+    // contents 배열을 별도의 필드로 변환합니다. (DB 스키마에 맞게)
+    // 예시: contentDesc1, contentDesc2, contentDesc3
+    contentDesc1: idea.contents[0] || "",
+    contentDesc2: idea.contents[1] || "",
+    contentDesc3: idea.contents[2] || "",
+    // 현재 키워드 정보를 추가해줍니다.
+    keywordName: keywordData?.keyword || "",
+  }));
+
+  console.log("DB로 전송할 변환된 데이터:", dtoList);
 
       console.log(localStorage.getItem("jwtToken"));
 
@@ -28,7 +47,7 @@ export const Chart_Bot_Collab = ({ onClose, keywordData, collabIdeas }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(collabIdeas) // 전체 배열 전송
+          body: JSON.stringify(dtoList) // 전체 배열 전송
           });
 
           if (!response.ok) {
@@ -64,16 +83,16 @@ export const Chart_Bot_Collab = ({ onClose, keywordData, collabIdeas }) => {
           <section key={i} className="collab-section">
           <h2 className="collab-section-title">{i + 1}. {collab.title}</h2>
             <ul className="collab-content">
-              <li className="collab-feature">✦ {collab.content1}</li>
-              <li className="collab-feature">✦ {collab.content2}</li> 
-              <li className="collab-feature">✦ {collab.content3}</li> 
+              {collab.contents?.map((content, j) => (
+                <li key={j} className="collab-feature">✦ {content}</li>
+              ))}
             </ul>
           </section>
         ))}
       </main>
 
       <footer className="collab-footer">
-        
+
          {/* 스크랩 버튼 */}
         <button
           className="collab-scrap-btn"

@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smhrd.web.DTO.CollabDTO;
+import com.smhrd.web.DTO.CollabIdeaDTO;
+import com.smhrd.web.DTO.CollabRequestDTO;
+import com.smhrd.web.service.ChatbotService;
 import com.smhrd.web.service.CollabService;
 import com.smhrd.web.service.CollabService.ScrapException;
 
@@ -22,8 +25,13 @@ import com.smhrd.web.service.CollabService.ScrapException;
 @CrossOrigin(origins = "http://localhost:5173")
 public class CollabController {
 
+    // DB저장 서비스
     @Autowired
     private CollabService collabService;
+
+    // AI 생성용 서비스
+    @Autowired
+    private ChatbotService chatbotService;
 
     // 콜라보 아이디어 저장
     @PostMapping("/collab")
@@ -66,6 +74,14 @@ public class CollabController {
             ));
         }
     }
+    // AI 콜라보 아이디어 생성
+    @PostMapping("/collab/generate")
+    public ResponseEntity<List<CollabIdeaDTO>> generateCollabIdeas(@RequestBody CollabRequestDTO request) {
+        System.out.println("==== [AI 콜라보 생성 API 호출됨] ====");
+        System.out.println("키워드: " + request.getKeyword());
 
+        List<CollabIdeaDTO> ideas = chatbotService.generateCollabIdeas(request.getKeyword());
+        return ResponseEntity.ok(ideas);
+    }
 }
 

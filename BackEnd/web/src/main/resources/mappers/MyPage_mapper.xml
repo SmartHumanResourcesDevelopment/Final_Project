@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.smhrd.web.repository.MyPageMapper">
+
+    <!-- 콜라보 아이디어 결과 매핑 -->
+    <resultMap id="myPageCollabResultMap" type="com.smhrd.web.DTO.MyPageCollabDTO">
+        <result property="ideaId" column="IDEA_ID" jdbcType="NUMERIC"/>
+        <result property="userId" column="USER_ID" jdbcType="VARCHAR"/>
+        <result property="keywordId" column="KEYWORD_ID" jdbcType="NUMERIC"/>
+        <result property="keywordName" column="KEYWORD_NAME" jdbcType="VARCHAR"/>
+        <result property="title" column="TITLE" jdbcType="VARCHAR"/>
+        <result property="contentTitle" column="CONTENT_TITLE" jdbcType="VARCHAR"/>
+        <result property="contentDesc1" column="CONTENT_DESC_1" jdbcType="VARCHAR"/>
+        <result property="contentDesc2" column="CONTENT_DESC_2" jdbcType="VARCHAR"/>
+        <result property="contentDesc3" column="CONTENT_DESC_3" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 사용자의 스크랩된 콜라보 아이디어 목록 조회 (키워드별 중복 제거) -->
+    <select id="selectUserCollabIdeas" resultMap="myPageCollabResultMap">
+        SELECT
+            MIN(c.IDEA_ID) as IDEA_ID,
+            c.USER_ID,
+            c.KEYWORD_ID,
+            k.KEYWORD_NAME,
+            MIN(c.TITLE) as TITLE,
+            MIN(c.CONTENT_TITLE) as CONTENT_TITLE,
+            MIN(c.CONTENT_DESC_1) as CONTENT_DESC_1,
+            MIN(c.CONTENT_DESC_2) as CONTENT_DESC_2,
+            MIN(c.CONTENT_DESC_3) as CONTENT_DESC_3
+        FROM USER_COLLAB_IDEA c
+        LEFT JOIN KEYWORD k ON c.KEYWORD_ID = k.KEYWORD_ID
+        WHERE c.USER_ID = #{userId}
+        GROUP BY c.USER_ID, c.KEYWORD_ID, k.KEYWORD_NAME
+        ORDER BY MIN(c.IDEA_ID) DESC
+    </select>
+
+    <!-- 특정 키워드의 콜라보 아이디어 상세 조회 (개인화) -->
+    <select id="selectCollabDetailsByKeyword" resultMap="myPageCollabResultMap">
+        SELECT
+            c.IDEA_ID,
+            c.USER_ID,
+            c.KEYWORD_ID,
+            k.KEYWORD_NAME,
+            c.TITLE,
+            c.CONTENT_TITLE,
+            c.CONTENT_DESC_1,
+            c.CONTENT_DESC_2,
+            c.CONTENT_DESC_3
+        FROM USER_COLLAB_IDEA c
+        LEFT JOIN KEYWORD k ON c.KEYWORD_ID = k.KEYWORD_ID
+        WHERE c.USER_ID = #{userId} AND c.KEYWORD_ID = #{keywordId}
+        ORDER BY c.IDEA_ID DESC
+    </select>
+
+    <!-- 키워드 이름으로 키워드 ID 조회 -->
+    <select id="selectKeywordIdByName" resultType="Long">
+        SELECT KEYWORD_ID
+        FROM KEYWORD
+        WHERE KEYWORD_NAME = #{keywordName}
+    </select>
+
+</mapper>
