@@ -19,6 +19,14 @@ export default function Main_top3() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getKeywordImagePath = (keyword) => {
+  if (!keyword) return "/img/default/이미지없음.png";
+
+  const encodedKeyword = encodeURIComponent(keyword);
+  return `/img/default/KeywordsImages/${encodedKeyword}.png`;
+};
+
+
   // TOP3 데이터 가져오기
   const fetchTop3Data = async () => {
     try {
@@ -98,8 +106,15 @@ export default function Main_top3() {
       // 키워드 검색 API 호출
       const data = await keywordApiService.searchKeyword(keyword);
 
+      // 전역 상태에 타임스탬프와 함께 저장
+      const updatedData = {
+        ...data,
+        searchTimestamp: Date.now(),
+        searchKeyword: keyword
+      };
+
       // 검색 결과를 전역 상태에 저장
-      setKeywordData(data);
+      setKeywordData(updatedData);
 
       // Sub 페이지로 이동
       navigate("/sub");
@@ -145,14 +160,21 @@ export default function Main_top3() {
             <button onClick={fetchTop3Data}>다시 시도</button>
           </div>
         ) : (
-          top3Data.map(({ id, image, title, desc }) => (
+          top3Data.map(({ id, title, desc }) => (
             <article
               key={id}
               className={`keyword-card top3__card${hovered === id ? " is-hover" : ""}`}
               onMouseEnter={() => setHovered(id)}
               onMouseLeave={() => setHovered(null)}
             >
-              <img src={image} alt={`${title} 이미지`} />
+            <img
+              src={getKeywordImagePath(title)}
+              alt={title}
+              onError={(e) => {
+                e.target.onerror = null; // 무한루프 방지
+                e.target.src = "/img/default/KeywordsImages/noImg.png";
+              }}
+              />
 
               {/* ↓↓↓ 카드 내부 콘텐츠 래퍼 추가 ↓↓↓ */}
               <div className="card-body">

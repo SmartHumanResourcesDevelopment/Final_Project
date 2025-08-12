@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        
+<mapper namespace="com.smhrd.web.repository.KeywordStatsMapper">
+
+    <!-- <select id="getLast7DaysKeywordCounts" resultType="com.smhrd.web.DTO.KeywordStatsDTO">
+        <![CDATA[
+        SELECT *
+        FROM (
+            SELECT
+                STATS_DATE,
+                SUM(DAILY_COUNT) AS DAILY_TOTAL_COUNT
+            FROM
+                keyword_daily_stats
+            GROUP BY
+                STATS_DATE
+            ORDER BY
+                STATS_DATE DESC
+        ) sub
+        WHERE ROWNUM <= 7
+        ]]>
+    </select> -->
+
+    <select id="getLast7DaysKeywordCounts" resultType="com.smhrd.web.DTO.KeywordStatsDTO">
+        <![CDATA[
+        SELECT *
+        FROM (
+            -- 먼저 정렬을 수행할 서브쿼리
+            SELECT
+                stats_date,
+                SUM(cnt) AS total_count
+            FROM (
+                SELECT post_date AS stats_date, COUNT(*) AS cnt FROM INSTAGRAM_POST GROUP BY post_date
+                UNION ALL
+                SELECT comment_date AS stats_date, COUNT(*) AS cnt FROM instagram_comment GROUP BY comment_date
+                UNION ALL
+                SELECT published_at AS stats_date, COUNT(*) AS cnt FROM youtube_video GROUP BY published_at
+                UNION ALL
+                SELECT published_at AS stats_date, COUNT(*) AS cnt FROM youtube_comment GROUP BY published_at
+            ) combined
+            GROUP BY stats_date
+            ORDER BY stats_date DESC
+        )
+        WHERE ROWNUM <= 7
+        ]]>
+    </select>
+
+
+</mapper>

@@ -1,5 +1,6 @@
 // NaverLoginButton.jsx
 import React from 'react';
+import naver_login from '../assets/img/login_join/naver_login.png';
 
 const NaverLoginButton = () => {
   const handleNaverLogin = () => {
@@ -10,9 +11,13 @@ const NaverLoginButton = () => {
   return (
     <button
       onClick={handleNaverLogin}
-      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+      className="hover:opacity-80 transition-opacity"
     >
-      네이버 로그인
+      <img
+        src={naver_login}
+        alt="네이버 로그인"
+        className="w-auto h-auto max-w-[200px]"
+      />
     </button>
   );
 };

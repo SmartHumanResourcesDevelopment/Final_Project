@@ -34,12 +34,19 @@
 }
 
 /* 키워드 하이라이트 스타일 */
-.keywordHighlight {background: #d6f7ff;
+.keywordHighlight {
   position: relative;
-  background: linear-gradient(180deg, transparent 60%, #fff5b3 60%);
+  background: linear-gradient(180deg, transparent 60%, #d6f7ff 60%);
   padding: 0 4px;
   font-weight: 800;
 }
+.keywordHighlight1 {
+  position: relative;
+  background: linear-gradient(180deg, transparent 60%, #ffd7dd 60%);
+  padding: 0 4px;
+  font-weight: 800;
+}
+
 .kote__subtitle {
   flex-basis: 100%;
   font-size: 1rem;

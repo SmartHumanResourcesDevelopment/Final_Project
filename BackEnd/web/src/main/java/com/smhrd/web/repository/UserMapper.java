@@ -8,6 +8,9 @@ import com.smhrd.web.DTO.SignUpRequest;
 import com.smhrd.web.DTO.UserDTO;
 
 import com.smhrd.web.DTO.UserInfoUpdate_DTO;
+import java.util.List;
+import java.util.Map;
+
 
 @Mapper
 public interface UserMapper {
@@ -42,5 +45,10 @@ public interface UserMapper {
 
     // 네이버 유저 등록
     int insertNaverUser(NaverDTO naverUser);
-    
+
+    List<Map<String, Object>> getCrawlingCountByDateRange(
+    @Param("from") String from,
+    @Param("to") String to
+);
+
 }

@@ -68,9 +68,6 @@ export default function Main_rank() {
           EAT&nbsp;PICK선정&nbsp;TOP20<br />
           같이 핫한 키워드를 찾아봐요
         </p>
-        <a href="#" aria-label="전체 키워드 보기">
-          전체보기&nbsp;&gt;
-        </a>
       </div>
 
       {/* ----- 오른쪽 랭킹 그래프 ----- */}

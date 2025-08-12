@@ -1,46 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  CartesianGrid,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 
-const chartData = [
-  { date: "7/4", value: 15000 },
-  { date: "7/5", value: 17000 },
-  { date: "7/6", value: 17200 },
-  { date: "7/7", value: 13000 },
-  { date: "7/8", value: 15000 },
-  { date: "7/9", value: 12050 },
-  { date: "7/10", value: 18500 },
-  { date: "7/11", value: 11050 },
-];
+const KeywordStatsChart = () => {
+  const [data, setData] = useState([]);
 
-export const Admin_bar_chart = () => {
+  useEffect(() => {
+    axios.get("http://localhost:8095/zal/api/keyword-stats/last7days")
+      .then(res => {
+        const formattedData = res.data.map(item => {
+          const dateObj = new Date(item.statsDate);
+          const month = dateObj.getMonth() + 1;
+          const day = dateObj.getDate();
+          return {
+            statsDate: `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}`,
+            totalCount: item.totalCount,
+          };
+        }).reverse();
+        setData(formattedData);
+      })
+      .catch(err => {
+        console.error("데이터 로드 실패:", err);
+      });
+  }, []);
+
   return (
-    <section className="w-full bg-white shadow p-6 rounded-lg max-w-[1200px] mx-auto mb-10">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-[#1f384c]">최근 크롤링 된 키워드 현황</h2>
-        <span className="text-sm text-gray-500">집계 기간: 최근 1주일 자료</span>
-      </div>
-
+    <div className="w-full bg-white shadow p-6 rounded-lg max-w-[1200px] mx-auto mb-10">
+      <h2 className="[font-family:'Noto_Sans_KR-blod',Helvetica] font-bold text-[#1f384c] text-lg tracking-[0.50px] leading-[23px] whitespace-nowrap mb-4">
+        하루 크롤링한 갯수
+      </h2>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip formatter={(value) => `${value.toLocaleString()}건`} />
-          <Legend />
-          <Bar dataKey="value" fill="#3b5cff" barSize={40} />
+          <XAxis dataKey="statsDate" />
+          <YAxis allowDecimals={false} />
+          <Tooltip />
+          <Bar dataKey="totalCount" fill="#869cecff" />
         </BarChart>
       </ResponsiveContainer>
-    </section>
+    </div>
   );
 };
 
-export default Admin_bar_chart;
+export default KeywordStatsChart;

@@ -4,7 +4,7 @@ import {jwtDecode} from "jwt-decode";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi";
-import google_login from "../assets/img/login_join/google_login.png";
+
 import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
 import mint_bg_color from "../assets/img/common/mint_bg_color.png";
 import "../assets/css/Login.css"; // 경로 주의
@@ -237,11 +237,8 @@ const Login = () => {
             </div>
 
             {/* SNS 로그인 */}
-              <div className="flex justify-center gap-6 w-full mt-10">
-                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Google login")}>
-                <img src={google_login} alt="Sign in with Google" />
-                </button>
-                {/* 네이버 로그인 버튼 컴포넌트 */}
+              <div className="flex justify-center w-full mt-10">
+                {/* 네이버 로그인 버튼 컴포넌트 - 중앙 정렬 */}
                 <NaverLoginButton />
               </div>
 

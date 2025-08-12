@@ -72,6 +72,15 @@ export default function DetailKeyword({ keywordData }) {
   const [showCollab, setShowCollab] = useState(false);
 
 
+  const getKeywordImagePath = (keyword) => {
+    if (!keyword) return "/img/default/이미지없음.png";
+
+    const encodedKeyword = encodeURIComponent(keyword);
+    return `/img/default/KeywordsImages/${encodedKeyword}.png`;
+  };
+
+
+
   // 키워드 검색 함수
   const handleSearch = async () => {
     if (!query.trim()) {
@@ -121,24 +130,38 @@ export default function DetailKeyword({ keywordData }) {
     }
 
     try {
-      console.log("🔍 키워드 검색 시작:", searchKeyword);
+      console.log("🔍 Detail_keyword - 키워드 검색 시작:", searchKeyword);
+      console.log("🔍 Detail_keyword - 검색 전 현재 keywordData:", keywordData);
 
       // 키워드 검색 API 호출
       const data = await keywordApiService.searchKeyword(searchKeyword);
+      console.log("🔍 Detail_keyword - API 응답 데이터:", data);
 
-      if (data && data.keywordInfo) {
-        // 검색 성공 시 전역 상태에 저장하고 현재 페이지 새로고침
-        setKeywordData(data);
-        console.log("✅ 키워드 검색 성공:", data);
+      if (data && (data.keywordInfo || data.keyword)) {
+        // 검색 성공 시 전역 상태에 저장
+        console.log("🔄 Detail_keyword - setKeywordData 호출 전");
+        console.log("🔄 Detail_keyword - 업데이트할 데이터:", data);
+
+        // 타임스탬프를 추가하여 강제로 새로운 객체로 만들기
+        const updatedData = {
+          ...data,
+          searchTimestamp: Date.now(),
+          searchKeyword: searchKeyword
+        };
+
+        setKeywordData(updatedData);
+        console.log("✅ Detail_keyword - setKeywordData 호출 완료");
+        console.log("✅ Detail_keyword - 키워드 검색 성공:", updatedData);
 
         // 검색어 초기화
         setQuery("");
 
-        // 페이지 새로고침 또는 상태 업데이트를 통해 새로운 키워드 데이터 표시
-        window.location.reload();
+        // 성공 메시지 표시
+        console.log(`✅ Detail_keyword - "${searchKeyword}" 검색 완료, 화면 업데이트 완료`);
 
       } else {
         // 검색 결과가 없는 경우 (이미 최근 검색에는 추가됨)
+        console.log("⚠️ Detail_keyword - 검색 결과 없음:", data);
         alert("해당 키워드로는 검색을 할 수 없습니다. 올바른 키워드 이름을 입력하세요.");
       }
 
@@ -182,7 +205,15 @@ export default function DetailKeyword({ keywordData }) {
 
       {/* ② 오른쪽 : 원형 이미지 */}
       <figure className="detailKeyword__thumb">
-        <img src={matchaImg} alt="말차 이미지" />
+           <img
+              src={getKeywordImagePath(currentKeywordData.keyword)}
+              alt={currentKeywordData.keyword}
+              onError={(e) => {
+                e.target.onerror = null; // 무한루프 방지
+                e.target.src = "/img/default/KeywordsImages/noImg.png";
+              }}
+              />
+
       </figure>
 
       {/* ③ 검색 버튼 (페이지 우측 상단 고정) */}

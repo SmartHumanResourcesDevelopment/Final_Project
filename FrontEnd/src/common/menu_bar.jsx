@@ -3,9 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import ChevronDown from "../assets/img/common/chevron_down.png";
 import notifIcon from "../assets/img/common/notif-icon.png";
 import { useUser } from "../contexts/UserContext";
+import { useKeywordData } from "../contexts/KeywordDataContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { buildProfileUrl } from "../util/buildProfileUrl";
 import { mainApiService } from "../api/mainApi";
+import { keywordApiService } from "../api/sub";
 
 
 
@@ -13,6 +15,7 @@ export const NavigationSection = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useUser();
+  const { setKeywordData } = useKeywordData();
 
 
   const [open, setOpen] = useState(false);
@@ -51,44 +54,49 @@ export const NavigationSection = () => {
       setIsLoadingRandom(true);
       console.log("🎲 랜덤 키워드로 심층분석 페이지 이동 시작");
 
-      const randomKeywordData = await mainApiService.getRandomKeyword();
+      // 1. 먼저 랜덤 키워드명 가져오기
+      const randomKeywordResponse = await mainApiService.getRandomKeyword();
 
-      if (randomKeywordData && randomKeywordData.keyword) {
-        console.log("✅ 랜덤 키워드 조회 성공:", randomKeywordData.keyword);
+      if (!randomKeywordResponse || !randomKeywordResponse.keyword) {
+        console.error("❌ 랜덤 키워드명을 가져올 수 없습니다.");
+        navigate("/sub");
+        return;
+      }
+
+      const randomKeyword = randomKeywordResponse.keyword;
+      console.log("🎯 선택된 랜덤 키워드:", randomKeyword);
+
+      // 2. 해당 키워드로 실제 검색 API 호출
+      const keywordData = await keywordApiService.searchKeyword(randomKeyword);
+
+      if (keywordData && (keywordData.keywordInfo || keywordData.keyword)) {
+        console.log("✅ 랜덤 키워드 검색 성공:", keywordData);
 
         // 랜덤 키워드도 최근 검색 키워드에 추가
         if (window.addRecentKeyword) {
-          window.addRecentKeyword(randomKeywordData.keyword);
-          console.log("💾 랜덤 키워드를 최근 검색에 추가:", randomKeywordData.keyword);
+          window.addRecentKeyword(randomKeyword);
+          console.log("💾 랜덤 키워드를 최근 검색에 추가:", randomKeyword);
         }
 
-        // Sub 페이지로 이동하면서 키워드 데이터 전달
-        navigate('/sub', {
-          state: {
-            keywordData: {
-              keyword: randomKeywordData.keyword,
-              ranking: randomKeywordData.ranking ?
-                       (typeof randomKeywordData.ranking === 'number' ?
-                        `${randomKeywordData.ranking}위` : randomKeywordData.ranking) :
-                       "순위 정보 없음",
-              emotionLabels: randomKeywordData.emotionLabels || ["감정", "분석", "정보", "없음", "~"],
-              description: randomKeywordData.description || "랜덤으로 선택된 키워드입니다.",
-              trendExplanation: randomKeywordData.trendExplanation || "트렌드 분석 정보를 로딩 중입니다.",
-              similarityInfo: randomKeywordData.similarityInfo || {},
-              similarKeywords: randomKeywordData.similarKeywords || [],
-              sentimentAnalysis: randomKeywordData.sentimentAnalysis,
-              positiveComments: randomKeywordData.positiveComments || [],
-              negativeComments: randomKeywordData.negativeComments || []
-            }
-          }
-        });
+        // 전역 상태에 타임스탬프와 함께 저장
+        const updatedData = {
+          ...keywordData,
+          searchTimestamp: Date.now(),
+          searchKeyword: randomKeyword
+        };
+
+        // 전역 상태 업데이트
+        setKeywordData(updatedData);
+        console.log("✅ 메뉴바 랜덤 키워드 - 전역 상태 업데이트 완료");
+
+        // Sub 페이지로 이동
+        navigate('/sub');
       } else {
-        console.error("❌ 랜덤 키워드 데이터가 없습니다.");
-        // 데이터가 없어도 기본 Sub 페이지로 이동
+        console.error("❌ 랜덤 키워드 검색 결과가 없습니다.");
         navigate("/sub");
       }
     } catch (error) {
-      console.error("❌ 랜덤 키워드 조회 실패:", error);
+      console.error("❌ 랜덤 키워드 검색 실패:", error);
       // 에러 시에도 기본 Sub 페이지로 이동
       navigate("/sub");
     } finally {

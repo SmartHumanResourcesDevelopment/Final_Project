@@ -202,6 +202,60 @@ public class OpenAIService {
     }
 
     /**
+     * OpenAI API 연결 테스트
+     * @return 연결 성공 여부
+     */
+    public boolean testConnection() {
+        if (apiKey == null || apiKey.isEmpty()) {
+            System.out.println("⚠️ OpenAI API 키가 설정되지 않음");
+            return false;
+        }
+
+        try {
+            System.out.println("🔍 OpenAI API 연결 테스트 시작");
+
+            // 요청 헤더 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(apiKey);
+
+            // 간단한 테스트 요청
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("model", "gpt-3.5-turbo");
+            requestBody.put("messages", List.of(
+                Map.of("role", "user", "content", "Hello")
+            ));
+            requestBody.put("max_tokens", 5);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+            // API 호출 (짧은 타임아웃 설정)
+            RestTemplate testTemplate = new RestTemplate();
+            testTemplate.setRequestFactory(new org.springframework.http.client.SimpleClientHttpRequestFactory() {{
+                setConnectTimeout(10000); // 연결 타임아웃 10초
+                setReadTimeout(15000);    // 읽기 타임아웃 15초
+            }});
+
+            @SuppressWarnings("rawtypes")
+            ResponseEntity<Map> response = testTemplate.exchange(
+                apiUrl,
+                HttpMethod.POST,
+                entity,
+                Map.class
+            );
+
+            boolean isSuccess = response.getStatusCode() == HttpStatus.OK && response.getBody() != null;
+            System.out.println(isSuccess ? "✅ OpenAI API 연결 테스트 성공" : "❌ OpenAI API 연결 테스트 실패");
+
+            return isSuccess;
+
+        } catch (Exception e) {
+            System.err.println("❌ OpenAI API 연결 테스트 실패: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * 기본 설명 반환 (OpenAI API 실패 시)
      * @param keyword 키워드명
      * @return 기본 설명

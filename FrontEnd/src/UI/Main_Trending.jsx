@@ -19,6 +19,14 @@ export default function Main_Trending() {
 
   // 기본 이미지 배열
   const defaultImages = [rectangle1251, rectangle1252, rectangle1253];
+  
+  const getKeywordImagePath = (keyword) => {
+      if (!keyword) return "/img/default/이미지없음.png";
+
+      const encodedKeyword = encodeURIComponent(keyword);
+      return `/img/default/KeywordsImages/${encodedKeyword}.png`;
+    };
+
 
   // 급상승 키워드 데이터 로드
   const fetchTrendingKeywords = async () => {
@@ -96,8 +104,15 @@ export default function Main_Trending() {
       // 키워드 검색 API 호출
       const data = await keywordApiService.searchKeyword(keyword.title);
 
+      // 전역 상태에 타임스탬프와 함께 저장
+      const updatedData = {
+        ...data,
+        searchTimestamp: Date.now(),
+        searchKeyword: keyword.title
+      };
+
       // 검색 결과를 전역 상태에 저장
-      setGlobalKeywordData(data);
+      setGlobalKeywordData(updatedData);
 
       // Sub 페이지로 이동
       navigate("/sub");
@@ -148,7 +163,7 @@ export default function Main_Trending() {
       {/* ── 왼쪽 설명 */}
       <header id="keyword-section-title" className="intro-box">
         <h1>
-          급상승 키워드<br />TOP&nbsp;3
+          잠재키워드<br />TOP&nbsp;3
         </h1>
         <p>
           최근 한 달간 가장 많이<br />
@@ -170,7 +185,14 @@ export default function Main_Trending() {
             onMouseLeave={() => setHovered(null)}
             aria-labelledby={`keyword-title-${k.id}`}
           >
-            <img src={k.image} alt={`${k.title} 관련 이미지`} />
+             <img
+              src={getKeywordImagePath(k.title)}
+              alt={k.title}
+              onError={(e) => {
+                e.target.onerror = null; // 무한루프 방지
+                e.target.src = "/img/default/KeywordsImages/noImg.png";
+              }}
+              />
 
             <div className="card-body">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

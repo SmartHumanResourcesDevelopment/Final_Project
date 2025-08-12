@@ -297,9 +297,10 @@
        - onlyMain=true 이면 MAIN_EMOTIONS에 있는 라벨만 집계
      ========================================= -->
   <select id="getKeywordSentimentAnalysis" parameterType="map" resultType="map">
+    <![CDATA[
     SELECT EMOTIONS AS LABEL, SOURCE_ID
     FROM (
-      -- YouTube 댓글의 감정 데이터
+      -- YouTube 댓글의 감정 데이터 (해시 버킷 샘플링 적용)
       SELECT yc.EMOTIONS, yc.COMMENT_ID AS SOURCE_ID
       FROM YOUTUBE_COMMENT yc
       JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
@@ -309,14 +310,19 @@
         AND yc.EMOTIONS != '["없음"]'
         AND yc.EMOTIONS != '["분석실패"]'
         AND yc.EMOTIONS != '["분석불가"]'
+        AND MOD(ORA_HASH(yc.COMMENT_ID), 10) = 0
+        AND ROWNUM <= 3000
+    ]]>
         <if test="period == '최신순(3개월)' and lastMentionDate != null">
+        <![CDATA[
         AND yc.PUBLISHED_AT >= ADD_MONTHS(#{lastMentionDate, jdbcType=DATE}, -3)
-        AND yc.PUBLISHED_AT <![CDATA[<=]]> #{lastMentionDate, jdbcType=DATE}
+        AND yc.PUBLISHED_AT <= #{lastMentionDate, jdbcType=DATE}
+        ]]>
         </if>
-
+    <![CDATA[
       UNION ALL
 
-      -- Instagram 댓글의 감정 데이터 (COMMENT_ID를 문자열로 변환)
+      -- Instagram 댓글의 감정 데이터 (해시 버킷 샘플링 적용)
       SELECT ic.EMOTIONS, TO_CHAR(ic.COMMENT_ID) AS SOURCE_ID
       FROM INSTAGRAM_COMMENT ic
       JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
@@ -326,12 +332,19 @@
         AND ic.EMOTIONS != '["없음"]'
         AND ic.EMOTIONS != '["분석실패"]'
         AND ic.EMOTIONS != '["분석불가"]'
+        AND MOD(ORA_HASH(ic.COMMENT_ID), 10) = 0
+        AND ROWNUM <= 3000
+    ]]>
         <if test="period == '최신순(3개월)' and lastMentionDate != null">
+        <![CDATA[
         AND ic.COMMENT_DATE >= ADD_MONTHS(#{lastMentionDate, jdbcType=DATE}, -3)
-        AND ic.COMMENT_DATE <![CDATA[<=]]> #{lastMentionDate, jdbcType=DATE}
+        AND ic.COMMENT_DATE <= #{lastMentionDate, jdbcType=DATE}
+        ]]>
         </if>
+    <![CDATA[
     )
     WHERE EMOTIONS IS NOT NULL
+    ]]>
   </select>
 
 
@@ -461,7 +474,7 @@
     <result column="PLATFORM" property="platform"/>
   </resultMap>
 
-  <!-- 특정 감정에 해당하는 댓글 조회 (VARCHAR2 컬럼 최적화) -->
+  <!-- 특정 감정에 해당하는 댓글 조회 (인덱스 최적화 + 해시 버킷 샘플링) -->
   <select id="getCommentsByEmotion" parameterType="map" resultMap="commentEmotionResultMap">
     <![CDATA[
     SELECT
@@ -469,7 +482,7 @@
       '${emotion}' as EMOTION,
       PLATFORM
     FROM (
-      -- YouTube 댓글 2개
+      -- YouTube 댓글 2개 (해시 버킷 샘플링)
       SELECT * FROM (
         SELECT
           DBMS_LOB.SUBSTR(yc.COMMENT_TEXT, 100, 1) as COMMENT_TEXT,
@@ -480,12 +493,12 @@
           AND yc.EMOTIONS IS NOT NULL
           AND INSTR(yc.EMOTIONS, '${emotion}') > 0
           AND DBMS_LOB.GETLENGTH(yc.COMMENT_TEXT) >= 15
-        ORDER BY DBMS_RANDOM.VALUE
+          AND MOD(ORA_HASH(yc.COMMENT_ID), 3) = 0
       ) WHERE ROWNUM <= 2
 
       UNION ALL
 
-      -- Instagram 댓글 2개
+      -- Instagram 댓글 2개 (해시 버킷 샘플링)
       SELECT * FROM (
         SELECT
           DBMS_LOB.SUBSTR(ic.COMMENT_TEXT, 100, 1) as COMMENT_TEXT,
@@ -496,10 +509,9 @@
           AND ic.EMOTIONS IS NOT NULL
           AND INSTR(ic.EMOTIONS, '${emotion}') > 0
           AND DBMS_LOB.GETLENGTH(ic.COMMENT_TEXT) >= 15
-        ORDER BY DBMS_RANDOM.VALUE
+          AND MOD(ORA_HASH(ic.COMMENT_ID), 3) = 0
       ) WHERE ROWNUM <= 2
     )
-    ORDER BY DBMS_RANDOM.VALUE
     ]]>
   </select>
 
