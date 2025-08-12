@@ -38,8 +38,8 @@ export function DetailInsightsKOTE_positivity_Graph({
       }))
     : positiveData; // 기본 데이터
 
-  // 댓글 4개만 표시
-  const displayComments = comments.slice(0, 4);
+  // 댓글 6개만 표시 (TOP 3 감정별로 각각 2개씩)
+  const displayComments = comments.slice(0, 6);
 
   return (
     <div className="koteChart">
@@ -67,16 +67,27 @@ export function DetailInsightsKOTE_positivity_Graph({
 
       {/* 긍정 댓글 4개 표시 */}
       <div className="emotion-comments">
-        <h4 className="emotion-comments__title">긍정 댓글 예시</h4>
+        <h4 className="emotion-comments__title">긍정 댓글 예시 (TOP 3 감정별)</h4>
         <div className="emotion-comments__list">
           {displayComments.length > 0 ? (
-            displayComments.map((comment, index) => (
-              <div key={index} className="emotion-comment">
-                <span className="emotion-comment__platform">{comment.platform}</span>
-                <p className="emotion-comment__text">💬 {comment.comment_text}</p>
-                <span className="emotion-comment__emotion">#{comment.emotion}</span>
-              </div>
-            ))
+            displayComments.map((comment, index) => {
+              // 플랫폼에 따른 클래스명 결정
+              const platformClass = comment.platform?.toLowerCase() === 'youtube'
+                ? 'emotion-comment__platform--youtube'
+                : comment.platform?.toLowerCase() === 'instagram'
+                ? 'emotion-comment__platform--instagram'
+                : '';
+
+              return (
+                <div key={index} className="emotion-comment">
+                  <span className={`emotion-comment__platform ${platformClass}`}>
+                    {comment.platform?.toUpperCase() || 'UNKNOWN'}
+                  </span>
+                  <p className="emotion-comment__text">💬 {comment.comment_text}</p>
+                  <span className="emotion-comment__emotion">#{comment.emotion}</span>
+                </div>
+              );
+            })
           ) : (
             <div className="emotion-comment emotion-comment--placeholder">
               <p className="emotion-comment__text">댓글 데이터를 불러오는 중...</p>
@@ -101,8 +112,8 @@ export function DetailInsightsKOTE_negative_Graph({
       }))
     : negativeData; // 기본 데이터
 
-  // 댓글 4개만 표시
-  const displayComments = comments.slice(0, 4);
+  // 댓글 6개만 표시 (TOP 3 감정별로 각각 2개씩)
+  const displayComments = comments.slice(0, 6);
 
   return (
     <div className="koteChart">
@@ -130,16 +141,27 @@ export function DetailInsightsKOTE_negative_Graph({
 
       {/* 부정 댓글 4개 표시 */}
       <div className="emotion-comments">
-        <h4 className="emotion-comments__title">부정 댓글 예시</h4>
+        <h4 className="emotion-comments__title">부정 댓글 예시 (TOP 3 감정별)</h4>
         <div className="emotion-comments__list">
           {displayComments.length > 0 ? (
-            displayComments.map((comment, index) => (
-              <div key={index} className="emotion-comment">
-                <span className="emotion-comment__platform">{comment.platform}</span>
-                <p className="emotion-comment__text">💬 {comment.comment_text}</p>
-                <span className="emotion-comment__emotion">#{comment.emotion}</span>
-              </div>
-            ))
+            displayComments.map((comment, index) => {
+              // 플랫폼에 따른 클래스명 결정
+              const platformClass = comment.platform?.toLowerCase() === 'youtube'
+                ? 'emotion-comment__platform--youtube'
+                : comment.platform?.toLowerCase() === 'instagram'
+                ? 'emotion-comment__platform--instagram'
+                : '';
+
+              return (
+                <div key={index} className="emotion-comment">
+                  <span className={`emotion-comment__platform ${platformClass}`}>
+                    {comment.platform?.toUpperCase() || 'UNKNOWN'}
+                  </span>
+                  <p className="emotion-comment__text">💬 {comment.comment_text}</p>
+                  <span className="emotion-comment__emotion">#{comment.emotion}</span>
+                </div>
+              );
+            })
           ) : (
             <div className="emotion-comment emotion-comment--placeholder">
               <p className="emotion-comment__text">댓글 데이터를 불러오는 중...</p>

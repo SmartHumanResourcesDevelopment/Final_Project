@@ -16,7 +16,7 @@ import "../assets/css/Sub.css";
 
 const Sub = ({ keywordData: propsKeywordData, onClose }) => {
   const { keywordData: contextKeywordData } = useKeywordData();
-
+  
   // props로 받은 데이터가 있으면 우선 사용, 없으면 context 데이터 사용
   const keywordData = propsKeywordData || contextKeywordData;
   const [openChat, setOpenChat]     = useState(false);
@@ -42,14 +42,18 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
   // 페이지 로드 시 감성분석 별도 호출
   useEffect(() => {
     const loadSentimentAnalysis = async () => {
-      if (!keywordData?.keyword) return;
+      const keyword = keywordData?.keywordInfo?.KEYWORD_NAME || keywordData?.keyword;
+      if (!keyword) {
+        console.log("⚠️ 감성분석 로딩 스킵: 키워드 없음");
+        return;
+      }
 
       setSentimentLoading(true);
       setSentimentError(null);
 
       try {
-        console.log("🎯 감성분석 로딩 시작:", keywordData.keyword);
-        const sentimentData = await keywordApiService.getSentimentAnalysis(keywordData.keyword);
+        console.log("🎯 감성분석 로딩 시작:", keyword);
+        const sentimentData = await keywordApiService.getSentimentAnalysis(keyword);
         setSentimentAnalysis(sentimentData);
         console.log("✅ 감성분석 로딩 완료:", sentimentData);
       } catch (error) {
@@ -63,7 +67,7 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
     // 페이지 도착 후 1초 뒤에 감성분석 시작
     const timer = setTimeout(loadSentimentAnalysis, 1000);
     return () => clearTimeout(timer);
-  }, [keywordData?.keyword]);
+  }, [keywordData?.keywordInfo?.KEYWORD_NAME, keywordData?.keyword]);
 
   // 페이지 빈 영역 클릭 시 챗봇 닫기
   const handleBackgroundClick = () => {
@@ -72,8 +76,22 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
       onClose?.();
     }
   };
-  
-console.log("키워드정보:",keywordData);
+  console.log("🔍 Sub 컴포넌트 - keywordData 내용:", keywordData);
+  console.log("🔍 Sub 컴포넌트 - propsKeywordData:", propsKeywordData);
+  console.log("🔍 Sub 컴포넌트 - contextKeywordData:", contextKeywordData);
+
+  // API 응답 구조 상세 분석
+  if (keywordData) {
+    console.log("📊 API 응답 구조 분석:");
+    console.log("  - keywordInfo:", keywordData.keywordInfo);
+    console.log("  - mainStats:", keywordData.mainStats);
+    console.log("  - trendExplanation:", keywordData.trendExplanation);
+    console.log("  - aiSummary:", keywordData.aiSummary);
+    console.log("  - description:", keywordData.description);
+    console.log("  - emotionLabels:", keywordData.emotionLabels);
+    console.log("  - emotions:", keywordData.emotions);
+    console.log("  - 모든 키:", Object.keys(keywordData));
+  }
   return (
     <div className="detail-root" onClick={handleBackgroundClick}>
       {/* 상단바 */}
@@ -82,12 +100,18 @@ console.log("키워드정보:",keywordData);
       <DetailKeyword keywordData={keywordData} />
       {/* 키워드 그래프소개 */}
       <DetailInsightsSection
-        keyword={keywordData?.keyword || "키워드 없음"}
-        trendExplanation={keywordData?.trendExplanation}
+        keyword={keywordData?.keywordInfo?.KEYWORD_NAME || keywordData?.keyword || "키워드 없음"}
+        trendExplanation={
+          keywordData?.trendExplanation ||
+          keywordData?.aiSummary ||
+          keywordData?.description ||
+          keywordData?.keywordInfo?.description ||
+          "트렌드 분석 정보를 불러오는 중입니다..."
+        }
       />
       {/* 감성분석 */}
       <KeywordHighlightSection
-        keyword={keywordData?.keyword || "키워드 없음"}
+        keyword={keywordData?.keywordInfo?.KEYWORD_NAME || keywordData?.keyword || "키워드 없음"}
         sentimentAnalysis={sentimentAnalysis}
         sentimentLoading={sentimentLoading}
         sentimentError={sentimentError}
@@ -96,7 +120,7 @@ console.log("키워드정보:",keywordData);
       />
       {/* 유사도 */}
       <TrendAnalysisSection
-        keyword={keywordData?.keyword || "키워드 없음"}
+        keyword={keywordData?.keywordInfo?.KEYWORD_NAME || keywordData?.keyword || "키워드 없음"}
         similarityInfo={keywordData?.similarityInfo}
         similarKeywords={keywordData?.similarKeywords || []}
       />

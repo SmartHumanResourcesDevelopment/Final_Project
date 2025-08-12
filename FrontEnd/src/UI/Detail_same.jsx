@@ -163,9 +163,9 @@ export default function TrendAnalysisSection({ keyword = "말차", similarityInf
     <div className="detailSame">
       {/* ------- 제목 & 부제 ------- */}
       <header className="detailSame__header">
-        <h2 className="detailSame__title">비슷한 키워드 TOP5</h2>
+        <h2 className="detailSame__title">유사한 키워드 분석</h2>
         <p className="detailSame__subtitle">
-          {user?.nickname || '찝찝박사'}님이 고르신 키워드로 EatPICK이 만들어드려요
+          {user?.nickname || '찝찝박사'} 님이 고르신 키워드로 EatPICK이 만들어드려요
         </p>
       </header>
 

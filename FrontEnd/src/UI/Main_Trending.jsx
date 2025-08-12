@@ -84,6 +84,12 @@ export default function Main_Trending() {
       return;
     }
 
+    // 🔥 트렌딩 카드 클릭도 최근 검색 키워드에 추가
+    if (window.addRecentKeyword) {
+      window.addRecentKeyword(keyword.title);
+      console.log("💾 트렌딩 키워드를 최근 검색에 추가:", keyword.title);
+    }
+
     try {
       console.log("🔍 심층분석 시작:", keyword.title);
 

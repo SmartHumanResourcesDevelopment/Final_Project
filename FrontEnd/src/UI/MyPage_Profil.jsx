@@ -61,37 +61,65 @@ const MyPage_Profil = ({ onClose }) => {
   };
 
   const handleUpdateProfile = async () => {
-    if (!contextUser) return;
+    if (!contextUser) {
+      console.error("❌ 사용자 정보가 없습니다");
+      return;
+    }
+
+    console.log("📁 프로필 업로드 시작");
+    console.log("   - 사용자 ID:", contextUser.userId);
+    console.log("   - 선택된 파일:", selectedFile ? selectedFile.name : "없음");
+    console.log("   - 파일 크기:", selectedFile ? selectedFile.size : "N/A");
 
     const form = new FormData();
     form.append("user_id", contextUser.userId);
+
     if (selectedFile) {
       form.append("file", selectedFile);
+      console.log("✅ 새 파일을 FormData에 추가");
     } else {
-      form.append("userProfile", DEFAULT_PROFILE);
+      console.log("⚠️ 선택된 파일이 없음 - 기본 프로필 사용");
+      // 파일이 없으면 요청하지 않음 (서버에서 required=true이므로)
+      alert("업로드할 파일을 선택해주세요.");
+      return;
+    }
+
+    // FormData 내용 확인
+    console.log("📋 FormData 내용:");
+    for (let [key, value] of form.entries()) {
+      console.log(`   - ${key}:`, value);
     }
 
     try {
+      console.log("🌐 서버로 요청 전송: /zal/api/updateProfile");
+
       const res = await fetchWithAuth("/zal/api/updateProfile", {
         method: "POST",
         body: form,
       });
 
+      console.log("📡 서버 응답 상태:", res.status);
+      console.log("📡 서버 응답 헤더:", res.headers);
+
       if (!res.ok) {
         const text = await res.text();
-        console.error("프로필 변경 실패:", res.status, text);
+        console.error("❌ 프로필 변경 실패:", res.status, text);
         throw new Error(text || `Status ${res.status}`);
       }
 
-      const { imageUrl } = await res.json();
+      const responseData = await res.json();
+      console.log("✅ 서버 응답 데이터:", responseData);
+
+      const { imageUrl } = responseData;
       const updated = { ...contextUser, userProfile: imageUrl };
       localStorage.setItem("user", JSON.stringify(updated));
       setUser(updated);
 
+      console.log("✅ 프로필 업데이트 완료:", imageUrl);
       onClose();
       alert("프로필이 변경되었습니다.");
     } catch (e) {
-      console.error("네트워크 예외:", e);
+      console.error("❌ 네트워크 예외:", e);
       alert("서버 오류 발생: " + e.message);
     }
   };

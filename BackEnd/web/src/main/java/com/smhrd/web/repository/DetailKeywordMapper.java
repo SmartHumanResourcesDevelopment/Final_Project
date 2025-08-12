@@ -121,4 +121,11 @@ public interface DetailKeywordMapper {
      */
     Map<String, Object> getLastMentionDate(@Param("keywordId") Long keywordId);
 
+    /**
+     * 특정 감정과 플랫폼의 댓글 조회
+     * @param params 조회 파라미터 (keywordId, emotion, platform, limit)
+     * @return 댓글 목록
+     */
+    List<Map<String, Object>> getCommentsByEmotionAndPlatform(Map<String, Object> params);
+
 }
