@@ -29,10 +29,10 @@ public class DetailKeywordService {
             List<Map<String, Object>> allKeywords = detailKeywordMapper.getAllKeywords();
             System.out.println("📊 DB에 있는 총 키워드 수: " + allKeywords.size());
 
-            // 젤리가 포함된 키워드들 찾기
+            // 검색 키워드와 관련된 키워드들 찾기
             allKeywords.stream()
-                .filter(k -> k.get("KEYWORD_NAME").toString().contains("젤리"))
-                .forEach(k -> System.out.println("🔍 젤리 관련 키워드: " + k.get("KEYWORD_NAME")));
+                .filter(k -> k.get("KEYWORD_NAME").toString().contains(keywordName))
+                .forEach(k -> System.out.println("🔍 " + keywordName + " 관련 키워드: " + k.get("KEYWORD_NAME")));
 
             // 1. 키워드 기본 정보 조회
             Map<String, Object> keywordInfo = detailKeywordMapper.getKeywordByName(keywordName);
@@ -159,6 +159,54 @@ public class DetailKeywordService {
             response.put("similarKeywords", similarKeywordDetails);
             response.put("suggestedKeywords", suggestedKeywords); // 검색 제안용 키워드 목록
             response.put("lastUpdated", new Date());
+
+            // 7. 실제 DB 데이터 추가 (KEYWORD_MAIN_STATS에서 가져오기)
+            if (keywordInfo != null && mainStats != null && !mainStats.isEmpty()) {
+                Map<String, Object> stats = mainStats.get(0);
+
+                // 키워드명
+                response.put("keyword", keywordInfo.get("KEYWORD_NAME"));
+
+                // MAIN_EMOTIONS에서 감정 라벨 추출 (최대 5개)
+                String mainEmotions = (String) stats.get("MAIN_EMOTIONS");
+                if (mainEmotions != null && !mainEmotions.trim().isEmpty()) {
+                    String[] allEmotions = mainEmotions.split(",");
+                    // 최대 5개까지만 선택, 공백 제거
+                    int maxEmotions = Math.min(5, allEmotions.length);
+                    String[] emotionLabels = new String[maxEmotions];
+                    for (int i = 0; i < maxEmotions; i++) {
+                        emotionLabels[i] = allEmotions[i].trim();
+                    }
+                    response.put("emotionLabels", emotionLabels);
+                    System.out.println("  - 선택된 감정 라벨 (5개): " + String.join(", ", emotionLabels));
+                } else {
+                    response.put("emotionLabels", new String[]{"관심", "호기심", "만족", "기대", "즐거움"});
+                    System.out.println("  - 기본 감정 라벨 사용");
+                }
+
+                // SHORT_DESCRIPTION 사용
+                String description = (String) stats.get("SHORT_DESCRIPTION");
+                if (description != null && !description.trim().isEmpty()) {
+                    response.put("description", description);
+                } else {
+                    response.put("description", keywordInfo.get("KEYWORD_NAME") + "에 대한 분석 정보입니다.");
+                }
+
+                // TREND_EXPLANATION 사용
+                String trendExplanation = (String) stats.get("TREND_EXPLANATION");
+                if (trendExplanation != null && !trendExplanation.trim().isEmpty()) {
+                    response.put("trendExplanation", trendExplanation);
+                } else {
+                    response.put("trendExplanation", keywordInfo.get("KEYWORD_NAME") + "에 대한 트렌드 분석 정보를 준비 중입니다.");
+                }
+
+                // 랭킹은 기존 방식 유지 (getKeywordOverallRank 사용)
+
+                System.out.println("✅ KEYWORD_MAIN_STATS에서 데이터 추출 완료:");
+                System.out.println("  - MAIN_EMOTIONS: " + mainEmotions);
+                System.out.println("  - SHORT_DESCRIPTION: " + (description != null ? description.substring(0, Math.min(50, description.length())) + "..." : "null"));
+                System.out.println("  - TREND_EXPLANATION: " + (trendExplanation != null ? trendExplanation.substring(0, Math.min(50, trendExplanation.length())) + "..." : "null"));
+            }
             
             // 🔽🔽🔽 여기서 전체 랭킹 값을 추가로 주입
             try {
@@ -230,23 +278,71 @@ public class DetailKeywordService {
     public Map<String, Object> getPopularKeywords() {
         try {
             System.out.println("🔍 인기 키워드 조회 시작");
-            
+
             List<Map<String, Object>> popularKeywords = detailKeywordMapper.getPopularKeywords();
-            System.out.println("📊 인기 키워드: " + popularKeywords.size() + "개");
-            
+            System.out.println("📊 DB에서 조회된 인기 키워드: " + (popularKeywords != null ? popularKeywords.size() : 0) + "개");
+
+            // null 체크 및 빈 리스트 처리
+            if (popularKeywords == null) {
+                popularKeywords = new ArrayList<>();
+                System.out.println("⚠️ DB 조회 결과가 null, 빈 리스트로 초기화");
+            }
+
+            // 데이터가 없으면 기본 키워드 제공
+            if (popularKeywords.isEmpty()) {
+                System.out.println("⚠️ 인기 키워드 데이터 없음, 기본 키워드 제공");
+                popularKeywords = createDefaultKeywords();
+            }
+
+            // 로그로 실제 데이터 확인
+            for (int i = 0; i < Math.min(3, popularKeywords.size()); i++) {
+                Map<String, Object> keyword = popularKeywords.get(i);
+                System.out.println("   " + (i+1) + ". " + keyword.get("KEYWORD_NAME") +
+                    " (언급: " + keyword.get("total_mentions") + ", 일수: " + keyword.get("mention_days") + ")");
+            }
+
             Map<String, Object> response = new HashMap<>();
             response.put("keywords", popularKeywords);
             response.put("count", popularKeywords.size());
             response.put("lastUpdated", new Date());
-            
-            System.out.println("✅ 인기 키워드 조회 완료");
+
+            System.out.println("✅ 인기 키워드 조회 완료 - 총 " + popularKeywords.size() + "개");
             return response;
-            
+
         } catch (Exception e) {
             System.err.println("❌ 인기 키워드 조회 실패: " + e.getMessage());
             e.printStackTrace();
-            throw e;
+
+            // 에러 발생 시 기본 키워드 반환
+            System.out.println("🔄 에러 발생으로 기본 키워드 반환");
+            Map<String, Object> fallbackResponse = new HashMap<>();
+            fallbackResponse.put("keywords", createDefaultKeywords());
+            fallbackResponse.put("count", 5);
+            fallbackResponse.put("lastUpdated", new Date());
+            fallbackResponse.put("error", "DB 조회 실패로 기본 키워드 제공");
+
+            return fallbackResponse;
         }
+    }
+
+    /**
+     * 기본 인기 키워드 생성
+     */
+    private List<Map<String, Object>> createDefaultKeywords() {
+        List<Map<String, Object>> defaultKeywords = new ArrayList<>();
+        String[] keywords = {"마라탕", "민트초코", "말차", "탕후루", "치킨"};
+
+        for (int i = 0; i < keywords.length; i++) {
+            Map<String, Object> keyword = new HashMap<>();
+            keyword.put("KEYWORD_ID", (long)(i + 1));
+            keyword.put("KEYWORD_NAME", keywords[i]);
+            keyword.put("total_mentions", 100 - (i * 10));
+            keyword.put("mention_days", 30 - (i * 2));
+            defaultKeywords.add(keyword);
+        }
+
+        System.out.println("📝 기본 키워드 생성: " + defaultKeywords.size() + "개");
+        return defaultKeywords;
     }
 
     /**
@@ -727,4 +823,6 @@ public class DetailKeywordService {
         return existingComments.stream()
             .anyMatch(existing -> newText.equals(existing.get("comment_text")));
     }
+
+
 }

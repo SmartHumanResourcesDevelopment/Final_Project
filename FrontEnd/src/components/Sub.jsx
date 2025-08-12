@@ -28,11 +28,31 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
   const { user } = useUser();
   const isAdmin = user.role === "관리자";
 
-  // props로 받은 데이터가 있으면 우선 사용, 없으면 context 데이터 사용
-  const keywordData = propsKeywordData || contextKeywordData;
+  // context 데이터를 우선 사용 (검색 시 업데이트), props는 초기 로드용
+  const keywordData = contextKeywordData || propsKeywordData;
+
+  // keywordData 변경 감지를 위한 상태
+  const [currentKeywordData, setCurrentKeywordData] = useState(keywordData);
+  const [lastSearchTimestamp, setLastSearchTimestamp] = useState(null);
   const [openChat, setOpenChat]     = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+
+  // keywordData 변경 감지 - 검색 시에만 한 번 업데이트
+  useEffect(() => {
+    // keywordData가 있고, searchTimestamp가 변경된 경우에만 업데이트
+    if (keywordData && keywordData.searchTimestamp && keywordData.searchTimestamp !== lastSearchTimestamp) {
+      console.log("🔄 Sub - 새로운 검색 감지");
+      console.log("  이전 타임스탬프:", lastSearchTimestamp);
+      console.log("  새로운 타임스탬프:", keywordData.searchTimestamp);
+      console.log("  키워드:", keywordData.keyword || keywordData.keywordInfo?.KEYWORD_NAME);
+
+      setCurrentKeywordData(keywordData);
+      setLastSearchTimestamp(keywordData.searchTimestamp);
+
+      console.log("✅ Sub - 키워드 데이터 업데이트 완료");
+    }
+  }, [keywordData?.searchTimestamp, lastSearchTimestamp]);
 
   // 감성분석 상태
   const [sentimentAnalysis, setSentimentAnalysis] = useState(null);
@@ -50,17 +70,21 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
     return () => clearInterval(iv);
   }, [openChat]);
 
-  // 페이지 로드 시 감성분석 별도 호출
+  // 키워드 변경 시 감성분석 별도 호출
   useEffect(() => {
     const loadSentimentAnalysis = async () => {
-      if (!keywordData?.keyword) return;
+      const keyword = currentKeywordData?.keywordInfo?.KEYWORD_NAME || currentKeywordData?.keyword;
+      if (!keyword || !currentKeywordData?.searchTimestamp) {
+        console.log("⚠️ 감성분석 로딩 스킵: 키워드 없음 또는 검색 데이터 아님");
+        return;
+      }
 
       setSentimentLoading(true);
       setSentimentError(null);
 
       try {
-        console.log("🎯 감성분석 로딩 시작:", keywordData.keyword);
-        const sentimentData = await keywordApiService.getSentimentAnalysis(keywordData.keyword);
+        console.log("🎯 감성분석 로딩 시작:", keyword);
+        const sentimentData = await keywordApiService.getSentimentAnalysis(keyword);
         setSentimentAnalysis(sentimentData);
         console.log("✅ 감성분석 로딩 완료:", sentimentData);
       } catch (error) {
@@ -71,10 +95,12 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
       }
     };
 
-    // 페이지 도착 후 1초 뒤에 감성분석 시작
-    const timer = setTimeout(loadSentimentAnalysis, 1000);
-    return () => clearTimeout(timer);
-  }, [keywordData?.keyword]);
+    // 키워드 데이터가 변경된 경우에만 감성분석 시작
+    if (currentKeywordData?.searchTimestamp) {
+      const timer = setTimeout(loadSentimentAnalysis, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentKeywordData?.searchTimestamp]);
 
   // 페이지 빈 영역 클릭 시 챗봇 닫기
   const handleBackgroundClick = () => {
@@ -83,32 +109,60 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
       onClose?.();
     }
   };
-// console.log("🔍 keywordData 내용:", keywordData);
+  console.log("🔍 Sub 컴포넌트 - keywordData 내용:", keywordData);
+  console.log("🔍 Sub 컴포넌트 - currentKeywordData 내용:", currentKeywordData);
+  console.log("🔍 Sub 컴포넌트 - propsKeywordData:", propsKeywordData);
+  console.log("🔍 Sub 컴포넌트 - contextKeywordData:", contextKeywordData);
+
+  // API 응답 구조 상세 분석
+  if (currentKeywordData) {
+    console.log("📊 현재 사용 중인 키워드 데이터 구조 분석:");
+    console.log("  - keyword:", currentKeywordData.keyword);
+    console.log("  - keywordInfo:", currentKeywordData.keywordInfo);
+    console.log("  - mainStats:", currentKeywordData.mainStats);
+    console.log("  - trendExplanation:", currentKeywordData.trendExplanation);
+    console.log("  - description:", currentKeywordData.description);
+    console.log("  - emotionLabels:", currentKeywordData.emotionLabels);
+    console.log("  - ranking:", currentKeywordData.ranking);
+    console.log("  - 모든 키:", Object.keys(currentKeywordData));
+  }
   return (
     <div className="detail-root" onClick={handleBackgroundClick}>
       {/* 상단바 */}
       {isAdmin ? <AdminNavigationBarSection /> : <NavigationSection />}
       {/* 키워드 소개 */}
-      <DetailKeyword keywordData={keywordData} />
+      <DetailKeyword
+        key={`detail-${currentKeywordData?.searchTimestamp || 'default'}`}
+        keywordData={currentKeywordData}
+      />
       {/* 키워드 그래프소개 */}
       <DetailInsightsSection
-        keyword={keywordData?.keyword || "키워드 없음"}
-        trendExplanation={keywordData?.trendExplanation}
+        key={`insights-${currentKeywordData?.searchTimestamp || 'default'}`}
+        keyword={currentKeywordData?.keywordInfo?.KEYWORD_NAME || currentKeywordData?.keyword || "키워드 없음"}
+        trendExplanation={
+          currentKeywordData?.trendExplanation ||
+          currentKeywordData?.aiSummary ||
+          currentKeywordData?.description ||
+          currentKeywordData?.keywordInfo?.description ||
+          "트렌드 분석 정보를 불러오는 중입니다..."
+        }
       />
       {/* 감성분석 */}
       <KeywordHighlightSection
-        keyword={keywordData?.keyword || "키워드 없음"}
+        key={`highlight-${currentKeywordData?.searchTimestamp || 'default'}`}
+        keyword={currentKeywordData?.keywordInfo?.KEYWORD_NAME || currentKeywordData?.keyword || "키워드 없음"}
         sentimentAnalysis={sentimentAnalysis}
         sentimentLoading={sentimentLoading}
         sentimentError={sentimentError}
-        positiveComments={keywordData?.positiveComments || []}
-        negativeComments={keywordData?.negativeComments || []}
+        positiveComments={currentKeywordData?.positiveComments || []}
+        negativeComments={currentKeywordData?.negativeComments || []}
       />
       {/* 유사도 */}
       <TrendAnalysisSection
-        keyword={keywordData?.keyword || "키워드 없음"}
-        similarityInfo={keywordData?.similarityInfo}
-        similarKeywords={keywordData?.similarKeywords || []}
+        key={`trend-${currentKeywordData?.searchTimestamp || 'default'}`}
+        keyword={currentKeywordData?.keywordInfo?.KEYWORD_NAME || currentKeywordData?.keyword || "키워드 없음"}
+        similarityInfo={currentKeywordData?.similarityInfo}
+        similarKeywords={currentKeywordData?.similarKeywords || []}
       />
       <FooterSection />
 

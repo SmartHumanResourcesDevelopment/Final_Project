@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../assets/css/Main_search.css";
 import searchIcon from "../assets/img/common/search.png";
 import { keywordApiService } from "../api/sub";
+import { useKeywordData } from "../contexts/KeywordDataContext";
 
 // 쿠키 관리 유틸리티 함수 (MyFeed.jsx와 동일)
 const CookieUtils = {
@@ -151,6 +152,7 @@ const addRecentKeywordLocal = (keyword) => {
 
 function Main_search() {
   const navigate = useNavigate();
+  const { setKeywordData } = useKeywordData();
   const [searchQuery, setSearchQuery] = useState("");
   const [popularKeywords, setPopularKeywords] = useState(["마라탕", "민트초코", "말차", "탕후루", "마라탕"]);
   const [searchResults, setSearchResults] = useState(null);
@@ -287,28 +289,20 @@ function Main_search() {
         } else {
           // 유사 키워드가 없으면 바로 Sub 페이지로 이동
           console.log("🎯 관련 키워드가 없어서 바로 '" + searchQuery + "'로 이동합니다.");
-          navigate('/sub', {
-            state: {
-              keywordData: {
-                keyword: data.keywordInfo.KEYWORD_NAME,
-              ranking: data.ranking ?
-                       (typeof data.ranking === 'number' ? `${data.ranking}위` : data.ranking) :
-                       "순위 정보 없음",
-              emotionLabels: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].MAIN_EMOTIONS ?
-                           data.mainStats[0].MAIN_EMOTIONS.split(',').slice(0, 5) : ["감정", "분석", "정보", "없음", "~"],
-              description: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].SHORT_DESCRIPTION ?
-                          data.mainStats[0].SHORT_DESCRIPTION : "키워드 설명이 없습니다.",
-              trendExplanation: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].TREND_EXPLANATION ?
-                               data.mainStats[0].TREND_EXPLANATION : "트렌드 설명이 없습니다.",
-              similarityInfo: data.similarityInfo,
-              similarKeywords: data.similarKeywords || [],
-              sentimentAnalysis: data.sentimentAnalysis,
-              positiveComments: data.positiveComments || [],
-              negativeComments: data.negativeComments || []
-            }
-          }
-        });
-        return; // 페이지 이동 후 함수 종료
+
+          // 전역 상태에 타임스탬프와 함께 저장
+          const updatedData = {
+            ...data,
+            searchTimestamp: Date.now(),
+            searchKeyword: searchKeyword
+          };
+
+          // 전역 상태 업데이트
+          setKeywordData(updatedData);
+          console.log("✅ 메인 검색 - 전역 상태 업데이트 완료");
+
+          navigate('/sub');
+          return; // 페이지 이동 후 함수 종료
         }
       }
 
@@ -364,28 +358,19 @@ function Main_search() {
         return;
       }
 
+      // 전역 상태에 타임스탬프와 함께 저장
+      const updatedData = {
+        ...data,
+        searchTimestamp: Date.now(),
+        searchKeyword: searchKeyword
+      };
+
+      // 전역 상태 업데이트
+      setKeywordData(updatedData);
+      console.log("✅ 메인 직접 검색 - 전역 상태 업데이트 완료");
+
       // Sub 페이지로 이동
-      navigate('/sub', {
-        state: {
-          keywordData: {
-            keyword: data.keywordInfo.KEYWORD_NAME,
-            ranking: data.ranking ?
-                     (typeof data.ranking === 'number' ? `${data.ranking}위` : data.ranking) :
-                     "순위 정보 없음",
-            emotionLabels: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].MAIN_EMOTIONS ?
-                          data.mainStats[0].MAIN_EMOTIONS.split(',').slice(0, 5) : ["감정", "분석", "정보", "없음", "~"],
-            description: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].SHORT_DESCRIPTION ?
-                        data.mainStats[0].SHORT_DESCRIPTION : "키워드 설명이 없습니다.",
-            trendExplanation: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].TREND_EXPLANATION ?
-                             data.mainStats[0].TREND_EXPLANATION : "트렌드 설명이 없습니다.",
-            similarityInfo: data.similarityInfo,
-            similarKeywords: data.similarKeywords || [],
-            sentimentAnalysis: data.sentimentAnalysis,
-            positiveComments: data.positiveComments || [],
-            negativeComments: data.negativeComments || []
-          }
-        }
-      });
+      navigate('/sub');
 
       console.log("✅ 원래 키워드로 Sub 페이지 이동 완료:", searchQuery);
 
@@ -437,28 +422,19 @@ function Main_search() {
       } else {
         setError('');
 
+        // 전역 상태에 타임스탬프와 함께 저장
+        const updatedData = {
+          ...data,
+          searchTimestamp: Date.now(),
+          searchKeyword: keyword
+        };
+
+        // 전역 상태 업데이트
+        setKeywordData(updatedData);
+        console.log("✅ 메인 유사 키워드 검색 - 전역 상태 업데이트 완료");
+
         // 바로 Sub 페이지로 이동 (유사 키워드 선택했으므로)
-        navigate('/sub', {
-          state: {
-            keywordData: {
-              keyword: data.keywordInfo.KEYWORD_NAME,
-              ranking: data.ranking ?
-                       (typeof data.ranking === 'number' ? `${data.ranking}위` : data.ranking) :
-                       "순위 정보 없음",
-              emotionLabels: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].MAIN_EMOTIONS ?
-                            data.mainStats[0].MAIN_EMOTIONS.split(',').slice(0, 5) : ["감정", "분석", "정보", "없음", "~"],
-              description: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].SHORT_DESCRIPTION ?
-                          data.mainStats[0].SHORT_DESCRIPTION : "키워드 설명이 없습니다.",
-              trendExplanation: data.mainStats && data.mainStats.length > 0 && data.mainStats[0].TREND_EXPLANATION ?
-                               data.mainStats[0].TREND_EXPLANATION : "트렌드 설명이 없습니다.",
-              similarityInfo: data.similarityInfo,
-              similarKeywords: data.similarKeywords || [],
-              sentimentAnalysis: data.sentimentAnalysis,
-              positiveComments: data.positiveComments || [],
-              negativeComments: data.negativeComments || []
-            }
-          }
-        });
+        navigate('/sub');
       }
 
     } catch (error) {

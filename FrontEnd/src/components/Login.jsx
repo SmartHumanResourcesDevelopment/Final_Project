@@ -1,15 +1,45 @@
-import axios from "axios";       
+import axios from "axios";
 //npm install jwt-decode
-import {jwtDecode} from "jwt-decode";  
-import React, { useState } from "react";
+import {jwtDecode} from "jwt-decode";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../api/authApi"; 
-import google_login from "../assets/img/login_join/google_login.png";
+import { login } from "../api/authApi";
+
 import login_join_bg_img from "../assets/img/common/login_join_bg_img.png";
 import mint_bg_color from "../assets/img/common/mint_bg_color.png";
 import "../assets/css/Login.css"; // 경로 주의
 import { useUser } from "../contexts/UserContext";
 import NaverLoginButton from "./NaverLoginButton";
+
+// 쿠키 관리 유틸리티 함수
+const CookieUtils = {
+  setCookie: (name, value, days = 30) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+    console.log("🍪 쿠키 저장:", name, value);
+  },
+
+  getCookie: (name) => {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) {
+        const value = decodeURIComponent(c.substring(nameEQ.length, c.length));
+        console.log("🍪 쿠키 읽기:", name, value);
+        return value;
+      }
+    }
+    return null;
+  },
+
+  deleteCookie: (name) => {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax`;
+    console.log("🍪 쿠키 삭제:", name);
+  }
+};
 
 const Login = () => {
   const [id, setId] = useState("");
@@ -18,9 +48,21 @@ const Login = () => {
   const navigate = useNavigate();
   const { setUser } = useUser();
 
+  // 컴포넌트 마운트 시 저장된 아이디 불러오기
+  useEffect(() => {
+    const savedId = CookieUtils.getCookie('savedUserId');
+    if (savedId) {
+      setId(savedId);
+      setRememberMe(true);
+      console.log("💾 저장된 아이디 불러오기:", savedId);
+    }
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      console.log("🔐 로그인 시도:", { id, rememberMe });
+
       const data = await login({ id, password });
       if (!data.success) {
         alert(`로그인 실패: ${data.message}`);
@@ -28,6 +70,15 @@ const Login = () => {
       }
 
       const { token } = data;
+
+      // 로그인 성공 시 아이디 저장 처리
+      if (rememberMe) {
+        CookieUtils.setCookie('savedUserId', id, 30); // 30일 저장
+        console.log("✅ 아이디 저장 완료:", id);
+      } else {
+        CookieUtils.deleteCookie('savedUserId');
+        console.log("🗑️ 저장된 아이디 삭제");
+      }
 
       // 토큰만 저장
       localStorage.setItem("jwtToken", token);
@@ -47,15 +98,36 @@ const Login = () => {
         userProfile: decoded.userProfile
       });
 
+      console.log("✅ 로그인 성공, 메인 페이지로 이동");
       // 메인 페이지로 이동
       navigate("/main");
     } catch (error) {
-      console.error("로그인 중 오류:", error);
+      console.error("❌ 로그인 중 오류:", error);
       alert("서버 오류로 로그인에 실패했습니다.");
       navigate("/");
     }
   };
+
+  // 아이디 저장 체크박스 변경 처리
+  const handleRememberMeChange = (e) => {
+    const checked = e.target.checked;
+    setRememberMe(checked);
+    console.log("📋 아이디 저장 체크박스 변경:", checked);
+
+    // 체크 해제 시 즉시 저장된 아이디 삭제
+    if (!checked) {
+      CookieUtils.deleteCookie('savedUserId');
+      console.log("🗑️ 체크 해제로 인한 저장된 아이디 삭제");
+    }
+  };
+
   const handleGoToJoin = () => navigate("/join");
+
+  // 비밀번호 찾기 클릭 처리
+  const handleForgotPassword = () => {
+    alert("준비되지 않은 기능입니다.\n관리자에게 문의하세요.");
+    console.log("🔒 비밀번호 찾기 기능 요청 - 미구현");
+  };
 
   return (
     <div className="relative bg-white w-full min-h-screen mx-auto overflow-hidden">
@@ -117,22 +189,23 @@ const Login = () => {
                 </div>
                 <button
                   type="button"
+                  onClick={handleForgotPassword}
                   className="absolute top-0 right-0 text-[11px] text-action-sec hover:underline"
                 >
                   비밀번호를 잊어버리셨나요?
                 </button>
               </div>
 
-              {/* 30일 저장 */}
+              {/* 아이디 저장 */}
               <label className="flex items-center gap-2 text-[13px] cursor-pointer">
                 <input
                 type="checkbox"
                 checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+                onChange={handleRememberMeChange}
                 className="w-5 h-5 border border-gray-300 rounded-sm accent-blue-500 cursor-pointer appearance-auto"
                 id="rememberMe"
               />
-                30일동안 아이디 저장하기
+                아이디 저장하기 (30일)
               </label>
 
               {/* 로그인 버튼 */}
@@ -164,11 +237,8 @@ const Login = () => {
             </div>
 
             {/* SNS 로그인 */}
-              <div className="flex justify-center gap-6 w-full mt-10">
-                <button className="w-[190px] hover:opacity-80" onClick={() => console.log("Google login")}>
-                <img src={google_login} alt="Sign in with Google" />
-                </button>
-                {/* 네이버 로그인 버튼 컴포넌트 */}
+              <div className="flex justify-center w-full mt-10">
+                {/* 네이버 로그인 버튼 컴포넌트 - 중앙 정렬 */}
                 <NaverLoginButton />
               </div>
 

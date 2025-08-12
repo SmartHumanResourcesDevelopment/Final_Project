@@ -19,8 +19,54 @@ export default function DetailKeyword({ keywordData }) {
     description: "‘맛있는 건강’을 추구하는 잘파세대의 새로운 일상",
   };
 
-  // props로 받은 데이터가 있으면 사용, 없으면 기본값 사용
-  const currentKeywordData = keywordData || defaultKeywordData;
+  // API 응답 데이터를 DetailKeyword 컴포넌트 형식으로 변환
+  const transformKeywordData = (apiData) => {
+    if (!apiData) {
+      console.log("⚠️ API 데이터가 없음, 기본값 사용");
+      return defaultKeywordData;
+    }
+
+    // API 응답에서 직접 데이터 사용 (백엔드에서 이미 처리됨)
+    const result = {
+      keyword: apiData.keyword || "키워드 없음",
+      ranking: apiData.ranking || "정보 없음",
+      emotionLabels: (apiData.emotionLabels && Array.isArray(apiData.emotionLabels)) ? apiData.emotionLabels : defaultKeywordData.emotionLabels,
+      description: apiData.description || defaultKeywordData.description,
+      // 원본 데이터도 보존
+      ...apiData
+    };
+
+    console.log("🔄 데이터 변환 결과:", {
+      "입력_keyword": apiData.keyword,
+      "입력_ranking": apiData.ranking,
+      "입력_emotionLabels": apiData.emotionLabels,
+      "입력_description": apiData.description,
+      "출력_keyword": result.keyword,
+      "출력_ranking": result.ranking,
+      "출력_emotionLabels": result.emotionLabels,
+      "출력_description": result.description
+    });
+
+    return result;
+  };
+
+  // props로 받은 데이터를 변환하여 사용
+  const currentKeywordData = transformKeywordData(keywordData);
+
+  console.log("🔍 Detail_keyword - 원본 키워드 데이터:", keywordData);
+  console.log("🔍 Detail_keyword - 변환된 키워드 데이터:", currentKeywordData);
+
+  // API 응답 구조 상세 분석
+  if (keywordData) {
+    console.log("📊 Detail_keyword API 응답 구조 분석:");
+    console.log("  - keywordInfo:", keywordData.keywordInfo);
+    console.log("  - mainStats:", keywordData.mainStats);
+    console.log("  - trendExplanation:", keywordData.trendExplanation);
+    console.log("  - description:", keywordData.description);
+    console.log("  - emotionLabels:", keywordData.emotionLabels);
+    console.log("  - ranking:", keywordData.ranking);
+    console.log("  - 모든 키:", Object.keys(keywordData));
+  }
   const [query, setQuery] = useState("");
 
   const getKeywordImagePath = (keyword) => {
@@ -81,24 +127,38 @@ export default function DetailKeyword({ keywordData }) {
     }
 
     try {
-      console.log("🔍 키워드 검색 시작:", searchKeyword);
+      console.log("🔍 Detail_keyword - 키워드 검색 시작:", searchKeyword);
+      console.log("🔍 Detail_keyword - 검색 전 현재 keywordData:", keywordData);
 
       // 키워드 검색 API 호출
       const data = await keywordApiService.searchKeyword(searchKeyword);
+      console.log("🔍 Detail_keyword - API 응답 데이터:", data);
 
-      if (data && data.keywordInfo) {
-        // 검색 성공 시 전역 상태에 저장하고 현재 페이지 새로고침
-        setKeywordData(data);
-        console.log("✅ 키워드 검색 성공:", data);
+      if (data && (data.keywordInfo || data.keyword)) {
+        // 검색 성공 시 전역 상태에 저장
+        console.log("🔄 Detail_keyword - setKeywordData 호출 전");
+        console.log("🔄 Detail_keyword - 업데이트할 데이터:", data);
+
+        // 타임스탬프를 추가하여 강제로 새로운 객체로 만들기
+        const updatedData = {
+          ...data,
+          searchTimestamp: Date.now(),
+          searchKeyword: searchKeyword
+        };
+
+        setKeywordData(updatedData);
+        console.log("✅ Detail_keyword - setKeywordData 호출 완료");
+        console.log("✅ Detail_keyword - 키워드 검색 성공:", updatedData);
 
         // 검색어 초기화
         setQuery("");
 
-        // 페이지 새로고침 또는 상태 업데이트를 통해 새로운 키워드 데이터 표시
-        window.location.reload();
+        // 성공 메시지 표시
+        console.log(`✅ Detail_keyword - "${searchKeyword}" 검색 완료, 화면 업데이트 완료`);
 
       } else {
         // 검색 결과가 없는 경우 (이미 최근 검색에는 추가됨)
+        console.log("⚠️ Detail_keyword - 검색 결과 없음:", data);
         alert("해당 키워드로는 검색을 할 수 없습니다. 올바른 키워드 이름을 입력하세요.");
       }
 
@@ -134,9 +194,9 @@ export default function DetailKeyword({ keywordData }) {
          </p>
 
         <p className="detailKeyword__labels">
-          감정 라벨링 TOP 5 : {currentKeywordData.emotionLabels.join(", ")}
+          주요감정 라벨 : {currentKeywordData.emotionLabels.map(label => label.trim()).join(", ")}
         </p>
-        <p className="detailKeyword__desc">{currentKeywordData.description}</p>
+        <p className="detailKeyword__desc">{currentKeywordData.description || "키워드 설명을 불러오는 중..."}</p>
       </div>
 
       {/* ② 오른쪽 : 원형 이미지 */}

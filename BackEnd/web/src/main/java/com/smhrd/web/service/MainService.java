@@ -1051,11 +1051,16 @@ public class MainService {
 
             if (allRankings.isEmpty()) {
                 System.out.println("⚠️ 랭킹 데이터가 없습니다.");
+                // 기본 키워드 목록에서 랜덤 선택
+                String[] defaultKeywords = {"마라탕", "젤리", "수건케이크", "탕후루", "민트초코", "딸기", "간식"};
+                Random random = new Random();
+                String randomKeyword = defaultKeywords[random.nextInt(defaultKeywords.length)];
+
                 return Map.of(
-                    "keyword", "먹방",
+                    "keyword", randomKeyword,
                     "ranking", 1,
                     "description", "기본 키워드입니다.",
-                    "emotionLabels", Arrays.asList("즐거움", "맛있음", "행복", "만족", "기대감")
+                    "emotionLabels", Arrays.asList("즐거움", "관심", "행복", "만족", "기대감")
                 );
             }
 
@@ -1089,13 +1094,17 @@ public class MainService {
             System.err.println("❌ 랜덤 키워드 조회 실패: " + e.getMessage());
             e.printStackTrace();
 
-            // 에러 시 기본 키워드 반환
+            // 에러 시 기본 키워드 반환 (랜덤 선택)
+            String[] defaultKeywords = {"마라탕", "젤리", "수건케이크", "탕후루", "민트초코", "딸기", "간식"};
+            Random random = new Random();
+            String randomKeyword = defaultKeywords[random.nextInt(defaultKeywords.length)];
+
             return Map.of(
-                "keyword", "먹방",
+                "keyword", randomKeyword,
                 "ranking", 1,
                 "description", "기본 키워드입니다.",
-                "emotionLabels", Arrays.asList("즐거움", "맛있음", "행복", "만족", "기대감"),
-                "trendExplanation", "먹방 트렌드에 대한 분석입니다.",
+                "emotionLabels", Arrays.asList("즐거움", "관심", "행복", "만족", "기대감"),
+                "trendExplanation", randomKeyword + " 트렌드에 대한 분석입니다.",
                 "similarityInfo", new HashMap<>(),
                 "similarKeywords", new ArrayList<>(),
                 "positiveComments", new ArrayList<>(),
