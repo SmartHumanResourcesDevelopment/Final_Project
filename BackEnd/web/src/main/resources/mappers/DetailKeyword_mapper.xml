@@ -157,20 +157,20 @@
         ]]>
     </select>
 
-    <!-- 인기 키워드 목록 조회 -->
+    <!-- 인기 키워드 목록 조회 (안전한 버전) -->
     <select id="getPopularKeywords" resultType="map">
         <![CDATA[
         SELECT * FROM (
             SELECT
                 k.KEYWORD_ID,
                 k.KEYWORD_NAME,
-                SUM(kds.DAILY_COUNT) as total_mentions,
-                COUNT(DISTINCT kds.STATS_DATE) as mention_days
+                NVL(SUM(kds.DAILY_COUNT), 0) as total_mentions,
+                NVL(COUNT(DISTINCT kds.STATS_DATE), 0) as mention_days
             FROM KEYWORD k
-            JOIN KEYWORD_DAILY_STATS kds ON k.KEYWORD_ID = kds.KEYWORD_ID
-            WHERE kds.STATS_DATE >= TRUNC(SYSDATE) - 30
+            LEFT JOIN KEYWORD_DAILY_STATS kds ON k.KEYWORD_ID = kds.KEYWORD_ID
+                AND kds.STATS_DATE >= TRUNC(SYSDATE) - 30
             GROUP BY k.KEYWORD_ID, k.KEYWORD_NAME
-            ORDER BY total_mentions DESC
+            ORDER BY total_mentions DESC, k.KEYWORD_NAME ASC
         ) WHERE ROWNUM <= 20
         ]]>
     </select>

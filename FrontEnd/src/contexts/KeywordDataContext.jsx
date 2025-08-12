@@ -7,9 +7,15 @@ const KeywordDataContext = createContext();
 export const KeywordDataProvider = ({ children }) => {
   const [keywordData, setKeywordData] = useState(null);
 
+  // 키워드 데이터 변경 시 로그
+  const setKeywordDataWithLog = (data) => {
+    console.log("🔄 KeywordDataContext - 키워드 데이터 업데이트:", data);
+    setKeywordData(data);
+  };
+
   const value = {
     keywordData,
-    setKeywordData,
+    setKeywordData: setKeywordDataWithLog,
   };
 
   return (
