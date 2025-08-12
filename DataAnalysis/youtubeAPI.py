@@ -145,6 +145,7 @@ def run() -> None:
         vid = make_video_id(s["channelTitle"], s["publishedAt"])
         rows.append({
             "VIDEO_ID":      vid,
+            "KEYWORD_ID": "",# 추후에 파싱예정
             "TITLE":         s.get("title", ""),
             "DESCRIPTION":   s.get("description", "").replace("\n", " "),
             "CHANNEL_TITLE": s["channelTitle"],

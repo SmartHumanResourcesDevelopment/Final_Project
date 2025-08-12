@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.smhrd.web.repository.DetailKeywordMapper">
+
+    <!-- 키워드명으로 키워드 기본 정보 조회 -->
+    <select id="getKeywordByName" resultType="map">
+        <![CDATA[
+        SELECT
+            k.KEYWORD_ID,
+            k.KEYWORD_NAME,
+            COUNT(DISTINCT kds.STATS_DATE) as mention_days,
+            SUM(kds.DAILY_COUNT) as total_mentions
+        FROM KEYWORD k
+        LEFT JOIN KEYWORD_DAILY_STATS kds ON k.KEYWORD_ID = kds.KEYWORD_ID
+        WHERE UPPER(k.KEYWORD_NAME) = UPPER(#{keywordName})
+        GROUP BY k.KEYWORD_ID, k.KEYWORD_NAME
+        ]]>
+    </select>
+
+    <!-- 디버그용: 모든 키워드 조회 -->
+    <select id="getAllKeywords" resultType="map">
+        <![CDATA[
+        SELECT
+            k.KEYWORD_ID,
+            k.KEYWORD_NAME,
+            COUNT(DISTINCT kds.STATS_DATE) as mention_days,
+            SUM(kds.DAILY_COUNT) as total_mentions
+        FROM KEYWORD k
+        LEFT JOIN KEYWORD_DAILY_STATS kds ON k.KEYWORD_ID = kds.KEYWORD_ID
+        GROUP BY k.KEYWORD_ID, k.KEYWORD_NAME
+        ORDER BY k.KEYWORD_NAME
+        ]]>
+    </select>
+
+    <!-- 키워드 메인 통계 조회 -->
+    <select id="getKeywordMainStats" resultType="map">
+        <![CDATA[
+        SELECT
+            kms.KEYWORD_ID,
+            kms.CURRENT_RANK,
+            TO_CHAR(kms.SHORT_DESCRIPTION) as SHORT_DESCRIPTION,
+            TO_CHAR(kms.TREND_EXPLANATION) as TREND_EXPLANATION,
+            TO_CHAR(kms.MAIN_EMOTIONS) as MAIN_EMOTIONS,
+            kms.CREATED_AT,
+            kms.UPDATED_AT
+        FROM KEYWORD_MAIN_STATS kms
+        WHERE kms.KEYWORD_ID = #{keywordId}
+        ORDER BY kms.UPDATED_AT DESC
+        ]]>
+    </select>
+
+ <!-- 특정 키워드의 전체 랭킹 한 건 조회 -->
+  <select id="getKeywordOverallRank"
+          parameterType="string"
+          resultType="map">
+          <![CDATA[
+      SELECT
+    t.rn            AS "ranking",
+    t.keyword_name  AS "name",
+    t.total_count   AS "count",
+    CASE
+      WHEN t.rn = 1 THEN '#e60000'
+      WHEN t.rn <= 3 THEN '#ff6600'
+      WHEN t.rn <= 7 THEN '#000000'
+      ELSE '#0044ff'
+    END             AS "color"
+  FROM (
+    SELECT
+      keyword_name,
+      SUM(NVL(daily_count, 0)) AS total_count,
+      DENSE_RANK() OVER (ORDER BY SUM(NVL(daily_count, 0)) DESC) AS rn
+    FROM KEYWORD_DAILY_STATS
+    WHERE keyword_name IS NOT NULL
+      AND daily_count > 0
+    GROUP BY keyword_name
+  ) t
+  WHERE t.keyword_name = #{keywordName}
+
+    ]]>
+  </select>
+
+  <!-- 전체 기간 누적 랭킹 전체 리스트 -->
+<select id="getOverallRankingAll" resultType="map">
+<![CDATA[
+  SELECT
+    seq_no      AS rank,
+    keyword_name AS name,
+    total_count  AS count,
+    '↔'          AS trend,
+    CASE
+      WHEN seq_no = 1 THEN '#e60000'
+      WHEN seq_no <= 3 THEN '#ff6600'
+      WHEN seq_no <= 7 THEN '#000000'
+      ELSE '#0044ff'
+    END AS color
+  FROM (
+    SELECT
+      ROW_NUMBER() OVER (ORDER BY SUM(NVL(daily_count, 0)) DESC) AS seq_no,
+      keyword_name,
+      SUM(NVL(daily_count, 0)) AS total_count
+    FROM KEYWORD_DAILY_STATS
+    WHERE keyword_name IS NOT NULL
+      AND daily_count > 0
+    GROUP BY keyword_name
+  )
+  ORDER BY seq_no
+  ]]>
+</select>
+
+    
+
+    <!-- 키워드 유사도 정보 조회 -->
+    <select id="getKeywordSimilarity" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                ks.ID,
+                ks.INPUT_ID,
+                ks.SIMILAR_1_ID,
+                ks.SIMILAR_2_ID,
+                ks.SIMILAR_3_ID,
+                ks.SIMILAR_4_ID,
+                ks.SIMILAR_5_ID,
+                TO_CHAR(ks.REASON) as REASON,
+                k1.KEYWORD_NAME as similar_1_name,
+                k2.KEYWORD_NAME as similar_2_name,
+                k3.KEYWORD_NAME as similar_3_name,
+                k4.KEYWORD_NAME as similar_4_name,
+                k5.KEYWORD_NAME as similar_5_name
+            FROM KEYWORD_SIMILARITY ks
+            LEFT JOIN KEYWORD k1 ON ks.SIMILAR_1_ID = k1.KEYWORD_ID AND ks.SIMILAR_1_ID != 0
+            LEFT JOIN KEYWORD k2 ON ks.SIMILAR_2_ID = k2.KEYWORD_ID AND ks.SIMILAR_2_ID != 0
+            LEFT JOIN KEYWORD k3 ON ks.SIMILAR_3_ID = k3.KEYWORD_ID AND ks.SIMILAR_3_ID != 0
+            LEFT JOIN KEYWORD k4 ON ks.SIMILAR_4_ID = k4.KEYWORD_ID AND ks.SIMILAR_4_ID != 0
+            LEFT JOIN KEYWORD k5 ON ks.SIMILAR_5_ID = k5.KEYWORD_ID AND ks.SIMILAR_5_ID != 0
+            WHERE ks.INPUT_ID = #{keywordId}
+            ORDER BY ks.ID DESC
+        ) WHERE ROWNUM = 1
+        ]]>
+    </select>
+
+    <!-- 키워드 자동완성 검색 -->
+    <select id="getAutocompleteKeywords" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_ID,
+                k.KEYWORD_NAME,
+                SUM(kds.DAILY_COUNT) as total_mentions
+            FROM KEYWORD k
+            LEFT JOIN KEYWORD_DAILY_STATS kds ON k.KEYWORD_ID = kds.KEYWORD_ID
+            WHERE UPPER(k.KEYWORD_NAME) LIKE UPPER('%' || #{query} || '%')
+            GROUP BY k.KEYWORD_ID, k.KEYWORD_NAME
+            ORDER BY total_mentions DESC NULLS LAST, k.KEYWORD_NAME
+        ) WHERE ROWNUM <= 10
+        ]]>
+    </select>
+
+    <!-- 인기 키워드 목록 조회 (안전한 버전) -->
+    <select id="getPopularKeywords" resultType="map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT
+                k.KEYWORD_ID,
+                k.KEYWORD_NAME,
+                NVL(SUM(kds.DAILY_COUNT), 0) as total_mentions,
+                NVL(COUNT(DISTINCT kds.STATS_DATE), 0) as mention_days
+            FROM KEYWORD k
+            LEFT JOIN KEYWORD_DAILY_STATS kds ON k.KEYWORD_ID = kds.KEYWORD_ID
+                AND kds.STATS_DATE >= TRUNC(SYSDATE) - 30
+            GROUP BY k.KEYWORD_ID, k.KEYWORD_NAME
+            ORDER BY total_mentions DESC, k.KEYWORD_NAME ASC
+        ) WHERE ROWNUM <= 20
+        ]]>
+    </select>
+
+    <!-- 유사 키워드 상세 정보 조회 -->
+    <select id="getSimilarKeywordDetails" resultType="map">
+        <![CDATA[
+        SELECT
+            k.KEYWORD_ID,
+            k.KEYWORD_NAME,
+            SUM(kds.DAILY_COUNT) as total_mentions,
+            COUNT(DISTINCT kds.STATS_DATE) as mention_days
+        FROM KEYWORD k
+        LEFT JOIN KEYWORD_DAILY_STATS kds ON k.KEYWORD_ID = kds.KEYWORD_ID
+        WHERE k.KEYWORD_ID IN
+        ]]>
+        <foreach collection="keywordIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        <![CDATA[
+        AND k.KEYWORD_ID != 0
+        GROUP BY k.KEYWORD_ID, k.KEYWORD_NAME
+        ORDER BY total_mentions DESC NULLS LAST
+        ]]>
+    </select>
+
+    <!-- 키워드 ID로 키워드 정보 조회 -->
+    <select id="getKeywordById" resultType="map">
+        <![CDATA[
+        SELECT
+            k.KEYWORD_ID,
+            k.KEYWORD_NAME,
+            SUM(kds.DAILY_COUNT) as TOTAL_MENTIONS,
+            COUNT(DISTINCT kds.STATS_DATE) as MENTION_DAYS
+        FROM KEYWORD k
+        LEFT JOIN KEYWORD_DAILY_STATS kds ON k.KEYWORD_ID = kds.KEYWORD_ID
+        WHERE k.KEYWORD_ID = #{keywordId}
+        AND k.KEYWORD_ID != 0
+        GROUP BY k.KEYWORD_ID, k.KEYWORD_NAME
+        ]]>
+    </select>
+
+    <!-- 키워드 일별 통계 조회 (기간별) - 마지막 언급일 기준 -->
+    <select id="getKeywordDailyStatsByPeriod" resultType="map">
+        <choose>
+            <!-- 1달 기간: 6개월간 월별 집계 -->
+            <when test="period == '1달'">
+                <![CDATA[
+                WITH LAST_MENTION AS (
+                    SELECT MAX(kds.STATS_DATE) as last_date
+                    FROM KEYWORD_DAILY_STATS kds
+                    WHERE kds.KEYWORD_ID = #{keywordId}
+                    AND kds.DAILY_COUNT > 0
+                )
+                SELECT
+                    TRUNC(kds.STATS_DATE, 'MM') as STATS_DATE,
+                    SUM(kds.DAILY_COUNT) as DAILY_COUNT,
+                    TO_CHAR(TRUNC(kds.STATS_DATE, 'MM'), 'MM/DD') as formatted_date,
+                    TO_CHAR(TRUNC(kds.STATS_DATE, 'MM'), 'YYYY-MM-DD') as date_string
+                FROM KEYWORD_DAILY_STATS kds, LAST_MENTION lm
+                WHERE kds.KEYWORD_ID = #{keywordId}
+                AND kds.STATS_DATE >= ADD_MONTHS(lm.last_date, -6)
+                AND kds.STATS_DATE <= lm.last_date
+                GROUP BY TRUNC(kds.STATS_DATE, 'MM'), TO_CHAR(TRUNC(kds.STATS_DATE, 'MM'), 'MM/DD'), TO_CHAR(TRUNC(kds.STATS_DATE, 'MM'), 'YYYY-MM-DD')
+                ORDER BY TRUNC(kds.STATS_DATE, 'MM') ASC
+                ]]>
+            </when>
+            <!-- 기타 기간: 일별 데이터 -->
+            <otherwise>
+                <![CDATA[
+                WITH LAST_MENTION AS (
+                    SELECT MAX(kds.STATS_DATE) as last_date
+                    FROM KEYWORD_DAILY_STATS kds
+                    WHERE kds.KEYWORD_ID = #{keywordId}
+                    AND kds.DAILY_COUNT > 0
+                )
+                SELECT
+                    kds.STATS_DATE,
+                    kds.DAILY_COUNT,
+                    TO_CHAR(kds.STATS_DATE, 'MM/DD') as formatted_date,
+                    TO_CHAR(kds.STATS_DATE, 'YYYY-MM-DD') as date_string
+                FROM KEYWORD_DAILY_STATS kds, LAST_MENTION lm
+                WHERE kds.KEYWORD_ID = #{keywordId}
+                AND kds.STATS_DATE >=
+                ]]>
+                <choose>
+                    <when test="period == '1일'">
+                        <![CDATA[lm.last_date - 1]]>
+                    </when>
+                    <when test="period == '7일'">
+                        <![CDATA[lm.last_date - 6]]>
+                    </when>
+                    <when test="period == '1주'">
+                        <![CDATA[lm.last_date - 6]]>
+                    </when>
+                    <when test="period == '1년'">
+                        <![CDATA[lm.last_date - 364]]>
+                    </when>
+                    <otherwise>
+                        <![CDATA[lm.last_date - 6]]>
+                    </otherwise>
+                </choose>
+                <![CDATA[
+                AND kds.STATS_DATE <= lm.last_date
+                ORDER BY kds.STATS_DATE ASC
+                ]]>
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 키워드 마지막 언급일 조회 -->
+    <select id="getLastMentionDate" resultType="map">
+        <![CDATA[
+        SELECT MAX(kds.STATS_DATE) as LAST_DATE
+        FROM KEYWORD_DAILY_STATS kds
+        WHERE kds.KEYWORD_ID = #{keywordId}
+        AND kds.DAILY_COUNT > 0
+        ]]>
+    </select>
+
+  <!-- =========================================
+       1) 키워드 감성 요약 (pos/neg 합계)
+       - 파라미터: Long keywordId, Boolean onlyMain (선택)
+       - onlyMain=true 이면 MAIN_EMOTIONS에 있는 라벨만 집계
+     ========================================= -->
+  <select id="getKeywordSentimentAnalysis" parameterType="map" resultType="map">
+    <![CDATA[
+    SELECT EMOTIONS AS LABEL, SOURCE_ID
+    FROM (
+      -- YouTube 댓글의 감정 데이터 (해시 버킷 샘플링 적용)
+      SELECT yc.EMOTIONS, yc.COMMENT_ID AS SOURCE_ID
+      FROM YOUTUBE_COMMENT yc
+      JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
+      WHERE yv.KEYWORD_ID = #{keywordId}
+        AND yc.EMOTIONS IS NOT NULL
+        AND yc.EMOTIONS != '[]'
+        AND yc.EMOTIONS != '["없음"]'
+        AND yc.EMOTIONS != '["분석실패"]'
+        AND yc.EMOTIONS != '["분석불가"]'
+        AND MOD(ORA_HASH(yc.COMMENT_ID), 10) = 0
+        AND ROWNUM <= 3000
+    ]]>
+        <if test="period == '최신순(3개월)' and lastMentionDate != null">
+        <![CDATA[
+        AND yc.PUBLISHED_AT >= ADD_MONTHS(#{lastMentionDate, jdbcType=DATE}, -3)
+        AND yc.PUBLISHED_AT <= #{lastMentionDate, jdbcType=DATE}
+        ]]>
+        </if>
+    <![CDATA[
+      UNION ALL
+
+      -- Instagram 댓글의 감정 데이터 (해시 버킷 샘플링 적용)
+      SELECT ic.EMOTIONS, TO_CHAR(ic.COMMENT_ID) AS SOURCE_ID
+      FROM INSTAGRAM_COMMENT ic
+      JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
+      WHERE ip.KEYWORD_ID = #{keywordId}
+        AND ic.EMOTIONS IS NOT NULL
+        AND ic.EMOTIONS != '[]'
+        AND ic.EMOTIONS != '["없음"]'
+        AND ic.EMOTIONS != '["분석실패"]'
+        AND ic.EMOTIONS != '["분석불가"]'
+        AND MOD(ORA_HASH(ic.COMMENT_ID), 10) = 0
+        AND ROWNUM <= 3000
+    ]]>
+        <if test="period == '최신순(3개월)' and lastMentionDate != null">
+        <![CDATA[
+        AND ic.COMMENT_DATE >= ADD_MONTHS(#{lastMentionDate, jdbcType=DATE}, -3)
+        AND ic.COMMENT_DATE <= #{lastMentionDate, jdbcType=DATE}
+        ]]>
+        </if>
+    <![CDATA[
+    )
+    WHERE EMOTIONS IS NOT NULL
+    ]]>
+  </select>
+
+
+  <!-- =========================================
+       2) 감정별 상세 카운트 (라벨별, pos/neg/neutral 포함)
+       - 파라미터: Long keywordId, Boolean onlyMain (선택)
+     ========================================= -->
+  <select id="getKeywordDetailedSentiments" parameterType="map" resultType="map">
+    <![CDATA[
+    SELECT
+      sr.LABEL AS emotion_label,
+      CASE
+        WHEN sr.LABEL IN ('환영/호의','감동/감탄','고마움','존경','기대감','뿌듯함',
+                          '편안/쾌적','신기함/관심','아껴주는','즐거움/신남','깨달음',
+                          '흐뭇함(귀여움/예쁨)','놀람','행복','기쁨','안심/신뢰') THEN 'positive'
+        WHEN sr.LABEL IN ('불평/불만','지긋지긋','슬픔','화남/분노','우쭐댐/무시함',
+                          '안타까움/실망','비장함','의심/불신','부끄러움','공포/무서움',
+                          '절망','한심함','역겨움/징그러움','짜증','어이없음','패배/자기혐오',
+                          '귀찮음','힘듦/지침','죄책감','증오/혐오','당황/난처','경악',
+                          '부담/안_내킴','서러움','재미없음','불쌍함/연민','불안/걱정') THEN 'negative'
+        ELSE 'neutral'
+      END AS sentiment_type,
+      COUNT(*) AS count
+    FROM SENTIMENT_RESULT sr
+    WHERE (
+      -- Instagram 댓글 (COMMENT_ID가 NUMBER이므로 직접 비교)
+      EXISTS (
+        SELECT 1 FROM INSTAGRAM_COMMENT ic
+        JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
+        WHERE ip.KEYWORD_ID = #{keywordId}
+        AND ic.COMMENT_ID = sr.SOURCE_ID
+      )
+      OR
+      -- YouTube 댓글 (COMMENT_ID가 VARCHAR2이므로 NUMBER로 변환해서 비교)
+      EXISTS (
+        SELECT 1 FROM YOUTUBE_COMMENT yc
+        JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
+        WHERE yv.KEYWORD_ID = #{keywordId}
+        AND TO_NUMBER(yc.COMMENT_ID) = sr.SOURCE_ID
+      )
+    )
+    AND sr.SOURCE_TYPE = 'comments'
+    AND sr.LABEL IN ('환영/호의','감동/감탄','고마움','존경','기대감','뿌듯함',
+                     '편안/쾌적','신기함/관심','아껴주는','즐거움/신남','깨달음',
+                     '흐뭇함(귀여움/예쁨)','놀람','행복','기쁨','안심/신뢰',
+                     '불평/불만','지긋지긋','슬픔','화남/분노','우쭐댐/무시함',
+                     '안타까움/실망','비장함','의심/불신','부끄러움','공포/무서움',
+                     '절망','한심함','역겨움/징그러움','짜증','어이없음','패배/자기혐오',
+                     '귀찮음','힘듦/지침','죄책감','증오/혐오','당황/난처','경악',
+                     '부담/안_내킴','서러움','재미없음','불쌍함/연민','불안/걱정')
+    GROUP BY sr.LABEL,
+      CASE
+        WHEN sr.LABEL IN ('환영/호의','감동/감탄','고마움','존경','기대감','뿌듯함',
+                          '편안/쾌적','신기함/관심','아껴주는','즐거움/신남','깨달음',
+                          '흐뭇함(귀여움/예쁨)','놀람','행복','기쁨','안심/신뢰') THEN 'positive'
+        WHEN sr.LABEL IN ('불평/불만','지긋지긋','슬픔','화남/분노','우쭐댐/무시함',
+                          '안타까움/실망','비장함','의심/불신','부끄러움','공포/무서움',
+                          '절망','한심함','역겨움/징그러움','짜증','어이없음','패배/자기혐오',
+                          '귀찮음','힘듦/지침','죄책감','증오/혐오','당황/난처','경악',
+                          '부담/안_내킴','서러움','재미없음','불쌍함/연민','불안/걱정') THEN 'negative'
+        ELSE 'neutral'
+      END
+    HAVING COUNT(*) > 0
+    ORDER BY sentiment_type DESC, count DESC
+    ]]>
+  </select>
+
+  <!-- =========================================
+       3) 랜덤 댓글 3개 (길이 >= 15)
+       - 파라미터: Long keywordId, Integer limit (기본 3)
+       - 11g: 바깥 SELECT에서 ROWNUM 컷
+     ========================================= -->
+  <select id="getRandomCommentsByKeyword" parameterType="map" resultType="map">
+    <![CDATA[
+    SELECT * FROM (
+      SELECT t.*
+      FROM (
+        -- YouTube
+        SELECT
+          DBMS_LOB.SUBSTR(c.COMMENT_TEXT, 4000, 1) AS comment_text,
+          c.COMMENT_ID AS comment_id,
+          'youtube' AS source_type
+        FROM YOUTUBE_VIDEO v
+        JOIN YOUTUBE_COMMENT c ON c.VIDEO_ID = v.VIDEO_ID
+        WHERE v.KEYWORD_ID = #{keywordId}
+          AND DBMS_LOB.GETLENGTH(c.COMMENT_TEXT) >= 15
+
+        UNION ALL
+
+        -- Instagram
+        SELECT
+          DBMS_LOB.SUBSTR(c.COMMENT_TEXT, 4000, 1) AS comment_text,
+          TO_CHAR(c.COMMENT_ID) AS comment_id,
+          'instagram' AS source_type
+        FROM INSTAGRAM_POST p
+        JOIN INSTAGRAM_COMMENT c ON c.POST_ID = p.POST_ID
+        WHERE p.KEYWORD_ID = #{keywordId}
+          AND DBMS_LOB.GETLENGTH(c.COMMENT_TEXT) >= 15
+      ) t
+      ORDER BY DBMS_RANDOM.VALUE
+    )
+    WHERE ROWNUM <= NVL(#{limit}, 3)
+    ]]>
+  </select>
+
+  <!-- 키워드 관련 데이터 존재 여부 확인 -->
+  <select id="checkKeywordData" resultType="map">
+    <![CDATA[
+    SELECT
+      (SELECT COUNT(*) FROM YOUTUBE_VIDEO WHERE KEYWORD_ID = #{keywordId}) AS youtube_videos,
+      (SELECT COUNT(*) FROM INSTAGRAM_POST WHERE KEYWORD_ID = #{keywordId}) AS instagram_posts,
+      (SELECT COUNT(*) FROM YOUTUBE_COMMENT yc
+       JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
+       WHERE yv.KEYWORD_ID = #{keywordId}) AS youtube_comments,
+      (SELECT COUNT(*) FROM INSTAGRAM_COMMENT ic
+       JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
+       WHERE ip.KEYWORD_ID = #{keywordId}) AS instagram_comments,
+      (SELECT COUNT(*) FROM SENTIMENT_RESULT WHERE SOURCE_TYPE = 'comments') AS total_sentiment_results
+    FROM DUAL
+    ]]>
+  </select>
+
+  <!-- 댓글 감정 분석 결과 매핑 -->
+  <resultMap id="commentEmotionResultMap" type="map">
+    <result column="COMMENT_TEXT" property="comment_text"/>
+    <result column="EMOTION" property="emotion"/>
+    <result column="PLATFORM" property="platform"/>
+  </resultMap>
+
+  <!-- 특정 감정에 해당하는 댓글 조회 (인덱스 최적화 + 해시 버킷 샘플링) -->
+  <select id="getCommentsByEmotion" parameterType="map" resultMap="commentEmotionResultMap">
+    <![CDATA[
+    SELECT
+      COMMENT_TEXT,
+      '${emotion}' as EMOTION,
+      PLATFORM
+    FROM (
+      -- YouTube 댓글 2개 (해시 버킷 샘플링)
+      SELECT * FROM (
+        SELECT
+          DBMS_LOB.SUBSTR(yc.COMMENT_TEXT, 100, 1) as COMMENT_TEXT,
+          'YouTube' as PLATFORM
+        FROM YOUTUBE_COMMENT yc
+        JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
+        WHERE yv.KEYWORD_ID = #{keywordId}
+          AND yc.EMOTIONS IS NOT NULL
+          AND INSTR(yc.EMOTIONS, '${emotion}') > 0
+          AND DBMS_LOB.GETLENGTH(yc.COMMENT_TEXT) >= 15
+          AND MOD(ORA_HASH(yc.COMMENT_ID), 3) = 0
+      ) WHERE ROWNUM <= 2
+
+      UNION ALL
+
+      -- Instagram 댓글 2개 (해시 버킷 샘플링)
+      SELECT * FROM (
+        SELECT
+          DBMS_LOB.SUBSTR(ic.COMMENT_TEXT, 100, 1) as COMMENT_TEXT,
+          'Instagram' as PLATFORM
+        FROM INSTAGRAM_COMMENT ic
+        JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
+        WHERE ip.KEYWORD_ID = #{keywordId}
+          AND ic.EMOTIONS IS NOT NULL
+          AND INSTR(ic.EMOTIONS, '${emotion}') > 0
+          AND DBMS_LOB.GETLENGTH(ic.COMMENT_TEXT) >= 15
+          AND MOD(ORA_HASH(ic.COMMENT_ID), 3) = 0
+      ) WHERE ROWNUM <= 2
+    )
+    ]]>
+  </select>
+
+  <!-- 특정 감정과 플랫폼의 댓글 조회 -->
+  <select id="getCommentsByEmotionAndPlatform" parameterType="map" resultMap="commentEmotionResultMap">
+    <choose>
+      <!-- Instagram 플랫폼 -->
+      <when test="platform == 'Instagram'">
+        <![CDATA[
+        SELECT * FROM (
+          SELECT
+            DBMS_LOB.SUBSTR(ic.COMMENT_TEXT, 100, 1) as COMMENT_TEXT,
+            '${emotion}' as EMOTION,
+            'Instagram' as PLATFORM
+          FROM INSTAGRAM_COMMENT ic
+          JOIN INSTAGRAM_POST ip ON ic.POST_ID = ip.POST_ID
+          WHERE ip.KEYWORD_ID = #{keywordId}
+            AND ic.EMOTIONS IS NOT NULL
+            AND INSTR(ic.EMOTIONS, '${emotion}') > 0
+            AND DBMS_LOB.GETLENGTH(ic.COMMENT_TEXT) >= 15
+          ORDER BY DBMS_RANDOM.VALUE
+        ) WHERE ROWNUM <= #{limit}
+        ]]>
+      </when>
+      <!-- YouTube 플랫폼 -->
+      <when test="platform == 'YouTube'">
+        <![CDATA[
+        SELECT * FROM (
+          SELECT
+            DBMS_LOB.SUBSTR(yc.COMMENT_TEXT, 100, 1) as COMMENT_TEXT,
+            '${emotion}' as EMOTION,
+            'YouTube' as PLATFORM
+          FROM YOUTUBE_COMMENT yc
+          JOIN YOUTUBE_VIDEO yv ON yc.VIDEO_ID = yv.VIDEO_ID
+          WHERE yv.KEYWORD_ID = #{keywordId}
+            AND yc.EMOTIONS IS NOT NULL
+            AND INSTR(yc.EMOTIONS, '${emotion}') > 0
+            AND DBMS_LOB.GETLENGTH(yc.COMMENT_TEXT) >= 15
+          ORDER BY DBMS_RANDOM.VALUE
+        ) WHERE ROWNUM <= #{limit}
+        ]]>
+      </when>
+    </choose>
+  </select>
+
+</mapper>

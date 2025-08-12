@@ -1,15 +1,6 @@
 import React from "react";
 import "../assets/css/common/DetailBubbleChart.css";
 
-/* 버블 테두리에 쓸 PNG/SVG 들 */
-import green   from "../assets/img/same_/green.png";
-import orange  from "../assets/img/same_/orange.png";
-import sky     from "../assets/img/same_/sky.png";
-import purple  from "../assets/img/same_/pupple.png";
-import pink    from "../assets/img/same_/pink.png";
-
-const imageMap = { green, orange, sky, purple, pink };
-
 export default function DetailBubbleChart({ data }) {
   return (
     <div
@@ -31,9 +22,14 @@ export default function DetailBubbleChart({ data }) {
         >
           <div
             className="bubble__circle"
-            style={{ backgroundColor: b.color, width: b.size - 10, height: b.size - 10 }}
+            style={{
+              backgroundColor: b.color,
+              width: b.size,
+              height: b.size,
+              border: `4px solid ${b.color}`,
+              boxShadow: `0 0 0 2px rgba(255,255,255,0.8), 0 4px 12px rgba(0,0,0,0.15)`
+            }}
           />
-          <img src={imageMap[b.img]} alt="" className="bubble__stroke" />
           <span className="bubble__pct">{b.pct}</span>
           <span className="bubble__label">{b.label}</span>
         </div>

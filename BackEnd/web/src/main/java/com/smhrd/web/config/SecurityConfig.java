@@ -23,6 +23,8 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             // === Swagger 관련 경로 추가 ===
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+            // === API 경로 허용 ===
+            .requestMatchers("/api/**").permitAll()
             // === 기존 public 경로 ===
             .requestMatchers("/zal/**").permitAll()
             // === 기타 경로 처리 ===
@@ -36,17 +38,18 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
+        // 프론트엔드 도메인 허용 (개발 환경)
         config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true); // 인증정보 포함 가능
+        config.setMaxAge(3600L); // preflight 캐시 시간
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/api/**", config); // API 경로 명시적 등록
 
+        System.out.println("✔ SecurityConfig CORS configured");
         return source;
     }
-
-
-    
 }

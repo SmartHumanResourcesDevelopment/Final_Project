@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => ({
 
       // ★ 이걸 proxy 객체 안으로 옮겨야 합니다
       '/uploads': {
-        target: 'http://localhost:8095',
+        target: 'http://localhost:8095/zal',
         changeOrigin: true,
       },
     },

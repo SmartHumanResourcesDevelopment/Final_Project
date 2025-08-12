@@ -7,15 +7,16 @@
 
     <!-- 아이디 중복 -->
     <select id="existsByUserId" resultType="int">
-        SELECT COUNT(*) FROM user_tbl WHERE user_id = #{id}
+        SELECT COUNT(*) FROM USER_TBL WHERE user_id = #{id}
     </select>
 
     <!-- 회원가입 -->
     <insert id="insertUser">
-        INSERT INTO user_tbl
+        INSERT INTO USER_TBL
         (user_id, username, password, phone_number, nickname,  created_at)
         VALUES
-        (#{user_id}, #{username}, #{password}, #{phone_number}, #{nickname} ,SYSDATE)
+        (#{user_id}, #{username}, #{password}, #{phone_number},
+         #{nickname} ,SYSDATE)
     </insert>
 
     <resultMap id="signUpResultMap" type="com.smhrd.web.DTO.SignUpRequest">
@@ -30,7 +31,7 @@
 
     <!-- 로그인 -->
     <select id="findByUserId" resultMap="signUpResultMap">
-        SELECT * FROM user_tbl WHERE user_id = #{user_input_id}
+        SELECT * FROM USER_TBL WHERE user_id = #{user_input_id}
     </select>
 
 
@@ -45,14 +46,14 @@
 
     <!-- 로그인 정보 가져오기 -->
     <select id="loginUserInfo" resultMap="signUpResultMap2">
-        SELECT * FROM user_tbl WHERE user_id = #{user_id}
+        SELECT * FROM USER_TBL WHERE user_id = #{user_id}
     </select>
 
 
 
     <!-- 유저 정보  수정 -->
     <update id="UserInfoUpdate" parameterType="com.smhrd.web.DTO.UserInfoUpdate_DTO">
-    UPDATE user_tbl
+    UPDATE USER_TBL
     SET
         password = #{password},
         username = #{username},
@@ -80,5 +81,51 @@
     <delete id="userInfoDelete" parameterType="string">
        DELETE FROM USER_TBL WHERE  USER_ID = #{userId}
     </delete>
+
+    <!-- 네이버 ID로 회원 여부 확인 -->
+    <select id="existsByUserNaver" resultType="int">
+    SELECT COUNT(*) FROM USER_TBL WHERE naverlogincheck = #{naverlogincheck,jdbcType=VARCHAR}
+    </select>
+
+    <resultMap id="signUpResultMap3" type="com.smhrd.web.DTO.NaverDTO">
+        <result property="user_id" column="USER_ID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="phone_number" column="PHONE_NUMBER"/>
+        <result property="nickname" column="NICKNAME"/>
+        <result property="userProfile" column="USERPROFILE"/>
+        <result property="role" column="ROLE"/>
+        <result property="naverlogincheck" column="NAVERLOGINCHECK"/>
+    </resultMap>
+
+    <!-- 네이버 ID로 회원 정보 조회-->
+    <select id="findByNaverId" parameterType="string" resultType="com.smhrd.web.DTO.NaverDTO" resultMap="signUpResultMap3">
+        SELECT *
+        FROM USER_TBL
+        WHERE naverlogincheck = #{naverlogincheck}
+    </select>
+
+    <!-- 네이버 사용자 신규 가입 -->
+    <insert id="insertNaverUser" parameterType="com.smhrd.web.DTO.NaverDTO">
+    INSERT INTO USER_TBL (
+        user_id, username, password, phone_number, nickname, naverlogincheck
+    ) VALUES (
+        #{user_id}, #{username}, #{password}, #{phone_number}, #{nickname}, #{naverlogincheck}
+    )
+    </insert>
+
+     <!-- 최근 일주일 간 크롤링 키워드 수 조회 -->
+    <select id="getCrawlingCountByDateRange" resultType="map">
+        SELECT
+            TO_CHAR(created_at, 'YY-MM-DD') AS date,
+            COUNT(*) AS count
+        FROM
+            KEYWORD_DAILY_STATS
+        WHERE
+            created_at BETWEEN TO_DATE(#{from}, 'YY-MM-DD') AND TO_DATE(#{to}, 'YY-MM-DD') + 1
+        GROUP BY
+            TO_CHAR(created_at, 'YY-MM-DD')
+        ORDER BY
+            date
+    </select>
 
 </mapper>

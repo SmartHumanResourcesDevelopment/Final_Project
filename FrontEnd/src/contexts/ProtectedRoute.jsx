@@ -12,7 +12,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // 기화 끝났는데 user가 없으면 로그인 페이지로
-  if (!user) {
+  if (!user.isLogin) {
     return <Navigate to="/" replace />;
   }
 
