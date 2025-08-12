@@ -5,6 +5,7 @@ import notifIcon from "../assets/img/common/notif-icon.png";
 import { useUser } from "../contexts/UserContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { buildProfileUrl } from "../util/buildProfileUrl";
+import { mainApiService } from "../api/mainApi";
 
 
 
@@ -16,6 +17,7 @@ export const NavigationSection = () => {
 
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [isLoadingRandom, setIsLoadingRandom] = useState(false);
 
 
   useEffect(() => {
@@ -43,6 +45,57 @@ export const NavigationSection = () => {
   };
   const currentMenu = pathToMenu[location.pathname] || "메인페이지";
 
+  // 랜덤 키워드로 심층분석 페이지 이동
+  const handleRandomAnalysis = async () => {
+    try {
+      setIsLoadingRandom(true);
+      console.log("🎲 랜덤 키워드로 심층분석 페이지 이동 시작");
+
+      const randomKeywordData = await mainApiService.getRandomKeyword();
+
+      if (randomKeywordData && randomKeywordData.keyword) {
+        console.log("✅ 랜덤 키워드 조회 성공:", randomKeywordData.keyword);
+
+        // 랜덤 키워드도 최근 검색 키워드에 추가
+        if (window.addRecentKeyword) {
+          window.addRecentKeyword(randomKeywordData.keyword);
+          console.log("💾 랜덤 키워드를 최근 검색에 추가:", randomKeywordData.keyword);
+        }
+
+        // Sub 페이지로 이동하면서 키워드 데이터 전달
+        navigate('/sub', {
+          state: {
+            keywordData: {
+              keyword: randomKeywordData.keyword,
+              ranking: randomKeywordData.ranking ?
+                       (typeof randomKeywordData.ranking === 'number' ?
+                        `${randomKeywordData.ranking}위` : randomKeywordData.ranking) :
+                       "순위 정보 없음",
+              emotionLabels: randomKeywordData.emotionLabels || ["감정", "분석", "정보", "없음", "~"],
+              description: randomKeywordData.description || "랜덤으로 선택된 키워드입니다.",
+              trendExplanation: randomKeywordData.trendExplanation || "트렌드 분석 정보를 로딩 중입니다.",
+              similarityInfo: randomKeywordData.similarityInfo || {},
+              similarKeywords: randomKeywordData.similarKeywords || [],
+              sentimentAnalysis: randomKeywordData.sentimentAnalysis,
+              positiveComments: randomKeywordData.positiveComments || [],
+              negativeComments: randomKeywordData.negativeComments || []
+            }
+          }
+        });
+      } else {
+        console.error("❌ 랜덤 키워드 데이터가 없습니다.");
+        // 데이터가 없어도 기본 Sub 페이지로 이동
+        navigate("/sub");
+      }
+    } catch (error) {
+      console.error("❌ 랜덤 키워드 조회 실패:", error);
+      // 에러 시에도 기본 Sub 페이지로 이동
+      navigate("/sub");
+    } finally {
+      setIsLoadingRandom(false);
+    }
+  };
+
   return (
     
     <nav
@@ -66,16 +119,17 @@ export const NavigationSection = () => {
               <button
                 onClick={() => {
                   if (label === "메인페이지") navigate("/main");
-                  if (label === "심층분석페이지") navigate("/sub");
+                  if (label === "심층분석페이지") handleRandomAnalysis();
                   if (label === "서비스소개") navigate("/servicepage");
                   if (label === "마이페이지") navigate("/mypage");
                 }}
                 aria-current={label === currentMenu ? "page" : undefined}
                 className={`text-base leading-[30px] hover:opacity-80 transition ${
                   label === currentMenu ? "font-black" : "font-normal"
-                }`}
+                } ${label === "심층분석페이지" && isLoadingRandom ? "opacity-50" : ""}`}
+                disabled={label === "심층분석페이지" && isLoadingRandom}
               >
-                {label}
+                {label === "심층분석페이지" && isLoadingRandom ? "🎲 키워드 선택 중..." : label}
               </button>
             </li>
           ))}

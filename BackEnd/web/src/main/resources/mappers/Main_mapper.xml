@@ -199,4 +199,32 @@
         ]]>
     </select>
 
+    <!-- 전체 키워드 랭킹 조회 (랜덤 키워드 선택용) -->
+    <select id="getOverallRankingAll" resultType="map">
+        <![CDATA[
+        SELECT
+            seq_no AS rank,
+            keyword_name AS name,
+            total_count AS count,
+            '↔' AS trend,
+            CASE
+                WHEN seq_no = 1 THEN '#e60000'
+                WHEN seq_no <= 3 THEN '#ff6600'
+                WHEN seq_no <= 7 THEN '#000000'
+                ELSE '#0044ff'
+            END AS color
+        FROM (
+            SELECT
+                ROW_NUMBER() OVER (ORDER BY SUM(NVL(daily_count, 0)) DESC) AS seq_no,
+                keyword_name,
+                SUM(NVL(daily_count, 0)) AS total_count
+            FROM KEYWORD_DAILY_STATS
+            WHERE keyword_name IS NOT NULL
+              AND daily_count > 0
+            GROUP BY keyword_name
+        )
+        ORDER BY seq_no
+        ]]>
+    </select>
+
 </mapper>

@@ -83,7 +83,7 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
       onClose?.();
     }
   };
-
+// console.log("🔍 keywordData 내용:", keywordData);
   return (
     <div className="detail-root" onClick={handleBackgroundClick}>
       {/* 상단바 */}

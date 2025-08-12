@@ -1036,6 +1036,74 @@ public class MainService {
         System.out.println("🗑️ 급상승 키워드 캐시 무효화 완료");
     }
 
+   
+
+    /**
+     * 랜덤 키워드 조회 (심층분석 페이지용)
+     * @return 랜덤 키워드 상세 정보
+     */
+    public Map<String, Object> getRandomKeyword() {
+        try {
+            System.out.println("🎲 랜덤 키워드 조회 시작");
+
+            // 전체 랭킹에서 상위 50개 중 랜덤 선택
+            List<Map<String, Object>> allRankings = mainMapper.getOverallRankingAll();
+
+            if (allRankings.isEmpty()) {
+                System.out.println("⚠️ 랭킹 데이터가 없습니다.");
+                return Map.of(
+                    "keyword", "먹방",
+                    "ranking", 1,
+                    "description", "기본 키워드입니다.",
+                    "emotionLabels", Arrays.asList("즐거움", "맛있음", "행복", "만족", "기대감")
+                );
+            }
+
+            // 상위 50개 중 랜덤 선택 (전체 개수가 50개 미만이면 전체에서 선택)
+            int maxIndex = Math.min(50, allRankings.size());
+            Random random = new Random();
+            int randomIndex = random.nextInt(maxIndex);
+
+            Map<String, Object> selectedKeyword = allRankings.get(randomIndex);
+            String keywordName = (String) selectedKeyword.get("name");
+            Integer ranking = ((Number) selectedKeyword.get("rank")).intValue();
+
+            System.out.println("🎯 선택된 랜덤 키워드: " + keywordName + " (" + ranking + "위)");
+
+            // 기본 응답 구성
+            Map<String, Object> response = new HashMap<>();
+            response.put("keyword", keywordName);
+            response.put("ranking", ranking);
+            response.put("description", keywordName + "에 대한 트렌드 분석을 확인해보세요.");
+            response.put("emotionLabels", Arrays.asList("감정", "분석", "로딩", "중", "~"));
+            response.put("trendExplanation", keywordName + "의 상세한 트렌드 분석이 곧 로딩됩니다.");
+            response.put("similarityInfo", new HashMap<>());
+            response.put("similarKeywords", new ArrayList<>());
+            response.put("positiveComments", new ArrayList<>());
+            response.put("negativeComments", new ArrayList<>());
+
+            System.out.println("✅ 랜덤 키워드 조회 완료: " + keywordName);
+            return response;
+
+        } catch (Exception e) {
+            System.err.println("❌ 랜덤 키워드 조회 실패: " + e.getMessage());
+            e.printStackTrace();
+
+            // 에러 시 기본 키워드 반환
+            return Map.of(
+                "keyword", "먹방",
+                "ranking", 1,
+                "description", "기본 키워드입니다.",
+                "emotionLabels", Arrays.asList("즐거움", "맛있음", "행복", "만족", "기대감"),
+                "trendExplanation", "먹방 트렌드에 대한 분석입니다.",
+                "similarityInfo", new HashMap<>(),
+                "similarKeywords", new ArrayList<>(),
+                "positiveComments", new ArrayList<>(),
+                "negativeComments", new ArrayList<>()
+            );
+        }
+    }
+
     /**
      * 키워드 설명 생성 헬퍼 메서드
      */

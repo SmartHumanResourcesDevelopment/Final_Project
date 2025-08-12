@@ -21,7 +21,7 @@ import {
 import "../assets/css/common/keyword_Kote.css";
 
 
-// const PERIODS = ["1일", "1주", "1달", "1년"];  // 예시 탭
+const SENTIMENT_PERIODS = ["전체", "최신순(3개월)"];  // 감성분석 기간 탭
 export default function KeywordHighlightSection({
   keyword = "말차",
   sentimentAnalysis,
@@ -30,7 +30,8 @@ export default function KeywordHighlightSection({
   positiveComments = [],
   negativeComments = []
 }) {
-  const [active, setActive] = useState("1주");
+  const [activePeriod, setActivePeriod] = useState("전체"); // 기간 필터 상태
+  const [periodSentimentData, setPeriodSentimentData] = useState(null); // 기간별 감성분석 데이터
 
   // 디버깅 로그
   console.log("KeywordHighlightSection props:", { keyword, sentimentAnalysis, positiveComments, negativeComments });
@@ -42,19 +43,53 @@ export default function KeywordHighlightSection({
     console.log("   부정 댓글:", sentimentAnalysis.NEGATIVE_COMMENTS);
   }
 
+  // 기간별 감성분석 데이터 로드 함수
+  const loadSentimentDataByPeriod = async (period) => {
+    if (period === "전체") {
+      setPeriodSentimentData(null); // 전체 기간은 기본 데이터 사용
+      return;
+    }
+
+    try {
+      console.log("🔍 기간별 감성분석 데이터 로드:", keyword, period);
+      const response = await fetch(`http://localhost:8095/zal/api/keyword/sentiment?keyword=${encodeURIComponent(keyword)}&period=${encodeURIComponent(period)}`);
+
+      if (!response.ok) {
+        throw new Error('기간별 감성분석 조회 실패');
+      }
+
+      const data = await response.json();
+      console.log("✅ 기간별 감성분석 데이터:", data);
+      setPeriodSentimentData(data);
+
+    } catch (error) {
+      console.error("❌ 기간별 감성분석 로드 실패:", error);
+      setPeriodSentimentData(null);
+    }
+  };
+
+  // 기간 변경 핸들러
+  const handlePeriodChange = (period) => {
+    setActivePeriod(period);
+    loadSentimentDataByPeriod(period);
+  };
+
+  // 기간별로 필터링된 감성분석 데이터
+  const filteredSentimentAnalysis = periodSentimentData || sentimentAnalysis;
+
   // 감성분석 데이터 확인 - TOP 3만 사용
-  const hasSentimentData = sentimentAnalysis &&
-    (sentimentAnalysis.POSITIVE_COUNT > 0 || sentimentAnalysis.NEGATIVE_COUNT > 0);
+  const hasSentimentData = filteredSentimentAnalysis &&
+    (filteredSentimentAnalysis.POSITIVE_COUNT > 0 || filteredSentimentAnalysis.NEGATIVE_COUNT > 0);
 
   // TOP 3 감정 데이터 추출
-  const topPositiveEmotions = sentimentAnalysis?.TOP_POSITIVE || [];
-  const topNegativeEmotions = sentimentAnalysis?.TOP_NEGATIVE || [];
+  const topPositiveEmotions = filteredSentimentAnalysis?.TOP_POSITIVE || [];
+  const topNegativeEmotions = filteredSentimentAnalysis?.TOP_NEGATIVE || [];
 
   // 그래프에 표시할 데이터 결정
   const hasPositiveData = topPositiveEmotions.length > 0;
   const hasNegativeData = topNegativeEmotions.length > 0;
 
-  console.log("TOP 3 감정 데이터:", { topPositiveEmotions, topNegativeEmotions });
+  console.log("기간별 필터링된 감정 데이터:", { activePeriod, topPositiveEmotions, topNegativeEmotions });
 
   // 댓글 기능은 추후 추가 예정
   return (
@@ -62,13 +97,24 @@ export default function KeywordHighlightSection({
       <div className="kote__inner">
         {/* ---------- 헤더 ---------- */}
         <header className="kote__header">
-          <h2 className="kote__title">KOTE 감성분석</h2>
+          <h2 className="kote__title">
+            <span className="keywordHighlight">{keyword}</span> KOTE 감성분석
+          </h2>
           <p className="kote__subtitle">
-            내가 주목한 키워드가 어떤 감성을 가지고 있는지 알아보아요
+            EAT PICK이 분석해드려요
           </p>
 
-          <nav className="kote__tabs" aria-label="기간 선택">
-
+          <nav className="kote__tabs" aria-label="감성분석 기간 선택">
+            {SENTIMENT_PERIODS.map((period) => (
+              <button
+                key={period}
+                onClick={() => handlePeriodChange(period)}
+                className={activePeriod === period ? "is-active" : ""}
+                aria-pressed={activePeriod === period}
+              >
+                {period}
+              </button>
+            ))}
           </nav>
         </header>
 
@@ -94,18 +140,20 @@ export default function KeywordHighlightSection({
               <div className="kote__charts">
                 {hasPositiveData && (
                   <DetailInsightsKOTE_positivity_Graph
-                    positiveCount={sentimentAnalysis.POSITIVE_COUNT}
-                    totalCount={sentimentAnalysis.TOTAL_COUNT}
+                    positiveCount={filteredSentimentAnalysis.POSITIVE_COUNT}
+                    totalCount={filteredSentimentAnalysis.TOTAL_COUNT}
                     topEmotions={topPositiveEmotions}
-                    comments={sentimentAnalysis.POSITIVE_COMMENTS || []}
+                    comments={filteredSentimentAnalysis.POSITIVE_COMMENTS || []}
+                    period={activePeriod}
                   />
                 )}
                 {hasNegativeData && (
                   <DetailInsightsKOTE_negative_Graph
-                    negativeCount={sentimentAnalysis.NEGATIVE_COUNT}
-                    totalCount={sentimentAnalysis.TOTAL_COUNT}
+                    negativeCount={filteredSentimentAnalysis.NEGATIVE_COUNT}
+                    totalCount={filteredSentimentAnalysis.TOTAL_COUNT}
                     topEmotions={topNegativeEmotions}
-                    comments={sentimentAnalysis.NEGATIVE_COMMENTS || []}
+                    comments={filteredSentimentAnalysis.NEGATIVE_COMMENTS || []}
+                    period={activePeriod}
                   />
                 )}
                 {!hasPositiveData && !hasNegativeData && (
@@ -118,7 +166,7 @@ export default function KeywordHighlightSection({
               {/* 댓글은 각 그래프 컴포넌트 내부에서 표시되므로 여기서는 제거 */}
 
               <p className="kote__footnote">
-                {sentimentAnalysis.TOTAL_COUNT}개 댓글 분석 기준 상위 감정
+                {filteredSentimentAnalysis.TOTAL_COUNT}개 댓글 분석 기준 상위 감정 ({activePeriod})
               </p>
             </>
           ) : (

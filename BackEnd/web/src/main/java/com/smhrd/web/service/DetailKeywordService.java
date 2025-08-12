@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.smhrd.web.repository.DetailKeywordMapper;
 import java.util.*;
-import java.util.LinkedHashSet;
 
 @Service
 public class DetailKeywordService {
@@ -23,6 +22,8 @@ public class DetailKeywordService {
             System.out.println("=================================================");
             System.out.println("🔍 키워드 상세 정보 조회 시작: " + keywordName);
             System.out.println("=================================================");
+
+            
 
             // 디버그: 모든 키워드 조회해서 확인
             List<Map<String, Object>> allKeywords = detailKeywordMapper.getAllKeywords();
@@ -159,15 +160,40 @@ public class DetailKeywordService {
             response.put("suggestedKeywords", suggestedKeywords); // 검색 제안용 키워드 목록
             response.put("lastUpdated", new Date());
             
+            // 🔽🔽🔽 여기서 전체 랭킹 값을 추가로 주입
+            try {
+                Map<String, Object> rankInfo = detailKeywordMapper.getKeywordOverallRank(keywordName);
+                System.out.println("🏆 전체 랭킹 조회 시작: " + keywordName);
+                System.out.println("🔍 rankInfo 결과: " + rankInfo);
+
+                if (rankInfo != null && rankInfo.get("ranking") != null) {
+                    int rankingValue = ((Number) rankInfo.get("ranking")).intValue();
+                    response.put("ranking", rankingValue);
+                    System.out.println("✅ 랭킹 설정 완료: " + rankingValue + "위");
+                } else {
+                    response.put("ranking", 999);
+                    System.out.println("⚠️ 랭킹 정보 없음, 기본값 999 설정");
+                }
+
+            } catch (Exception e) {
+                System.out.println("❌ 전체 랭킹 조회 실패: " + e.getMessage());
+                e.printStackTrace();
+                response.put("ranking", 999);
+            }
+
             System.out.println("✅ 키워드 상세 정보 조회 완료: " + keywordName);
+            System.out.println("📤 프론트엔드로 전달되는 ranking 값: " + response.get("ranking"));
             return response;
-            
+
         } catch (Exception e) {
             System.err.println("❌ 키워드 상세 정보 조회 실패: " + e.getMessage());
             e.printStackTrace();
             throw e;
         }
     }
+
+
+    
 
     /**
      * 키워드 자동완성 검색
@@ -312,11 +338,12 @@ public class DetailKeywordService {
     /**
      * 키워드 감성분석 정보 조회 (별도 API)
      * @param keywordName 키워드명
+     * @param period 기간 (전체, 최신순(3개월))
      * @return 감성분석 결과
      */
-    public Map<String, Object> getKeywordSentimentAnalysis(String keywordName) {
+    public Map<String, Object> getKeywordSentimentAnalysis(String keywordName, String period) {
         try {
-            System.out.println("🎯 감성분석 조회 시작 - 키워드: " + keywordName);
+            System.out.println("🎯 감성분석 조회 시작 - 키워드: " + keywordName + ", 기간: " + period);
 
             // 1. 키워드 기본 정보 조회
             Map<String, Object> keywordInfo = detailKeywordMapper.getKeywordByName(keywordName);
@@ -333,10 +360,29 @@ public class DetailKeywordService {
             Map<String, Object> dataCheck = detailKeywordMapper.checkKeywordData(keywordId);
             System.out.println("📊 데이터 현황: " + dataCheck);
 
-            // 3. 감성분석 데이터 조회
+            // 3. 감성분석 데이터 조회 (기간별 필터링)
             Map<String, Object> sentimentParams = new HashMap<>();
             sentimentParams.put("keywordId", keywordId);
             sentimentParams.put("onlyMain", false);
+            sentimentParams.put("period", period);
+
+            // 최신순(3개월) 기간인 경우 날짜 필터 추가
+            if ("최신순(3개월)".equals(period)) {
+                // 키워드의 마지막 언급일 조회
+                Map<String, Object> lastMentionInfo = detailKeywordMapper.getLastMentionDate(keywordId);
+                if (lastMentionInfo != null && lastMentionInfo.get("LAST_DATE") != null) {
+                    Object lastDate = lastMentionInfo.get("LAST_DATE");
+                    // Oracle DATE 타입을 java.sql.Date로 변환
+                    if (lastDate instanceof java.sql.Date) {
+                        sentimentParams.put("lastMentionDate", lastDate);
+                    } else if (lastDate instanceof java.util.Date) {
+                        sentimentParams.put("lastMentionDate", new java.sql.Date(((java.util.Date) lastDate).getTime()));
+                    } else {
+                        sentimentParams.put("lastMentionDate", lastDate);
+                    }
+                    System.out.println("📅 마지막 언급일 기준 3개월 필터 적용: " + lastDate);
+                }
+            }
 
             List<Map<String, Object>> sentimentResults = detailKeywordMapper.getKeywordSentimentAnalysis(sentimentParams);
             System.out.println("📊 감성분석 원본 데이터: " + sentimentResults.size() + "개");
@@ -538,47 +584,69 @@ public class DetailKeywordService {
         List<Map<String, Object>> allComments = new ArrayList<>();
 
         try {
-            // 각 TOP 감정별로 댓글 조회 (감정당 2개씩, 총 4개 목표)
-            int commentsPerEmotion = Math.max(1, 4 / Math.max(1, topEmotions.size()));
-
-            for (Map<String, Object> emotion : topEmotions) {
+            // TOP 3 감정별로 각각 2개씩 댓글 조회 (총 6개 목표)
+            for (int i = 0; i < Math.min(3, topEmotions.size()); i++) {
+                Map<String, Object> emotion = topEmotions.get(i);
                 String emotionName = (String) emotion.get("emotion");
+
                 if (emotionName == null || emotionName.trim().isEmpty()) {
                     continue;
                 }
 
-                // 매퍼 파라미터 설정
-                Map<String, Object> params = new HashMap<>();
-                params.put("keywordId", keywordId);
-                params.put("emotion", emotionName);
-                params.put("limit", commentsPerEmotion);
+                String safeEmotionName = emotionName.replace("'", "''").trim();
+                System.out.println("🔍 " + (i+1) + "등 감정 검색: '" + emotionName + "'");
 
-                // 해당 감정의 댓글 조회
-                List<Map<String, Object>> emotionComments = detailKeywordMapper.getCommentsByEmotion(params);
+                // 플랫폼별 균형 댓글 조회 (인스타 1개, 유튜브 1개)
+                List<Map<String, Object>> emotionComments = getBalancedCommentsByEmotion(keywordId, safeEmotionName);
 
                 if (emotionComments != null && !emotionComments.isEmpty()) {
                     allComments.addAll(emotionComments);
-                    System.out.println("📝 " + emotionName + " 감정 댓글: " + emotionComments.size() + "개");
+                    System.out.println("📝 " + (i+1) + "등 " + emotionName + " 감정 댓글: " + emotionComments.size() + "개");
 
-                    // 실제 댓글 내용 출력
-                    for (int i = 0; i < Math.min(emotionComments.size(), 2); i++) {
-                        Map<String, Object> comment = emotionComments.get(i);
+                    // 댓글 내용 출력
+                    for (Map<String, Object> comment : emotionComments) {
                         System.out.println("   💬 [" + comment.get("platform") + "] " + comment.get("comment_text"));
                     }
-                }
-
-                // 총 4개 이상이면 중단
-                if (allComments.size() >= 4) {
-                    break;
+                } else {
+                    System.out.println("⚠️ " + (i+1) + "등 " + emotionName + " 감정 댓글 없음");
                 }
             }
 
-            // 4개로 제한
-            if (allComments.size() > 4) {
-                allComments = allComments.subList(0, 4);
+            // 댓글이 부족한 경우 상위 감정으로 채우기
+            if (allComments.size() < 6 && !topEmotions.isEmpty()) {
+                System.out.println("🔄 댓글 부족으로 상위 감정으로 채우기 (현재: " + allComments.size() + "개)");
+
+                for (int i = 0; i < topEmotions.size() && allComments.size() < 6; i++) {
+                    Map<String, Object> emotion = topEmotions.get(i);
+                    String emotionName = (String) emotion.get("emotion");
+
+                    if (emotionName == null || emotionName.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    String safeEmotionName = emotionName.replace("'", "''").trim();
+
+                    // 추가 댓글 조회
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("keywordId", keywordId);
+                    params.put("emotion", safeEmotionName);
+                    params.put("limit", 6 - allComments.size());
+
+                    List<Map<String, Object>> additionalComments = detailKeywordMapper.getCommentsByEmotion(params);
+
+                    if (additionalComments != null && !additionalComments.isEmpty()) {
+                        // 중복 제거하면서 추가
+                        for (Map<String, Object> comment : additionalComments) {
+                            if (allComments.size() < 6 && !isDuplicateComment(allComments, comment)) {
+                                allComments.add(comment);
+                            }
+                        }
+                        System.out.println("➕ " + emotionName + " 추가 댓글: " + (allComments.size() - (6 - (6 - allComments.size()))) + "개");
+                    }
+                }
             }
 
-            System.out.println("💬 총 댓글 예시: " + allComments.size() + "개");
+            System.out.println("💬 최종 댓글 수: " + allComments.size() + "개");
 
         } catch (Exception e) {
             System.err.println("❌ 감정별 댓글 조회 실패: " + e.getMessage());
@@ -586,5 +654,77 @@ public class DetailKeywordService {
         }
 
         return allComments;
+    }
+
+    /**
+     * 플랫폼별 균형을 맞춘 댓글 조회 (인스타 1개, 유튜브 1개)
+     */
+    private List<Map<String, Object>> getBalancedCommentsByEmotion(Long keywordId, String emotion) {
+        List<Map<String, Object>> balancedComments = new ArrayList<>();
+
+        try {
+            // 인스타그램 댓글 1개 조회
+            Map<String, Object> instagramParams = new HashMap<>();
+            instagramParams.put("keywordId", keywordId);
+            instagramParams.put("emotion", emotion);
+            instagramParams.put("platform", "Instagram");
+            instagramParams.put("limit", 1);
+
+            List<Map<String, Object>> instagramComments = detailKeywordMapper.getCommentsByEmotionAndPlatform(instagramParams);
+
+            // 유튜브 댓글 1개 조회
+            Map<String, Object> youtubeParams = new HashMap<>();
+            youtubeParams.put("keywordId", keywordId);
+            youtubeParams.put("emotion", emotion);
+            youtubeParams.put("platform", "YouTube");
+            youtubeParams.put("limit", 1);
+
+            List<Map<String, Object>> youtubeComments = detailKeywordMapper.getCommentsByEmotionAndPlatform(youtubeParams);
+
+            // 결과 합치기
+            if (instagramComments != null) balancedComments.addAll(instagramComments);
+            if (youtubeComments != null) balancedComments.addAll(youtubeComments);
+
+            // 한쪽 플랫폼이 부족하면 다른 쪽에서 채우기
+            if (balancedComments.size() < 2) {
+                int needed = 2 - balancedComments.size();
+                Map<String, Object> fallbackParams = new HashMap<>();
+                fallbackParams.put("keywordId", keywordId);
+                fallbackParams.put("emotion", emotion);
+                fallbackParams.put("limit", needed);
+
+                List<Map<String, Object>> fallbackComments = detailKeywordMapper.getCommentsByEmotion(fallbackParams);
+                if (fallbackComments != null) {
+                    // 중복 제거하면서 추가
+                    for (Map<String, Object> comment : fallbackComments) {
+                        if (balancedComments.size() < 2 && !isDuplicateComment(balancedComments, comment)) {
+                            balancedComments.add(comment);
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ 플랫폼별 균형 댓글 조회 실패: " + e.getMessage());
+            // 실패 시 기존 방식으로 폴백
+            Map<String, Object> params = new HashMap<>();
+            params.put("keywordId", keywordId);
+            params.put("emotion", emotion);
+            params.put("limit", 2);
+            return detailKeywordMapper.getCommentsByEmotion(params);
+        }
+
+        return balancedComments;
+    }
+
+    /**
+     * 중복 댓글 체크
+     */
+    private boolean isDuplicateComment(List<Map<String, Object>> existingComments, Map<String, Object> newComment) {
+        String newText = (String) newComment.get("comment_text");
+        if (newText == null) return false;
+
+        return existingComments.stream()
+            .anyMatch(existing -> newText.equals(existing.get("comment_text")));
     }
 }

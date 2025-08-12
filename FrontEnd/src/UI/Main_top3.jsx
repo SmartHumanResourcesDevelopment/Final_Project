@@ -94,6 +94,12 @@ export default function Main_top3() {
 
   // 심층분석 버튼 클릭 핸들러
   const handleAnalysisClick = async (keyword) => {
+    // 🔥 심층분석 클릭도 최근 검색 키워드에 추가
+    if (window.addRecentKeyword) {
+      window.addRecentKeyword(keyword);
+      console.log("💾 심층분석 키워드를 최근 검색에 추가:", keyword);
+    }
+
     try {
       console.log("🔍 심층분석 시작:", keyword);
 

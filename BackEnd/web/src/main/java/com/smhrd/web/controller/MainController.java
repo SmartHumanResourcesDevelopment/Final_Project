@@ -1,6 +1,7 @@
 package com.smhrd.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -239,5 +240,22 @@ public class MainController {
         );
 
         return ResponseEntity.ok(stats);
+    }
+
+    /**
+     * 랜덤 키워드 조회 (심층분석 페이지용)
+     * @return 랜덤 키워드 상세 정보
+     */
+    @GetMapping("/random-keyword")
+    public ResponseEntity<Map<String, Object>> getRandomKeyword() {
+        try {
+            System.out.println("🎲 랜덤 키워드 조회 API 호출");
+            Map<String, Object> randomKeyword = mainService.getRandomKeyword();
+            return ResponseEntity.ok(randomKeyword);
+        } catch (Exception e) {
+            System.err.println("❌ 랜덤 키워드 조회 실패: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "랜덤 키워드 조회에 실패했습니다."));
+        }
     }
 }

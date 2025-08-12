@@ -44,7 +44,8 @@ public class DetaiKeywordController {
 
         try {
             Map<String, Object> response = detailKeywordService.getKeywordDetails(keywordName);
-
+            System.out.println("➡️ response keys: " + response.keySet());
+            System.out.println("➡️ response.ranking: " + response.get("ranking") + " (" + (response.get("ranking")!=null?response.get("ranking").getClass().getName():"null") + ")");
             if (response.get("keywordInfo") == null) {
                 System.out.println("⚠️ 키워드를 찾을 수 없음: " + keywordName);
                 return ResponseEntity.notFound().build();
@@ -63,19 +64,21 @@ public class DetaiKeywordController {
     /**
      * 키워드 감성분석 조회 (별도 API)
      * @param keywordName 키워드명
+     * @param period 기간 (전체, 최신순(3개월))
      * @return 감성분석 결과
      */
     @GetMapping("/sentiment")
     public ResponseEntity<Map<String, Object>> getKeywordSentiment(
-            @RequestParam("keyword") String keywordName) {
+            @RequestParam("keyword") String keywordName,
+            @RequestParam(value = "period", defaultValue = "전체") String period) {
 
         System.out.println("=================================================");
-        System.out.println("🎯 감성분석 API 호출됨 - 키워드: " + keywordName);
-        System.out.println("📍 API URL: http://localhost:8095/zal/api/keyword/sentiment?keyword=" + keywordName);
+        System.out.println("🎯 감성분석 API 호출됨 - 키워드: " + keywordName + ", 기간: " + period);
+        System.out.println("📍 API URL: http://localhost:8095/zal/api/keyword/sentiment?keyword=" + keywordName + "&period=" + period);
         System.out.println("=================================================");
 
         try {
-            Map<String, Object> response = detailKeywordService.getKeywordSentimentAnalysis(keywordName);
+            Map<String, Object> response = detailKeywordService.getKeywordSentimentAnalysis(keywordName, period);
 
             if (response.containsKey("error")) {
                 System.out.println("⚠️ 감성분석 오류: " + response.get("error"));

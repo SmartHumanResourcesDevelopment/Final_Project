@@ -32,6 +32,14 @@
   background: #d6f7ff;
   z-index: -1;
 }
+
+/* 키워드 하이라이트 스타일 */
+.keywordHighlight {background: #d6f7ff;
+  position: relative;
+  background: linear-gradient(180deg, transparent 60%, #fff5b3 60%);
+  padding: 0 4px;
+  font-weight: 800;
+}
 .kote__subtitle {
   flex-basis: 100%;
   font-size: 1rem;
@@ -424,14 +432,26 @@
 
 .emotion-comment__platform {
   display: inline-block;
-  background: #007bff;
   color: white;
   font-size: 10px;
-  padding: 2px 6px;
+  padding: 4px 8px;
   border-radius: 4px;
   margin-bottom: 6px;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* YouTube 플랫폼 스타일 */
+.emotion-comment__platform--youtube {
+  background: #FF0000;
+  color: white;
+}
+
+/* Instagram 플랫폼 스타일 */
+.emotion-comment__platform--instagram {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: white;
 }
 
 .emotion-comment__text {
