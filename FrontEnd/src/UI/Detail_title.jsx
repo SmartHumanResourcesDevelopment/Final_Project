@@ -10,7 +10,7 @@ export default function DetailInsightsSection({ keyword = "말차", trendExplana
       {/* ---------- 헤더 영역 ---------- */}
       <header className="insightHeader">
         <h2 className="insightHeader__title">
-          <span className="keywordHighlight">{keyword}</span><span className="keywordHighlight"> 트렌드 확산 배경</span>
+          <span className="keywordHighlight1">{keyword}</span><span className="keywordHighlight1"> 트렌드 확산 배경</span>
         </h2>
         <p className="insightHeader__sub">EAT PICK이 분석해드려요</p>
 

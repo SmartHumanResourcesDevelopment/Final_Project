@@ -106,8 +106,15 @@ export default function Main_top3() {
       // 키워드 검색 API 호출
       const data = await keywordApiService.searchKeyword(keyword);
 
+      // 전역 상태에 타임스탬프와 함께 저장
+      const updatedData = {
+        ...data,
+        searchTimestamp: Date.now(),
+        searchKeyword: keyword
+      };
+
       // 검색 결과를 전역 상태에 저장
-      setKeywordData(data);
+      setKeywordData(updatedData);
 
       // Sub 페이지로 이동
       navigate("/sub");

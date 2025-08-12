@@ -29,10 +29,10 @@ public class DetailKeywordService {
             List<Map<String, Object>> allKeywords = detailKeywordMapper.getAllKeywords();
             System.out.println("📊 DB에 있는 총 키워드 수: " + allKeywords.size());
 
-            // 젤리가 포함된 키워드들 찾기
+            // 검색 키워드와 관련된 키워드들 찾기
             allKeywords.stream()
-                .filter(k -> k.get("KEYWORD_NAME").toString().contains("젤리"))
-                .forEach(k -> System.out.println("🔍 젤리 관련 키워드: " + k.get("KEYWORD_NAME")));
+                .filter(k -> k.get("KEYWORD_NAME").toString().contains(keywordName))
+                .forEach(k -> System.out.println("🔍 " + keywordName + " 관련 키워드: " + k.get("KEYWORD_NAME")));
 
             // 1. 키워드 기본 정보 조회
             Map<String, Object> keywordInfo = detailKeywordMapper.getKeywordByName(keywordName);
