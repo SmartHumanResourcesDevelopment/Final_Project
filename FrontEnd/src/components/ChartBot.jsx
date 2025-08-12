@@ -45,10 +45,24 @@ export const ChartBot = ({ onClose, keywordData }) => {
 
     // API로부터 받아온 새로운 데이터
     const generatedIdeas = [
-      `'${keywordData.keyword}' 컨셉의 팝업 스토어 열기`,
-      `'${keywordData.keyword}' 관련 인플루언서와 공동구매 진행`,
-      `경쟁사와의 '${keywordData.keyword}' 비교 분석 콘텐츠 발행`,
-      `'${keywordData.keyword}'를 주제로 한 숏폼 챌린지`
+      { 
+        title: `'${keywordData.keyword}' 컨셉의 팝업 스토어`, 
+        content1: "긍정 반응: " + (keywordData?.positiveComments?.join(', ') || "특별한 긍정 반응이 없습니다."), 
+        content2: "부정 반응: " + (keywordData?.negativeComments?.join(', ') || "특별한 부정 반응이 없습니다."),
+        content3: "트렌드 분석: " + (keywordData?.trendExplanation || "데이터가 없습니다.")
+      },
+      { 
+        title: `'${keywordData?.keyword}' 관련 인플루언서와 공동구매`, 
+        content1: "유명 먹방 유튜버와 협업하여 긍정적 이미지를 극대화합니다.", 
+        content2: "라이브 방송을 통한 실시간 소통으로 부정적 우려를 해소합니다.",
+        content3: `이 트렌드는 ${keywordData?.trendExplanation?.substring(0, 30)}... 와 같이 요약될 수 있습니다.`
+      },
+      { 
+        title: `'${keywordData.keyword}' 임시 글 작성 제목`, 
+        content1: "임시 글 작성 부제목", 
+        content2: "임시 글 작성 서술",
+        content3: "임시 글 작성 내용"
+      },
     ];
     
     // 3. 받아온 새 데이터로 state를 업데이트합니다.

@@ -9,9 +9,8 @@ export const Chart_Bot_Collab = ({ onClose, keywordData, collabIdeas }) => {
   console.log("온클로즈 값 : ",onClose)
   console.log("키워드데이터 값 : ",keywordData)
 
-  const handleScrap = async (collabs) => {
+  const handleScrap = async () => {
     console.log("==== [콜라보 API 호출됨] ====");
-    console.log("콜라보 아이템:", collabs);
 
       console.log(localStorage.getItem("jwtToken"));
 
@@ -29,7 +28,7 @@ export const Chart_Bot_Collab = ({ onClose, keywordData, collabIdeas }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(keywordData) // 전체 배열 전송
+          body: JSON.stringify(collabIdeas) // 전체 배열 전송
           });
 
           if (!response.ok) {
@@ -60,13 +59,14 @@ export const Chart_Bot_Collab = ({ onClose, keywordData, collabIdeas }) => {
       </header>
 
       <main className="collab-main">
+  
         {collabIdeas?.map((collab, i) => (
           <section key={i} className="collab-section">
-            <h2 className="collab-section-title">{i + 1}. {collab.title}</h2>
+          <h2 className="collab-section-title">{i + 1}. {collab.title}</h2>
             <ul className="collab-content">
-              <li className="collab-feature">✦ {collab.subtitle}</li>
-              <li className="collab-feature">✦ {collab.description}</li> 
-              <li className="collab-feature">✦ {collab.contrnt}</li> 
+              <li className="collab-feature">✦ {collab.content1}</li>
+              <li className="collab-feature">✦ {collab.content2}</li> 
+              <li className="collab-feature">✦ {collab.content3}</li> 
             </ul>
           </section>
         ))}
@@ -77,7 +77,7 @@ export const Chart_Bot_Collab = ({ onClose, keywordData, collabIdeas }) => {
          {/* 스크랩 버튼 */}
         <button
           className="collab-scrap-btn"
-          onClick={() => handleScrap(collabIdeas)}
+          onClick={handleScrap}
         >
           스크랩하기
         </button>
