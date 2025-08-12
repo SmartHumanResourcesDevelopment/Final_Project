@@ -6,7 +6,7 @@ const BASE_URL = "http://localhost:8095/zal/api/keyword";
 // axios 인스턴스 생성
 const subApi = axios.create({
   baseURL: BASE_URL,
-  timeout: 240000, // 60초 타임아웃으로 증가
+  timeout: 3000000, // 60초 타임아웃으로 증가
   headers: {
     'Content-Type': 'application/json',
   },
@@ -75,6 +75,18 @@ export const keywordApiService = {
       const endTime = Date.now();
       console.log("⏱️ 응답 시간:", `${endTime - startTime}ms`);
       console.log("✅ 키워드 검색 성공:", response.data);
+
+      // API 응답 구조 상세 분석
+      console.log("📊 API 응답 상세 분석:");
+      console.log("  - keywordInfo:", response.data.keywordInfo);
+      console.log("  - mainStats:", response.data.mainStats);
+      console.log("  - keyword:", response.data.keyword);
+      console.log("  - emotionLabels:", response.data.emotionLabels);
+      console.log("  - description:", response.data.description);
+      console.log("  - trendExplanation:", response.data.trendExplanation);
+      console.log("  - ranking:", response.data.ranking);
+      console.log("  - 모든 키:", Object.keys(response.data));
+
       return response.data;
       
     } catch (error) {

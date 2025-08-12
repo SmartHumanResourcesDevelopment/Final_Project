@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.smhrd.web.service.DetailKeywordService;
+import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -131,17 +132,32 @@ public class DetaiKeywordController {
     @GetMapping("/popular")
     public ResponseEntity<Map<String, Object>> getPopularKeywords() {
 
+        System.out.println("=================================================");
         System.out.println("🔍 인기 키워드 API 호출됨");
+        System.out.println("📍 API URL: http://localhost:8095/zal/api/keyword/popular");
+        System.out.println("=================================================");
 
         try {
             Map<String, Object> response = detailKeywordService.getPopularKeywords();
+
             System.out.println("✅ 인기 키워드 조회 성공");
+            System.out.println("📊 응답 데이터 키: " + response.keySet());
+            System.out.println("📊 키워드 개수: " + response.get("count"));
+
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             System.err.println("❌ 인기 키워드 조회 실패: " + e.getMessage());
+            System.err.println("❌ 에러 타입: " + e.getClass().getSimpleName());
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+
+            // 에러 응답 생성
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "인기 키워드 조회 실패");
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("timestamp", new Date());
+
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
 

@@ -19,8 +19,54 @@ export default function DetailKeyword({ keywordData }) {
     description: "‘맛있는 건강’을 추구하는 잘파세대의 새로운 일상",
   };
 
-  // props로 받은 데이터가 있으면 사용, 없으면 기본값 사용
-  const currentKeywordData = keywordData || defaultKeywordData;
+  // API 응답 데이터를 DetailKeyword 컴포넌트 형식으로 변환
+  const transformKeywordData = (apiData) => {
+    if (!apiData) {
+      console.log("⚠️ API 데이터가 없음, 기본값 사용");
+      return defaultKeywordData;
+    }
+
+    // API 응답에서 직접 데이터 사용 (백엔드에서 이미 처리됨)
+    const result = {
+      keyword: apiData.keyword || "키워드 없음",
+      ranking: apiData.ranking || "정보 없음",
+      emotionLabels: (apiData.emotionLabels && Array.isArray(apiData.emotionLabels)) ? apiData.emotionLabels : defaultKeywordData.emotionLabels,
+      description: apiData.description || defaultKeywordData.description,
+      // 원본 데이터도 보존
+      ...apiData
+    };
+
+    console.log("🔄 데이터 변환 결과:", {
+      "입력_keyword": apiData.keyword,
+      "입력_ranking": apiData.ranking,
+      "입력_emotionLabels": apiData.emotionLabels,
+      "입력_description": apiData.description,
+      "출력_keyword": result.keyword,
+      "출력_ranking": result.ranking,
+      "출력_emotionLabels": result.emotionLabels,
+      "출력_description": result.description
+    });
+
+    return result;
+  };
+
+  // props로 받은 데이터를 변환하여 사용
+  const currentKeywordData = transformKeywordData(keywordData);
+
+  console.log("🔍 Detail_keyword - 원본 키워드 데이터:", keywordData);
+  console.log("🔍 Detail_keyword - 변환된 키워드 데이터:", currentKeywordData);
+
+  // API 응답 구조 상세 분석
+  if (keywordData) {
+    console.log("📊 Detail_keyword API 응답 구조 분석:");
+    console.log("  - keywordInfo:", keywordData.keywordInfo);
+    console.log("  - mainStats:", keywordData.mainStats);
+    console.log("  - trendExplanation:", keywordData.trendExplanation);
+    console.log("  - description:", keywordData.description);
+    console.log("  - emotionLabels:", keywordData.emotionLabels);
+    console.log("  - ranking:", keywordData.ranking);
+    console.log("  - 모든 키:", Object.keys(keywordData));
+  }
   const [query, setQuery] = useState("");
 
   // 키워드 검색 함수
@@ -125,9 +171,9 @@ export default function DetailKeyword({ keywordData }) {
          </p>
 
         <p className="detailKeyword__labels">
-          감정 라벨링 TOP 5 : {currentKeywordData.emotionLabels.join(", ")}
+          주요감정 라벨 : {currentKeywordData.emotionLabels.map(label => label.trim()).join(", ")}
         </p>
-        <p className="detailKeyword__desc">{currentKeywordData.description}</p>
+        <p className="detailKeyword__desc">{currentKeywordData.description || "키워드 설명을 불러오는 중..."}</p>
       </div>
 
       {/* ② 오른쪽 : 원형 이미지 */}
