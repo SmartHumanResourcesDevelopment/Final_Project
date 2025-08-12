@@ -69,6 +69,15 @@ export default function DetailKeyword({ keywordData }) {
   }
   const [query, setQuery] = useState("");
 
+  const getKeywordImagePath = (keyword) => {
+    if (!keyword) return "/img/default/이미지없음.png";
+
+    const encodedKeyword = encodeURIComponent(keyword);
+    return `/img/default/KeywordsImages/${encodedKeyword}.png`;
+  };
+
+
+
   // 키워드 검색 함수
   const handleSearch = async () => {
     if (!query.trim()) {
@@ -178,7 +187,15 @@ export default function DetailKeyword({ keywordData }) {
 
       {/* ② 오른쪽 : 원형 이미지 */}
       <figure className="detailKeyword__thumb">
-        <img src={matchaImg} alt="말차 이미지" />
+           <img
+              src={getKeywordImagePath(currentKeywordData.keyword)}
+              alt={currentKeywordData.keyword}
+              onError={(e) => {
+                e.target.onerror = null; // 무한루프 방지
+                e.target.src = "/img/default/KeywordsImages/noImg.png";
+              }}
+              />
+
       </figure>
 
       {/* ③ 검색 버튼 (페이지 우측 상단 고정) */}

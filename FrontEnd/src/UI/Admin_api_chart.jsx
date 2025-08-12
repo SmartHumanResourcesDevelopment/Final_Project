@@ -3,10 +3,23 @@ import React from "react";
 // 컴포넌트 이름과 파일 이름을 Admin_api_chart로 맞추는 것이 좋습니다.
 // 만약 파일 이름이 ApiStatusTableSection.jsx 라면 export const ApiStatusTableSection = () => { ... }; 로 유지하세요.
 export const Admin_api_chart = () => { // 컴포넌트 이름을 Admin_api_chart로 변경 (선택 사항, 파일명과 맞추는 게 좋음)
+
+
+  const today = new Date();
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}.${month}.${day}`;
+  };
+
+
+
   const apiStatusData = [
-    { type: "크롤링", status: "🟢 운영중", date: "2025.07.11" },
-    { type: "Open AI", status: "🔴 중지", date: "2025.07.11" },
-    { type: "DB", status: "🟢 운영중", date: "2025.07.11" },
+    { type: "크롤링", status: "🟢 운영중", date: formatDate(today) },
+    { type: "Open AI", status: "🔴 중지", date: formatDate(today)},
+    { type: "DB", status: "🟢 운영중", date: formatDate(today)},
   ];
 
   return (

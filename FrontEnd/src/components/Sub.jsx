@@ -1,6 +1,11 @@
 // src/pages/Sub.jsx
 import React, { useState, useEffect } from "react";
 import { NavigationSection }  from "../common/menu_bar";
+
+import { AdminNavigationBarSection } from "../common/Admin_menu_bar";
+
+import { useUser } from "../contexts/UserContext";
+
 import { DetailKeyword }      from "../UI/Detail_keyword";
 import { DetailInsightsSection } from "../UI/Detail_title";
 import { KeywordHighlightSection } from "../UI/Detail_kote";
@@ -14,9 +19,15 @@ import { useKeywordData }      from "../contexts/KeywordDataContext";
 
 import "../assets/css/Sub.css";
 
+
+
 const Sub = ({ keywordData: propsKeywordData, onClose }) => {
   const { keywordData: contextKeywordData } = useKeywordData();
-  
+
+
+  const { user } = useUser();
+  const isAdmin = user.role === "관리자";
+
   // props로 받은 데이터가 있으면 우선 사용, 없으면 context 데이터 사용
   const keywordData = propsKeywordData || contextKeywordData;
   const [openChat, setOpenChat]     = useState(false);
@@ -95,7 +106,7 @@ const Sub = ({ keywordData: propsKeywordData, onClose }) => {
   return (
     <div className="detail-root" onClick={handleBackgroundClick}>
       {/* 상단바 */}
-      <NavigationSection />
+      {isAdmin ? <AdminNavigationBarSection /> : <NavigationSection />}
       {/* 키워드 소개 */}
       <DetailKeyword keywordData={keywordData} />
       {/* 키워드 그래프소개 */}

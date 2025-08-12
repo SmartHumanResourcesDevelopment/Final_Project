@@ -112,4 +112,20 @@
         #{user_id}, #{username}, #{password}, #{phone_number}, #{nickname}, #{naverlogincheck}
     )
     </insert>
+
+     <!-- 최근 일주일 간 크롤링 키워드 수 조회 -->
+    <select id="getCrawlingCountByDateRange" resultType="map">
+        SELECT
+            TO_CHAR(created_at, 'YY-MM-DD') AS date,
+            COUNT(*) AS count
+        FROM
+            KEYWORD_DAILY_STATS
+        WHERE
+            created_at BETWEEN TO_DATE(#{from}, 'YY-MM-DD') AND TO_DATE(#{to}, 'YY-MM-DD') + 1
+        GROUP BY
+            TO_CHAR(created_at, 'YY-MM-DD')
+        ORDER BY
+            date
+    </select>
+
 </mapper>

@@ -19,6 +19,14 @@ export default function Main_top3() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getKeywordImagePath = (keyword) => {
+  if (!keyword) return "/img/default/이미지없음.png";
+
+  const encodedKeyword = encodeURIComponent(keyword);
+  return `/img/default/KeywordsImages/${encodedKeyword}.png`;
+};
+
+
   // TOP3 데이터 가져오기
   const fetchTop3Data = async () => {
     try {
@@ -145,14 +153,21 @@ export default function Main_top3() {
             <button onClick={fetchTop3Data}>다시 시도</button>
           </div>
         ) : (
-          top3Data.map(({ id, image, title, desc }) => (
+          top3Data.map(({ id, title, desc }) => (
             <article
               key={id}
               className={`keyword-card top3__card${hovered === id ? " is-hover" : ""}`}
               onMouseEnter={() => setHovered(id)}
               onMouseLeave={() => setHovered(null)}
             >
-              <img src={image} alt={`${title} 이미지`} />
+            <img
+              src={getKeywordImagePath(title)}
+              alt={title}
+              onError={(e) => {
+                e.target.onerror = null; // 무한루프 방지
+                e.target.src = "/img/default/KeywordsImages/noImg.png";
+              }}
+              />
 
               {/* ↓↓↓ 카드 내부 콘텐츠 래퍼 추가 ↓↓↓ */}
               <div className="card-body">
