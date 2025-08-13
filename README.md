@@ -61,17 +61,20 @@
 ```
 
 ## 기술 스택
-<p align="left">
-  <img src="https://img.shields.io/badge/React-18-61DAFB?logo=react" />
-  <img src="https://img.shields.io/badge/SpringBoot-3.x-6DB33F?logo=springboot" />
-  <img src="https://img.shields.io/badge/Oracle-11g-F80000?logo=oracle" />
-  <img src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python" />
-  <img src="https://img.shields.io/badge/HuggingFace-KOTE%20Model-FF6F00?logo=huggingface" />
-  <img src="https://img.shields.io/badge/TailwindCSS-4.x-38B2AC?logo=tailwindcss" />
-  <img src="https://img.shields.io/badge/MyBatis-3.x-BF1F24?logo=java" />
-  <img src="https://img.shields.io/badge/Selenium-Automation-43B02A?logo=selenium" />
-  <img src="https://img.shields.io/badge/OpenAI-Embeddings-412991?logo=openai" />
-</p>
+
+| 구분                | 기술                      | 버전/모델      | 뱃지                                                                                                       |
+| ----------------- | ----------------------- | ---------- | -------------------------------------------------------------------------------------------------------- |
+| **Frontend**      | React                   | 18         | <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=React&logoColor=white"/>             |
+|                   | Tailwind CSS            | 4.x        | <img src="https://img.shields.io/badge/TailwindCSS-38B2AC?style=flat&logo=TailwindCSS&logoColor=white"/> |
+|                   | CSS                     | -          | <img src="https://img.shields.io/badge/CSS-1572B6?style=flat&logo=CSS3&logoColor=white"/>                |
+| **Backend**       | Spring Boot             | 3.x        | <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=SpringBoot&logoColor=white"/>   |
+|                   | MyBatis                 | 3.x        | <img src="https://img.shields.io/badge/MyBatis-BF1F24?style=flat&logo=Java&logoColor=white"/>            |
+|                   | Oracle DB               | 11g        | <img src="https://img.shields.io/badge/Oracle-F80000?style=flat&logo=Oracle&logoColor=white"/>           |
+| **Data Analysis** | Python                  | 3.11       | <img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=Python&logoColor=white"/>           |
+|                   | Hugging Face KOTE Model | 44 labels  | <img src="https://img.shields.io/badge/HuggingFace-FF6F00?style=flat&logo=HuggingFace&logoColor=white"/> |
+|                   | Selenium                | Automation | <img src="https://img.shields.io/badge/Selenium-43B02A?style=flat&logo=Selenium&logoColor=white"/>       |
+|                   | OpenAI Embeddings       | -          | <img src="https://img.shields.io/badge/OpenAI-412991?style=flat&logo=OpenAI&logoColor=white"/>           |
+
 
 ## 데이터 파이프라인
 
