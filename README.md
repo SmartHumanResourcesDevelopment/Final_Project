@@ -9,8 +9,8 @@
 | 이름  | 역할                | 담당 업무                                     |
 | --- | ----------------- | ----------------------------------------- |
 | 박병록 | Team Leader (PM), DataAnalysis  | 리액트 컴포넌트 설계, 각 페이지 키워드 설명, 데이터 분석, API 관리 |
-| 김다현 | FrontEnd, BackEnd | 화면 설계, 프론트엔드(CSS), 크롤링                    |
-| 차명훈 | FrontEnd, BackEnd | 챗봇, 마이페이지 스크랩 보기, 로그인(SNS), 회원가입          |
+| 김다현 | FrontEnd | 화면 설계, 프론트엔드(CSS), 크롤링                    |
+| 차명훈 | BackEnd | 챗봇, 마이페이지 스크랩 보기, 로그인(SNS), 회원가입          |
 
 
 **협업 노션 문서**: [📄 프로젝트 노션 링크](https://slime-roast-ee5.notion.site/20fa64f7def180d88c26fb1ffd3bb9b5?source=copy_link)
