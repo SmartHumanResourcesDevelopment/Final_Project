@@ -4,7 +4,7 @@
 >
 > **프로젝트 진행 기간**: 2025.07.14 \~ 2025.08.13
  
-**노션 문서**: [📄 프로젝트 노션 링크]([https://www.notion.so/](https://slime-roast-ee5.notion.site/20fa64f7def180d88c26fb1ffd3bb9b5?source=copy_link))
+**노션 문서**: [📄 프로젝트 노션 링크]((https://slime-roast-ee5.notion.site/20fa64f7def180d88c26fb1ffd3bb9b5?source=copy_link)
 
 
 
