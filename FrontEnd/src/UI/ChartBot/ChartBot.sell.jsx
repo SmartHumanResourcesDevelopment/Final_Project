@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import close from "../../assets/img/Chart_Bot/close.png";
 import flag from "../../assets/img/Chart_Bot/sell.png";
+import LoadingMessage from "../../components/LoadingMessage";
 import "../../assets/css/chartbot/sell.css";
 
 // 부모로부터 keywordData를 props로 받도록 추가합니다.
@@ -107,7 +108,14 @@ export const Chart_Bot_Sell = ({ onClose, keywordData }) => {
       <main className="sell-main">
         {/* 4. 로딩 중일 때와 데이터가 있을 때를 구분하여 표시합니다. */}
         {isLoading ? (
-          <div className="loading-message">AI가 마케팅 문구를 작성 중입니다...</div>
+          <div style={{ color: '#ffffff' }}>
+            <LoadingMessage
+              message="AI가 마케팅 문구를 작성 중입니다"
+              type="pulse"
+              showIcon={true}
+              textColor="#ffffff"
+            />
+          </div>
         ) : (
           slogans?.map((slogan, i) => (
             <section key={i} className="sell-section">

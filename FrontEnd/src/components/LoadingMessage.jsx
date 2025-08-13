@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import '../assets/css/LoadingAnimation.css';
 
-const LoadingMessage = ({ 
+const LoadingMessage = ({
   message = "AI가 마케팅 문구를 작성 중입니다",
   type = "default", // default, typing, dots, pulse
-  showIcon = true 
+  showIcon = true,
+  textColor = "#ffffff" // 기본 회색, 커스터마이징 가능
 }) => {
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -46,7 +47,7 @@ const LoadingMessage = ({
         return (
           <>
             {showIcon && <div className="loading-icon"></div>}
-            <span className="loading-text">{displayText}</span>
+            <span className="loading-text" style={{ color: textColor }}>{displayText}</span>
           </>
         );
       
@@ -54,7 +55,7 @@ const LoadingMessage = ({
         return (
           <>
             {showIcon && <div className="loading-icon"></div>}
-            <span className="loading-text">{message}</span>
+            <span className="loading-text" style={{ color: textColor }}>{message}</span>
             <div className="loading-dots">
               <div className="loading-dot"></div>
               <div className="loading-dot"></div>
@@ -62,20 +63,20 @@ const LoadingMessage = ({
             </div>
           </>
         );
-      
+
       case 'pulse':
         return (
           <>
             {showIcon && <div className="loading-icon"></div>}
-            <span className="loading-text">{message}</span>
+            <span className="loading-text" style={{ color: textColor, fontWeight: '500', fontStyle: 'italic' }}>{message}</span>
           </>
         );
-      
+
       default:
         return (
           <>
             {showIcon && <div className="loading-icon"></div>}
-            <span className="loading-text">{message}</span>
+            <span className="loading-text" style={{ color: textColor }}>{message}</span>
             <div className="loading-dots">
               <div className="loading-dot"></div>
               <div className="loading-dot"></div>

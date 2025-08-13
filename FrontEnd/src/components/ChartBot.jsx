@@ -131,6 +131,7 @@ export const ChartBot = ({ onClose, keywordData }) => {
                     message="AI가 제품 아이디어를 구상 중입니다"
                     type="typing"
                     showIcon={true}
+                    textColor="#ffffff"
                   />
                 ) : (
                   <Chart_Bot_idea
@@ -151,6 +152,7 @@ export const ChartBot = ({ onClose, keywordData }) => {
                     message="AI가 콜라보 아이디어를 구상 중입니다"
                     type="dots"
                     showIcon={true}
+                    textColor="#ffffff"
                   />
                 ) : (
                   <Chart_Bot_Collab

@@ -7,7 +7,7 @@
   padding: 20px;
   font-size: 16px;
   font-weight: 500;
-  color: #666;
+  color: rgb(255, 255, 255);
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border-radius: 12px;
   border: 1px solid #dee2e6;
@@ -47,6 +47,7 @@
 .loading-text {
   position: relative;
   z-index: 1;
+  /* 색상은 인라인 스타일로 설정되도록 기본값 제거 */
 }
 
 .loading-text::after {

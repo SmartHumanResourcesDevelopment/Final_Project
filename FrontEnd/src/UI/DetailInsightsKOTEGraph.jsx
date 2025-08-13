@@ -67,7 +67,7 @@ export function DetailInsightsKOTE_positivity_Graph({
 
       {/* 긍정 댓글 4개 표시 */}
       <div className="emotion-comments">
-        <h4 className="emotion-comments__title">긍정 댓글 예시 (TOP 3 감정별)</h4>
+        <h4 className="emotion-comments__title">긍정 댓글 (TOP 3 감정별)</h4>
         <div className="emotion-comments__list">
           {displayComments.length > 0 ? (
             displayComments.map((comment, index) => {
@@ -141,7 +141,7 @@ export function DetailInsightsKOTE_negative_Graph({
 
       {/* 부정 댓글 4개 표시 */}
       <div className="emotion-comments">
-        <h4 className="emotion-comments__title">부정 댓글 예시 (TOP 3 감정별)</h4>
+        <h4 className="emotion-comments__title">부정 댓글 (TOP 3 감정별)</h4>
         <div className="emotion-comments__list">
           {displayComments.length > 0 ? (
             displayComments.map((comment, index) => {
