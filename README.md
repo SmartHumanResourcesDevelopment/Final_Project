@@ -16,7 +16,7 @@
 **협업 노션 문서**: [📄 프로젝트 노션 링크](https://slime-roast-ee5.notion.site/20fa64f7def180d88c26fb1ffd3bb9b5?source=copy_link)
 
 
-## 목차
+## 📁목차
 
 * [프로젝트 개요](#프로젝트-개요)
 * [주요 기능](#주요-기능)
@@ -34,7 +34,7 @@
 
 ---
 
-## 프로젝트 개요
+## 🔎프로젝트 개요
 
 * **목표**: SNS 원천 데이터(Instagram/YouTube)에서 **키워드 트렌드**와 **감성 흐름**을 분석하여, 마케터/기획자에게 **키워드 랭킹, 유사 키워드, 감성 분포, 마케팅 아이디어**를 제공.
 * **핵심 포인트**
@@ -44,7 +44,7 @@
   * 키워드 임베딩/유사도 + RapidFuzz로 문맥 유사 탐지
   * Oracle 기반 집계·인덱싱 최적화로 응답 속도 개선
 
-## 주요 기능
+## 🚀주요 기능
 
 * **키워드 트렌드 대시보드**: 기간별 랭킹, 일별 언급량, 급상승 키워드
 * **감성 분석**: 긍/부정 및 세부 감정 Top-N, 감정별 댓글 샘플
@@ -52,7 +52,7 @@
 * **마케팅 인사이트 요약**: 키워드별 요약/활용 아이디어 자동 생성
 * **데이터 관리**: 크롤링 → 필터링 → 전처리 → DB 적재 파이프라인
 
-## 아키텍처
+## ⚙️아키텍처
 
 ```
 [Instagram/YouTube]  ─┐
@@ -67,7 +67,7 @@
                                                         [대시보드/REST API]
 ```
 
-## 기술 스택
+## 🖥️기술 스택
 
 | 구분                | 기술                      | 버전/모델      | 뱃지                                                                                                       |
 | ----------------- | ----------------------- | ---------- | -------------------------------------------------------------------------------------------------------- |
@@ -83,7 +83,7 @@
 |                   | OpenAI Embeddings       | -          | <img src="https://img.shields.io/badge/OpenAI-412991?style=flat&logo=OpenAI&logoColor=white"/>           |
 
 
-## 데이터 파이프라인
+## 📚데이터 파이프라인
 
 1. **수집**: Instagram/YouTube 포스트·댓글 데이터 크롤링
 2. **필터링/정제**: 이모지·중복 제거, 불용어 적용
@@ -91,25 +91,25 @@
 4. **유사도 계산**: OpenAI 임베딩+RapidFuzz 혼합 방식
 5. **적재/집계**: Oracle에 저장 후 인덱스·프로시저 기반 조회 최적화
 
-## 데이터 스키마(Schema) & 인덱싱
+## 📖데이터 스키마(Schema) & 인덱싱
 
 * `YOUTUBE_VIDEO`, `YOUTUBE_COMMENT`, `INSTAGRAM_POST`, `INSTAGRAM_COMMENT`, `SENTIMENT_RESULT`, `KEYWORD_DAILY_STATS`, `KEYWORD_MAIN_STATS`, `KEYWORD_SIMILARITY`,`USER_TBL`, `KEYWORD`,`SENTIMENT_KEYWORD_MAP`
 * `USER_COLLAB_IDEA`,`USER_MARKETING_SLOGAN`,`USER_PRODUCT_IDEA`
 * 주요 인덱스: 기간·키워드 복합, 조인 최적화, 감정·출처 필터 인덱스, 랭킹 관련 인덱스
 
-## ER 다이어그램
+## 📑ER 다이어그램
 
 <img width="645" height="591" alt="image" src="https://github.com/user-attachments/assets/784e1d38-7dfc-4a6c-9fe3-2fb8305eb42c" />
 
-## 서비스 흐름도
+## 📋서비스 흐름도
 ![22](https://github.com/user-attachments/assets/31e18562-cc0b-4bbd-a97b-e7273b728803)
 
 
-## 유스케이스 다이어그램
+## 🏷️유스케이스 다이어그램
 ![444](https://github.com/user-attachments/assets/5f4ae36c-01e1-436f-baa7-e98fca506c1b)
 
 
-## 설치 & 실행
+## 💡설치 & 실행
 
 * **사전 준비**: Node.js 18+, Java 17, Python 3.11, Oracle 11g
 * **환경 변수**: DB 접속, API 키, 클라이언트 URL 등 .env 관리
@@ -117,12 +117,12 @@
 * **프론트엔드**: `npm run dev`
 * **데이터 분석**: `pip install -r requirements.txt` 후 크롤러·전처리 스크립트 실행
 
-## API 개요
+## 🔔API 개요
 
 * 키워드 랭킹, 트렌드, 감성 분석, 유사 키워드, 샘플 댓글 조회
 
-## UI 주요 화면
-### 메인 화면 구성
+## 📌UI 주요 화면
+### 🎯메인 화면 구성
 <img width="1803" height="695" alt="image" src="https://github.com/user-attachments/assets/5a29aade-6169-43a1-a294-53d3dfce5115" />
 
 <img width="1070" height="790" alt="image" src="https://github.com/user-attachments/assets/0025a8d0-1231-431c-bc03-1ba7dcfca796" />
@@ -131,22 +131,22 @@
 
 <img width="1076" height="696" alt="image" src="https://github.com/user-attachments/assets/c5dcaf88-4b16-4190-ac9a-12775903cf21" />
 
-### 심층 상세페이지
+### 📝심층 상세페이지
 <img width="1045" height="552" alt="image" src="https://github.com/user-attachments/assets/0a796635-1a19-4f0a-86a1-5934c890c128" />
 
 <img width="781" height="584" alt="image" src="https://github.com/user-attachments/assets/a98e293c-0d95-4baf-90bb-f47235307ba0" />
 
 <img width="791" height="445" alt="image" src="https://github.com/user-attachments/assets/cb0ed64a-6edd-4375-a66e-d161a57b43b9" />
 
-### 챗봇 인사이트
+### 👾챗봇 인사이트
 <img width="583" height="770" alt="image" src="https://github.com/user-attachments/assets/c2986914-f8ef-471b-9d19-d9fc2d30a0ea" />
 <img width="579" height="756" alt="image" src="https://github.com/user-attachments/assets/eca70f71-9d93-453f-9405-bc635373e376" />
 
-## 성능 최적화
+## 🔬성능 최적화
 
 * 인덱스 온리 쿼리, 통계 최신화, 조인 최적화, MERGE 프로시저 활용
 
-## 주요 트러블슈팅
+## 🔫주요 트러블슈팅
 
 > 아래 항목은 실제 프로젝트 진행 중 발생한 대표 이슈를 **요약 → 원인 → 해결 → 검증** 순으로 정리한 기록입니다.
 
@@ -307,6 +307,12 @@ public ResponseEntity<?> scrap(@AuthenticationPrincipal UserPrincipal user,
 
 * 인증 사용자로 호출 시 200 OK, 비인증 호출 시 401 Unauthorized 확인.
 
-## 시연 영상
-[![프로젝트시연파일](https://github.com/user-attachments/assets/746cde71-6f92-42d2-8bfe-9d7a25eded36)](https://drive.google.com/file/d/1_avCMTfeb32LSSvnrROxXldI7Bkqz-ZR/view?usp=sharing)
+## 💽프로젝트 시연
+
+> 아래 이미지를 클릭하면 **시연 영상(구글 드라이브)** 으로 이동하고, 텍스트 링크를 누르면 **서비스 사이트**로 이동합니다.
+
+
+[![프로젝트 시연 이미지](https://github.com/user-attachments/assets/04fc8a1b-e74d-4f85-902a-9cf500ab6ed9)](https://drive.google.com/file/d/1_avCMTfeb32LSSvnrROxXldI7Bkqz-ZR/view?usp=sharing)
+
+**사이트 바로가기 »** [https://example.com](https://example.com)
 
