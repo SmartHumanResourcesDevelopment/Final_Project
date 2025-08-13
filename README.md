@@ -73,7 +73,7 @@
 
 ## 기술 스택
 
-<div align="center" style="display:flex;flex-wrap:wrap;gap:18px;justify-content:center;align-items:flex-start">
+<div align="left" style="display:flex;flex-wrap:wrap;gap:18px;justify-content:center;align-items:flex-start">
 
   <!-- Spring Boot (inline SVG, auto-colored via currentColor) -->
 
