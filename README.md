@@ -308,4 +308,5 @@ public ResponseEntity<?> scrap(@AuthenticationPrincipal UserPrincipal user,
 * 인증 사용자로 호출 시 200 OK, 비인증 호출 시 401 Unauthorized 확인.
 
 ## 시연 영상
-[![Video Label]([https://drive.google.com/file/d/1_avCMTfeb32LSSvnrROxXldI7Bkqz-ZR/view?usp=sharing])(https://drive.google.com/file/d/1_avCMTfeb32LSSvnrROxXldI7Bkqz-ZR/view?usp=sharing)
+[![프로젝트시연파일](<img width="530" height="393" alt="image" src="https://github.com/user-attachments/assets/746cde71-6f92-42d2-8bfe-9d7a25eded36" />
+)](https://drive.google.com/file/d/1_avCMTfeb32LSSvnrROxXldI7Bkqz-ZR/view?usp=sharing)
