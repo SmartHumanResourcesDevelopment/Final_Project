@@ -1,38 +1,98 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import close from "../../assets/img/Chart_Bot/close.png";
 import lightOn from "../../assets/img/Chart_Bot/idea_icon.png";
 import "../../assets/css/chartbot/idea.css";
 
-export const Chart_Bot_idea = ({ onClose }) => {
-  const [productIdeas] = useState([
-    {
-      id: 1,
-      title: "말차츄 츄잇바 (MALCHU CHEW)",
-      features: [
-        "씹고 풀면 집중력 + 힐링",
-        '공부방에서 꺼내면 "오~ 그거 뭐야?" 소리 들을템',
-        '포장에 "차분한데 중독됨" 문구 붙이면 완벽',
-      ],
-    },
-    {
-      id: 2,
-      title: "말차×떡볶이 디핑소스",
-      features: [
-        '"맵찔이 전용 구원템"',
-        "크림 떡볶이+말차 조합 = 뉴트로 폭발",
-        "편의점 밀키트 한정판용으로 딱",
-      ],
-    },
-    {
-      id: 3,
-      title: "말차폼 탑재 보틀라떼",
-      features: [
-        "쉐이크하면 쫀쫀폼이 올라오는 텀블러형 말차",
-        "SNS에 영상 올리기 좋은 ASMR 푸드",
-        '"폼 미쳤다" 해시태그로 바이럴 유도',
-      ],
-    },
-  ]);
+// 부모로부터 keywordData를 props로 받도록 추가합니다.
+export const Chart_Bot_idea = ({ onClose, keywordData }) => {
+  // 1. 더미 데이터 대신, API 응답을 저장할 state를 만듭니다.
+  const [productIdeas, setProductIdeas] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 2. 컴포넌트가 렌더링될 때 AI 아이디어를 요청하는 로직을 추가합니다.
+  useEffect(() => {
+    const fetchProductIdeasFromAI = async () => {
+      // keywordData가 없으면 실행하지 않습니다.
+      if (!keywordData?.keyword) return;
+
+      setIsLoading(true);
+      console.log(`'${keywordData.keyword}'로 AI 제품 아이디어를 요청합니다.`);
+
+      try {
+        // 백엔드의 제품 아이디어 생성 API를 호출합니다.
+        const response = await fetch("http://localhost:8095/zal/api/chatbot/product/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ keyword: keywordData.keyword }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`서버 에러: ${response.status}`);
+        }
+
+        const generatedIdeas = await response.json();
+        setProductIdeas(generatedIdeas);
+        console.log("✅ AI 제품 아이디어 수신:", generatedIdeas);
+
+      } catch (error) {
+        console.error("❌ 제품 아이디어 요청 실패:", error);
+        setProductIdeas([
+          { title: "오류 발생!", contents: ["아이디어를 불러오는 데 실패했습니다.", error.message] }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProductIdeasFromAI();
+  }, [keywordData]); // keywordData가 변경될 때마다 다시 실행됩니다.
+
+  const handleScrap = async () => {
+    if (!productIdeas || productIdeas.length === 0) {
+      alert("스크랩할 아이디어가 없습니다.");
+      return;
+    }
+
+    // 3. 스크랩 시 keywordName을 포함하도록 수정합니다.
+    const dtoList = productIdeas.map(idea => ({
+      contentTitle: idea.title,
+      contentDesc1: idea.contents[0] || "",
+      contentDesc2: idea.contents[1] || "",
+      contentDesc3: idea.contents[2] || "",
+      keywordName: keywordData?.keyword || "", // 키워드 정보 추가
+    }));
+
+    console.log("DB로 전송할 제품 아이디어 데이터:", dtoList);
+
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8095/zal/api/chatbot/product", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(dtoList)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "저장 실패");
+      }
+
+      const result = await response.json();
+      alert(result.message || "저장 완료!");
+
+    } catch (error) {
+      console.error("스크랩 중 오류:", error);
+      alert(`저장 실패: ${error.message}`);
+    }
+  };
 
   return (
     <div className="idea-container">
@@ -46,24 +106,30 @@ export const Chart_Bot_idea = ({ onClose }) => {
       </header>
 
       <main className="idea-main">
-        {productIdeas.map((idea, i) => (
-          <section key={idea.id} className="idea-section">
-            <h2 className="idea-section-title">{i + 1}. {idea.title}</h2>
-            <ul className="idea-features">
-              {idea.features.map((f, j) => (
-                <li key={j} className="idea-feature">✦ {f}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
+        {/* 4. 로딩 중일 때와 데이터가 있을 때를 구분하여 표시합니다. */}
+        {isLoading ? (
+          <div className="loading-message">AI가 제품 아이디어를 구상 중입니다...</div>
+        ) : (
+          productIdeas?.map((idea, i) => (
+            <section key={i} className="idea-section">
+              <h2 className="idea-section-title">{i + 1}. {idea.title}</h2>
+              <ul className="idea-content">
+                {idea.contents?.map((content, j) => (
+                  <li key={j} className="idea-feature">✦ {content}</li>
+                ))}
+              </ul>
+            </section>
+          ))
+        )}
       </main>
 
       <footer className="idea-footer">
-        <button className="idea-scrap-btn" onClick={() => console.log("스크랩!")}>
+        <button className="idea-scrap-btn" onClick={handleScrap}>
           스크랩하기
         </button>
       </footer>
     </div>
   );
 };
-export default Chart_Bot_idea
+
+export default Chart_Bot_idea;

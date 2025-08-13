@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import Chart_Bot_Collab from "../UI/ChartBot/ChartBot_coll"
 import { useUser } from "../contexts/UserContext";
 import { useKeywordData } from "../contexts/KeywordDataContext";
 import matchaImg from "../assets/img/common/녹차.png";
@@ -68,6 +69,8 @@ export default function DetailKeyword({ keywordData }) {
     console.log("  - 모든 키:", Object.keys(keywordData));
   }
   const [query, setQuery] = useState("");
+  const [showCollab, setShowCollab] = useState(false);
+
 
   const getKeywordImagePath = (keyword) => {
     if (!keyword) return "/img/default/이미지없음.png";
@@ -175,6 +178,7 @@ export default function DetailKeyword({ keywordData }) {
       handleSearch();
     }
   };
+
   return (
     <section className="detailKeyword">
       {/* ① 왼쪽 : 텍스트  */}
@@ -232,6 +236,13 @@ export default function DetailKeyword({ keywordData }) {
               onClick={(e) => e.stopPropagation()}      // 아이콘 클릭과 구분
             />
           </div>
+          {/* 콜라보 컴포넌트 (props 전달) */}
+          {showCollab && (
+            <Chart_Bot_Collab
+              onClose={() => setShowCollab(false)}
+              keywordData={keywordData} // *핵심: 여기서 props 전달
+            />
+          )}
     </section>
   );
 }

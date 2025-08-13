@@ -1,37 +1,97 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import close from "../../assets/img/Chart_Bot/close.png";
 import flag from "../../assets/img/Chart_Bot/sell.png";
 import "../../assets/css/chartbot/sell.css";
 
-export const Chart_Bot_Sell = ({ onClose }) => {
-  const sloganData = [
-    {
-      id: 1,
-      title: '"말차니까, 말 안해도 알지"',
-      concepts: [
-        "나를 알아주는 브랜드처럼 다가가는 컨셉",
-        "이모지 💚나 말풍선으로 감성 살리면 굿",
-      ],
-    },
-    {
-      id: 2,
-      title: '"찐-초록의 힐링각"',
-      concepts: [
-        '"찐" + 감성 + 줄임말 = Z세대 언어 완성',
-        "유튜브 썸네일형 배너에도 어울림",
-      ],
-    },
-    {
-      id: 3,
-      title: '"오늘 좀 말차고 싶은 날이야"',
-      concepts: [
-        "감정 공감 → 소비로 이어지는 연결고리",
-        '"카페 대신 말차" 느낌',
-      ],
-    },
-  ];
+// 부모로부터 keywordData를 props로 받도록 추가합니다.
+export const Chart_Bot_Sell = ({ onClose, keywordData }) => {
+  // 1. 더미 데이터 대신, API 응답을 저장할 state를 만듭니다.
+  const [slogans, setSlogans] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleScrap = () => console.log("스크랩하기 clicked");
+  // 2. 컴포넌트가 렌더링될 때 AI 슬로건을 요청하는 로직을 추가합니다.
+  useEffect(() => {
+    const fetchSlogansFromAI = async () => {
+      if (!keywordData?.keyword) return;
+
+      setIsLoading(true);
+      console.log(`'${keywordData.keyword}'로 AI 슬로건을 요청합니다.`);
+
+      try {
+        // 백엔드의 슬로건 생성 API를 호출합니다.
+        const response = await fetch("http://localhost:8095/zal/api/chatbot/slogan/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ keyword: keywordData.keyword }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`서버 에러: ${response.status}`);
+        }
+
+        const generatedSlogans = await response.json();
+        setSlogans(generatedSlogans);
+        console.log("✅ AI 슬로건 수신:", generatedSlogans);
+
+      } catch (error) {
+        console.error("❌ 슬로건 요청 실패:", error);
+        setSlogans([
+          { title: "오류 발생!", contents: ["슬로건을 불러오는 데 실패했습니다.", error.message] }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSlogansFromAI();
+  }, [keywordData]);
+
+  const handleScrap = async () => {
+    if (!slogans || slogans.length === 0) {
+      alert("스크랩할 슬로건이 없습니다.");
+      return;
+    }
+
+    // 3. 스크랩 시 keywordName을 포함하도록 수정합니다.
+    const dtoList = slogans.map(slogan => ({
+      contentTitle: slogan.title,
+      contentDesc1: slogan.contents[0] || "",
+      contentDesc2: slogan.contents[1] || "",
+      contentDesc3: slogan.contents[2] || "",
+      keywordName: keywordData?.keyword || "", // 키워드 정보 추가
+    }));
+
+    console.log("DB로 전송할 슬로건 데이터:", dtoList);
+
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8095/zal/api/chatbot/slogan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(dtoList)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "저장 실패");
+      }
+
+      const result = await response.json();
+      alert(result.message || "저장 완료!");
+
+    } catch (error) {
+      console.error("스크랩 중 오류:", error);
+      alert(`저장 실패: ${error.message}`);
+    }
+  };
 
   return (
     <div className="sell-container">
@@ -45,18 +105,21 @@ export const Chart_Bot_Sell = ({ onClose }) => {
       </header>
 
       <main className="sell-main">
-        {sloganData.map((item) => (
-          <section key={item.id} className="sell-section">
-            <h2 className="sell-section-title">
-              {item.id}. {item.title}
-            </h2>
-            <ul className="sell-concepts">
-              {item.concepts.map((c, i) => (
-                <li key={i} className="sell-concept">✦ {c}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
+        {/* 4. 로딩 중일 때와 데이터가 있을 때를 구분하여 표시합니다. */}
+        {isLoading ? (
+          <div className="loading-message">AI가 마케팅 문구를 작성 중입니다...</div>
+        ) : (
+          slogans?.map((slogan, i) => (
+            <section key={i} className="sell-section">
+              <h2 className="sell-section-title">{i + 1}. {slogan.title}</h2>
+              <ul className="sell-content">
+                {slogan.contents?.map((content, j) => (
+                  <li key={j} className="sell-feature">✦ {content}</li>
+                ))}
+              </ul>
+            </section>
+          ))
+        )}
       </main>
 
       <footer className="sell-footer">
@@ -67,6 +130,5 @@ export const Chart_Bot_Sell = ({ onClose }) => {
     </div>
   );
 };
-
 
 export default Chart_Bot_Sell;

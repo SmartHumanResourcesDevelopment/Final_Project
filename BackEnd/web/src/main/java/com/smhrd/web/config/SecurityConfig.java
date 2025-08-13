@@ -2,12 +2,16 @@ package com.smhrd.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.smhrd.web.repository.UserMapper;
 
 import java.util.Arrays;
 
@@ -15,6 +19,18 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtFilter jwtFilter;
+    private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
+
+    public SecurityConfig(@Lazy JwtUtil jwtUtil, @Lazy UserMapper userMapper, @Lazy JwtFilter jwtFilter) {
+        this.jwtUtil = jwtUtil;
+        this.userMapper = userMapper;
+        this.jwtFilter = jwtFilter;
+    }
+
+
+    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
           return http
@@ -30,8 +46,12 @@ public class SecurityConfig {
             // === 기타 경로 처리 ===
             .anyRequest().permitAll()
         )
-        .httpBasic(httpBasic -> {}) // 기본 인증
-        .build();
+
+        // httpBasic 비활성화
+            .httpBasic(httpBasic -> httpBasic.disable())
+            // JwtFilter를 UsernamePasswordAuthenticationFilter 이전에 추가
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
     }
 
     @Bean
@@ -43,7 +63,6 @@ public class SecurityConfig {
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true); // 인증정보 포함 가능
-        config.setMaxAge(3600L); // preflight 캐시 시간
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

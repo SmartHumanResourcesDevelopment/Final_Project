@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.smhrd.web.repository.MyPageMapper">
+
+    <resultMap id="myPageResultMap" type="com.smhrd.web.DTO.MyPageCollabDTO">
+        <result property="ideaId" column="IDEA_ID" />
+        <result property="userId" column="USER_ID" />
+        <result property="keywordId" column="KEYWORD_ID" />
+        <result property="keywordName" column="KEYWORD_NAME" />
+        <result property="title" column="TITLE" />
+        <result property="contentTitle" column="CONTENT_TITLE" />
+        <result property="contentDesc1" column="CONTENT_DESC_1" />
+        <result property="contentDesc2" column="CONTENT_DESC_2" />
+        <result property="contentDesc3" column="CONTENT_DESC_3" />
+    </resultMap>
+
+    <!-- 1. 콜라보 아이디어 조회 -->
+    <select id="selectUserCollabIdeas" resultMap="myPageResultMap">
+        SELECT MIN(c.IDEA_ID) as IDEA_ID, c.USER_ID, c.KEYWORD_ID, k.KEYWORD_NAME, MIN(c.TITLE) as TITLE, MIN(c.CONTENT_TITLE) as CONTENT_TITLE, MIN(c.CONTENT_DESC_1) as CONTENT_DESC_1, MIN(c.CONTENT_DESC_2) as CONTENT_DESC_2, MIN(c.CONTENT_DESC_3) as CONTENT_DESC_3
+        FROM USER_COLLAB_IDEA c
+        LEFT JOIN KEYWORD k ON c.KEYWORD_ID = k.KEYWORD_ID
+        WHERE c.USER_ID = #{userId}
+        GROUP BY c.USER_ID, c.KEYWORD_ID, k.KEYWORD_NAME
+        ORDER BY MIN(c.IDEA_ID) DESC
+    </select>
+    <!-- 1. 콜라보 아이디어 상세 조회 -->
+    <select id="selectCollabDetailsByKeyword" resultMap="myPageResultMap">
+        SELECT c.IDEA_ID, c.USER_ID, c.KEYWORD_ID, k.KEYWORD_NAME, c.TITLE, c.CONTENT_TITLE, c.CONTENT_DESC_1, c.CONTENT_DESC_2, c.CONTENT_DESC_3
+        FROM USER_COLLAB_IDEA c
+        LEFT JOIN KEYWORD k ON c.KEYWORD_ID = k.KEYWORD_ID
+        WHERE c.USER_ID = #{userId} AND c.KEYWORD_ID = #{keywordId}
+        ORDER BY c.IDEA_ID DESC
+    </select>
+
+    <!-- 2. 제품 아이디어 조회 -->
+    <select id="selectUserProductIdeas" resultMap="myPageResultMap">
+        SELECT MIN(p.IDEA_ID) as IDEA_ID, p.USER_ID, p.KEYWORD_ID, k.KEYWORD_NAME, MIN(p.TITLE) as TITLE, MIN(p.CONTENT_TITLE) as CONTENT_TITLE, MIN(p.CONTENT_DESC_1) as CONTENT_DESC_1, MIN(p.CONTENT_DESC_2) as CONTENT_DESC_2, MIN(p.CONTENT_DESC_3) as CONTENT_DESC_3
+        FROM USER_PRODUCT_IDEA p
+        LEFT JOIN KEYWORD k ON p.KEYWORD_ID = k.KEYWORD_ID
+        WHERE p.USER_ID = #{userId}
+        GROUP BY p.USER_ID, p.KEYWORD_ID, k.KEYWORD_NAME
+        ORDER BY MIN(p.IDEA_ID) DESC
+    </select>
+    <!-- 2. 제품 아이디어 상세 조회 -->
+    <select id="selectProductDetailsByKeyword" resultMap="myPageResultMap">
+        SELECT p.IDEA_ID as IDEA_ID, p.USER_ID, p.KEYWORD_ID, k.KEYWORD_NAME, p.TITLE, p.CONTENT_TITLE, p.CONTENT_DESC_1, p.CONTENT_DESC_2, p.CONTENT_DESC_3
+        FROM USER_PRODUCT_IDEA p
+        LEFT JOIN KEYWORD k ON p.KEYWORD_ID = k.KEYWORD_ID
+        WHERE p.USER_ID = #{userId} AND p.KEYWORD_ID = #{keywordId}
+        ORDER BY p.IDEA_ID DESC
+    </select>
+
+    <!-- 3. 슬로건 아이디어 조회  -->
+    <select id="selectUserSloganIdeas" resultMap="myPageResultMap">
+        SELECT MIN(s.SLOGAN_ID) as IDEA_ID, s.USER_ID, s.KEYWORD_ID, k.KEYWORD_NAME, MIN(s.TITLE) as TITLE, MIN(s.CONTENT_TITLE) as CONTENT_TITLE, MIN(s.CONTENT_DESC_1) as CONTENT_DESC_1, MIN(s.CONTENT_DESC_2) as CONTENT_DESC_2, MIN(s.CONTENT_DESC_3) as CONTENT_DESC_3
+        FROM USER_MARKETING_SLOGAN s
+        LEFT JOIN KEYWORD k ON s.KEYWORD_ID = k.KEYWORD_ID
+        WHERE s.USER_ID = #{userId}
+        GROUP BY s.USER_ID, s.KEYWORD_ID, k.KEYWORD_NAME
+        ORDER BY MIN(s.SLOGAN_ID) DESC
+    </select>
+    <!-- 3. 슬로건 아이디어 상세 조회 -->
+    <select id="selectSloganDetailsByKeyword" resultMap="myPageResultMap">
+        SELECT s.SLOGAN_ID as IDEA_ID, s.USER_ID, s.KEYWORD_ID, k.KEYWORD_NAME, s.TITLE, s.CONTENT_TITLE, s.CONTENT_DESC_1, s.CONTENT_DESC_2, s.CONTENT_DESC_3
+        FROM USER_MARKETING_SLOGAN s
+        LEFT JOIN KEYWORD k ON s.KEYWORD_ID = k.KEYWORD_ID
+        WHERE s.USER_ID = #{userId} AND s.KEYWORD_ID = #{keywordId}
+        ORDER BY s.SLOGAN_ID DESC
+    </select>
+
+    <!-- 4. 공통 -->
+    <select id="selectKeywordIdByName" resultType="Long">
+        SELECT KEYWORD_ID FROM KEYWORD WHERE KEYWORD_NAME = #{keywordName}
+    </select>
+
+</mapper>

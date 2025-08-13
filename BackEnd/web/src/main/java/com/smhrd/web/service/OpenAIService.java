@@ -134,11 +134,11 @@ public class OpenAIService {
 
             // 요청 바디 설정
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("model", "gpt-3.5-turbo");
+            requestBody.put("model", "gpt-4o");
             requestBody.put("messages", List.of(
                 Map.of("role", "user", "content", prompt)
             ));
-            requestBody.put("max_tokens", 200);
+            requestBody.put("max_tokens", 500);
             requestBody.put("temperature", 0.7);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);

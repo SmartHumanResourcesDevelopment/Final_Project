@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { keywordApiService } from "../api/sub";
+import { fetchWithAuth } from "../util/fetchWithAuth";
+import CollabDetailModal from "./CollabDetailModal";
 
 // 쿠키 관리 유틸리티 함수
 const CookieUtils = {
@@ -59,6 +61,13 @@ export const ActivityFeedSection = () => {
   const navigate = useNavigate();
   const [recentKeywords, setRecentKeywords] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [scrapedReports, setScrapedReports] = useState([]);
+  const [scrapLoading, setScrapLoading] = useState(false);
+
+  // 모달 상태 관리
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedKeyword, setSelectedKeyword] = useState("");
+  const [selectedScrapType, setSelectedScrapType] = useState("콜라보");
 
   // 최근 검색 키워드 불러오기 (쿠키 + localStorage 이중화)
   const loadRecentKeywords = () => {
@@ -207,9 +216,36 @@ export const ActivityFeedSection = () => {
     }
   };
 
-  // 컴포넌트 마운트 시 최근 키워드 로드
+  // 스크랩 정보 클릭 핸들러
+  const handleScrapClick = (reportText) => {
+    const match = reportText.match(/\[(콜라보|제품|슬로건)\]\s*(.+?)에\s*관한\s*보고서/);
+    
+    // match[1]은 타입(콜라보, 제품, 슬로건), match[2]는 키워드 이름이 됩니다.
+    if (match && match[1] && match[2]) {
+      const type = match[1].trim();
+      const keywordName = match[2].trim();
+
+      console.log(`🔍 스크랩 클릭 - 타입: ${type}, 키워드: ${keywordName}`);
+      
+      setSelectedScrapType(type); // 어떤 종류의 스크랩인지 상태에 저장
+      setSelectedKeyword(keywordName);
+      setIsModalOpen(true);
+    } else {
+      console.error("❌ 키워드를 추출할 수 없습니다:", reportText);
+      alert("키워드를 찾을 수 없습니다.");
+    }
+  };
+
+  // 모달 닫기 핸들러
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedKeyword("");
+  };
+
+  // 컴포넌트 마운트 시 최근 키워드와 스크랩 정보 로드
   useEffect(() => {
     loadRecentKeywords();
+    loadScrapInfo(); // 스크랩 정보도 함께 로드
 
     // 전역 함수로 등록 (다른 컴포넌트에서 사용 가능)
     window.addRecentKeyword = addRecentKeyword;
@@ -250,11 +286,35 @@ export const ActivityFeedSection = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
-  const scrapedReports = [
-    "냉라면에 관한 보고서", "비건에 관한 보고서", "하입푸드에 관한 보고서",
-    "초코바나나에 관한 보고서", "멜론킥에 관한 보고서", "민초에 관한 보고서",
-    "말차에 관한 보고서",
-  ];
+  // 스크랩 정보 로드 함수
+  const loadScrapInfo = async () => {
+    try {
+      setScrapLoading(true);
+      console.log("🔍 스크랩 정보 로드 시작");
+
+      const response = await fetchWithAuth("/zal/api/mypage/scrap-info", { method: "GET" });
+
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setScrapedReports(result.data);
+          console.log("✅ 스크랩 정보 로드 성공:", result.data);
+        } else {
+          console.error("❌ 스크랩 정보 로드 실패:", result.message);
+          setScrapedReports(["스크랩 정보를 불러올 수 없습니다."]);
+        }
+      } else {
+        console.error("❌ 스크랩 정보 API 호출 실패");
+        setScrapedReports(["로그인이 필요합니다."]);
+      }
+    } catch (error) {
+      console.error("❌ 스크랩 정보 로드 오류:", error);
+      setScrapedReports(["스크랩 정보 로드 중 오류가 발생했습니다."]);
+    } finally {
+      setScrapLoading(false);
+    }
+  };
 
   return (
     <section className="w-full bg-white shadow p-6 rounded-lg max-w-[1200px] mx-auto mb-20">
@@ -301,13 +361,39 @@ export const ActivityFeedSection = () => {
         </div>
         <div className="pl-3"> {/* 선과 내용 사이에 여백을 줍니다. */}
           <h3 className="mb-2">스크랩 정보</h3>
-          <ul className="list-disc list-inside">
-            {scrapedReports.map(report => (
-              <li key={report}>{report}</li>
-            ))}
-          </ul>
+          {scrapLoading ? (
+            <div className="text-gray-500 text-sm italic">
+              스크랩 정보를 불러오는 중...
+            </div>
+          ) : scrapedReports.length > 0 ? (
+            <ul className="list-disc list-inside space-y-1">
+              {scrapedReports.map((report, index) => (
+                <li
+                  key={`${report}-${index}`}
+                  className="cursor-pointer hover:text-blue-600 hover:underline transition-colors"
+                  onClick={() => handleScrapClick(report)}
+                  title="클릭하여 상세 정보 보기"
+                >
+                  {report}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-gray-500 text-sm italic">
+              아직 스크랩한 아이디어가 없습니다.<br />
+              챗봇에서 아이디어를 스크랩해보세요!
+            </div>
+          )}
         </div>
       </div>
+
+      {/* 콜라보 상세 정보 모달 */}
+      <CollabDetailModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        keywordName={selectedKeyword}
+        scrapType={selectedScrapType}
+      />
     </section>
   );
 };
