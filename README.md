@@ -3,11 +3,10 @@
 > 인스타그램·유튜브 데이터를 수집·정제·분석해 **잘파세대**(Gen Z/Alpha) 식문화 트렌드를 탐지하고, 감성 분석과 키워드 유사도 기반 인사이트를 제공하는 풀스택 프로젝트입니다.
 >
 > **기간**: 2025.07.14 \~ 2025.08.13
-> **노션 문서**: [📄 프로젝트 노션 링크]([https://www.notion.so/](https://slime-roast-ee5.notion.site/20fa64f7def180d88c26fb1ffd3bb9b5?source=copy_link))
+ 
+**노션 문서**: [📄 프로젝트 노션 링크]([https://www.notion.so/](https://slime-roast-ee5.notion.site/20fa64f7def180d88c26fb1ffd3bb9b5?source=copy_link))
 
 
-
----
 
 ## 목차
 
