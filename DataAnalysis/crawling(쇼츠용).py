@@ -10,7 +10,7 @@ import re
 import pandas as pd
 import os
 
-# 날짜 포맷 변환 함수
+# 날짜 포맷 변환 함수11
 def extract_date_from_kor_format(text):
     # '년', '월', '일' 문자를 포함하는 한국어 날짜 형식에서 연, 월, 일을 추출
     match = re.search(r'(\d{4})[\uAC00-\uD7A3]*\s*(\d{1,2})[\uAC00-\uD7A3]*\s*(\d{1,2})[\uAC00-\uD7A3]*', text)
