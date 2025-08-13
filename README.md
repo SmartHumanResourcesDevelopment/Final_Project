@@ -1,6 +1,6 @@
 # KOTE 모델을 활용한 잘파세대 식문화 트렌드 분석 서비스 (EatPick)
 
-## 📃서비스 소개
+## 📃프로젝트 소개
 인스타그램·유튜브 데이터를 수집·정제·분석해 **잘파세대**(Gen Z/Alpha) 식문화 트렌드를 탐지하고, 감성 분석과 키워드 유사도 기반 인사이트를 제공하는 풀스택 프로젝트입니다.
 
 > **프로젝트 진행 기간**: 2025.07.14 \~ 2025.08.13
@@ -308,5 +308,5 @@ public ResponseEntity<?> scrap(@AuthenticationPrincipal UserPrincipal user,
 * 인증 사용자로 호출 시 200 OK, 비인증 호출 시 401 Unauthorized 확인.
 
 ## 시연 영상
-[![프로젝트시연파일](<img width="530" height="393" alt="image" src="https://github.com/user-attachments/assets/746cde71-6f92-42d2-8bfe-9d7a25eded36" />
-)](https://drive.google.com/file/d/1_avCMTfeb32LSSvnrROxXldI7Bkqz-ZR/view?usp=sharing)
+[![프로젝트시연파일](https://github.com/user-attachments/assets/746cde71-6f92-42d2-8bfe-9d7a25eded36)](https://drive.google.com/file/d/1_avCMTfeb32LSSvnrROxXldI7Bkqz-ZR/view?usp=sharing)
+
