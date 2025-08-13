@@ -43,7 +43,17 @@ export default function RisingInsightsChart() {
   }, []); // 빈 의존성 배열 추가 - 컴포넌트 마운트 시 한 번만 실행
 
   if (loading) {
-    return <div>로딩 중...</div>;
+    return (
+      <div className="chart-loading-container">
+        <div className="chart-loading-spinner"></div>
+        <span className="chart-loading-text">급상승 인사이트 차트를 생성하는 중</span>
+        <div className="chart-loading-dots">
+          <span className="dot"></span>
+          <span className="dot"></span>
+          <span className="dot"></span>
+        </div>
+      </div>
+    );
   }
 
   if (!chartData.length) {

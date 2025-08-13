@@ -87,8 +87,14 @@ export default function Main_rank() {
 
         {/* 랭킹 리스트 */}
         {loading ? (
-          <div className="loading-state">
-            <p>데이터를 불러오는 중...</p>
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <span className="loading-text">랭킹 데이터를 불러오는 중</span>
+            <div className="loading-dots">
+              <span className="dot"></span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+            </div>
           </div>
         ) : error ? (
           <div className="error-state">

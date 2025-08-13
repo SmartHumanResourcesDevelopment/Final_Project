@@ -107,15 +107,25 @@ export default function Main_top3_insight() {
         />
 
         {/* AI 생성 설명문 */}
-        <p className="insight__caption">
+        <div className="insight__caption">
           {loading ? (
-            <span style={{ color: '#666', fontStyle: 'italic' }}>
-              🤖 AI가 트렌드를 분석하고 있습니다...
-            </span>
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <span className="loading-text">
+                AI가 트렌드를 분석하고 있습니다
+              </span>
+              <div className="loading-dots">
+                <span className="dot"></span>
+                <span className="dot"></span>
+                <span className="dot"></span>
+              </div>
+            </div>
           ) : (
-            aiSummary || "트렌드 분석 결과를 불러오는 중입니다."
+            <p className="summary-text">
+              {aiSummary || "트렌드 분석 결과를 불러오는 중입니다."}
+            </p>
           )}
-        </p>
+        </div>
       </div>
     </section>
   );

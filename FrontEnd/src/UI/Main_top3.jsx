@@ -151,8 +151,14 @@ export default function Main_top3() {
       {/* ── 카드 영역 ─────────────────────── */}
       <div className="card-list top3__cards">
         {loading ? (
-          <div className="loading-message">
-            <p>TOP3 키워드를 불러오는 중...</p>
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <span className="loading-text">TOP3 키워드를 불러오는 중</span>
+            <div className="loading-dots">
+              <span className="dot"></span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+            </div>
           </div>
         ) : error ? (
           <div className="error-message">

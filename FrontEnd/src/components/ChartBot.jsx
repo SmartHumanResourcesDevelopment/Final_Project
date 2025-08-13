@@ -7,6 +7,7 @@ import messageBot from "../assets/img/Chart_Bot/Message_Bot.png";
 import Chart_Bot_idea from "../UI/ChartBot/ChartBot_idea";
 import Chart_Bot_Collab from "../UI/ChartBot/ChartBot_coll";
 import Chart_Bot_Sell from "../UI/ChartBot/ChartBot.sell";
+import LoadingMessage from "./LoadingMessage";
 
 import "../assets/css/chartbot.css";
 
@@ -126,7 +127,11 @@ export const ChartBot = ({ onClose, keywordData }) => {
             <div className="chartbot-subcontent">
               <div className="sub-scroll">
                 {isLoading ? (
-                  <div className="loading-message">AI가 제품 아이디어를 구상 중입니다...</div>
+                  <LoadingMessage
+                    message="AI가 제품 아이디어를 구상 중입니다"
+                    type="typing"
+                    showIcon={true}
+                  />
                 ) : (
                   <Chart_Bot_idea
                     onClose={() => setView(0)}
@@ -142,7 +147,11 @@ export const ChartBot = ({ onClose, keywordData }) => {
             <div className="chartbot-subcontent">
               <div className="sub-scroll">
                 {isLoading ? (
-                  <div className="loading-message">AI가 콜라보 아이디어를 구상 중입니다...</div>
+                  <LoadingMessage
+                    message="AI가 콜라보 아이디어를 구상 중입니다"
+                    type="dots"
+                    showIcon={true}
+                  />
                 ) : (
                   <Chart_Bot_Collab
                     onClose={() => setView(0)}
@@ -158,7 +167,11 @@ export const ChartBot = ({ onClose, keywordData }) => {
             <div className="chartbot-subcontent">
               <div className="sub-scroll">
                 {isLoading ? (
-                  <div className="loading-message">AI가 마케팅 문구를 작성 중입니다...</div>
+                  <LoadingMessage
+                    message="AI가 마케팅 문구를 작성 중입니다"
+                    type="pulse"
+                    showIcon={true}
+                  />
                 ) : (
                   <Chart_Bot_Sell
                     onClose={() => setView(0)}
