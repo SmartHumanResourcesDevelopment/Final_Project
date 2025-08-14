@@ -10,8 +10,9 @@ export default function Main_servise_banner() {
   const handleServiceIntroClick = (e) => {
     e.preventDefault();
     console.log("🔗 서비스소개 페이지로 이동");
-    navigate('/service');
+    navigate('/servicepage');
   };
+  
 
   return (
     /* ─ 네비게이션(fixed 77px) 바로 다음에 렌더링 ─ */
@@ -24,7 +25,7 @@ export default function Main_servise_banner() {
             잘파세대의 핫한 음식 트렌드, 한눈에 Pick!
           </p>
           <a
-            href="/service"
+            href="/servicepage"
             className="hero__link"
             onClick={handleServiceIntroClick}
           >
